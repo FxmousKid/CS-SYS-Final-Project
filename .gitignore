@@ -10,8 +10,6 @@ modeling/
 
 # build
 ./build/
-tadmor
-erraid
 logfile.txt
 
 inetutils-2.0/
