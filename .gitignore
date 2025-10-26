@@ -9,8 +9,8 @@ modeling/
 *.drawio
 
 # build
-./build/
-logfile.txt
+build/
+bin/
 
 inetutils-2.0/
 vgcore*
