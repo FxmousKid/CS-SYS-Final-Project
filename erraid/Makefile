@@ -5,7 +5,10 @@ DOCS_DIR	= docs
 
 # source code, with root = $SRC_DIR/
 SRC_FILES_NAMES = main.c
-#SRC_FILES_NAMES += file.c
+
+SRC_FILES_NAMES += parser/parse_cli.c
+
+SRC_FILES_NAMES += utils.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))

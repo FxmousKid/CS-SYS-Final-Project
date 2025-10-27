@@ -11,6 +11,8 @@ modeling/
 # build
 build/
 bin/
+tadmor/tadmor
+erraid/erraid
 
 inetutils-2.0/
 vgcore*

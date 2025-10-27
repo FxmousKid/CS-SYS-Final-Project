@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "parser/parse_cli.h"
+#include "structs.h"
+
 int main(int argc, char *argv[])
 {
-	(void)argc;
-	(void)argv;
+	struct s_data ctx = {0};
 
-	printf("Hello From erraid\n");
+	parser(&ctx, argc, argv);
 	return EXIT_SUCCESS;
 }
