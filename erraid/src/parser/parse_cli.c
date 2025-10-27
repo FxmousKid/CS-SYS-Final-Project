@@ -1,5 +1,18 @@
 #include "parser/parse_cli.h"
 #include "utils.h"
+#include "macros.h"
+
+static void	check_and_set_run_dir_default(struct s_data *ctx)
+{
+	char *user;
+
+	user = getenv("USER");
+	strcpy(ctx->run_directory, "/tmp/");
+	if (user)
+		strcat(ctx->run_directory, user);
+	strcat(ctx->run_directory, "/erraid");	
+
+}
 
 static bool	parse_run_directory(struct s_data *ctx, const char *path)
 {
@@ -46,16 +59,15 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 
 bool	parser(struct s_data *ctx, int argc, char *argv[])
 {
-	char	*shortopts = "hr:";		
-	int	opt;
-	extern int opterr;
+	char		*shortopts = "hr:";		
+	int		opt;
+	extern int	opterr;
 
 	struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
 		{"run-directory", required_argument, NULL, 'r'},
 		{NULL, 0, NULL, 0}
 	};
-
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
 		// if opts_handle() returns false, no need to parse anymore
@@ -63,8 +75,8 @@ bool	parser(struct s_data *ctx, int argc, char *argv[])
 			exit(ctx->exit_code);
 		}
 	}
+	check_and_set_run_dir_default(ctx);
 	argc -= optind;
 	argv += optind;
-
 	return true;
 }
