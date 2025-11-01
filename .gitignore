@@ -13,8 +13,8 @@ build/
 bin/
 tadmor/tadmor
 erraid/erraid
+sujet/
 
-inetutils-2.0/
 vgcore*
 
 #------------- template .gitignore file C projects. -------------
