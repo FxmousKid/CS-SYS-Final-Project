@@ -16,12 +16,12 @@ static void	check_and_set_run_dir_default(struct s_data *ctx)
 static bool	parse_run_directory(struct s_data *ctx, const char *path)
 {
 	if (!path || !*path) {
-		fprintf(stderr, "Error: Invalid run directory path\n");
+		printf("Error: Invalid run directory path\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
 	if (strlen(path) >= PATH_MAX) {
-		fprintf(stderr, "Error: Run directory path too long\n");
+		printf("Error: Run directory path too long\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
@@ -52,7 +52,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 
 	// Unknown option
 	case '?':
-		fprintf(stderr, "Check usage with -h, --help\n");
+		printf("Check usage with -h, --help\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
@@ -79,7 +79,8 @@ bool	parser(struct s_data *ctx, int argc, char *argv[])
 			exit(ctx->exit_code);
 		}
 	}
-	check_and_set_run_dir_default(ctx);
+	if (ctx->run_directory[0] == '\0')
+		check_and_set_run_dir_default(ctx);
 	argc -= optind;
 	argv += optind;
 	return true;
