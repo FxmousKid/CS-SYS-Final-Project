@@ -1,6 +1,5 @@
 #include "parser/parse_cli.h"
 #include "utils.h"
-#include "macros.h"
 
 static void	check_and_set_run_dir_default(struct s_data *ctx)
 {
@@ -46,9 +45,13 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		print_help();
 		return false;
 
+	// data is little-endian : -l
+	case 'l':
+		ctx->is_data_le = true;
+		break;
+
 	// Unknown option
 	case '?':
-		// fprintf(stderr, "Unknown option: %c\n", optopt);
 		fprintf(stderr, "Check usage with -h, --help\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
@@ -65,6 +68,7 @@ bool	parser(struct s_data *ctx, int argc, char *argv[])
 
 	struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
+		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'r'},
 		{NULL, 0, NULL, 0}
 	};
