@@ -1,7 +1,7 @@
 #include "parser/parse_cli.h"
 #include "utils.h"
 
-static void	check_and_set_run_dir_default(struct s_data *ctx)
+static void	set_run_dir_default(struct s_data *ctx)
 {
 	char *user;
 
@@ -10,10 +10,9 @@ static void	check_and_set_run_dir_default(struct s_data *ctx)
 	if (user)
 		strcat(ctx->run_directory, user);
 	strcat(ctx->run_directory, "/erraid");	
-
 }
 
-static bool	parse_run_directory(struct s_data *ctx, const char *path)
+static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
 	if (!path || !*path) {
 		printf("Error: Invalid run directory path\n");
@@ -29,15 +28,13 @@ static bool	parse_run_directory(struct s_data *ctx, const char *path)
 	return true;
 }
 
-static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
+static bool	opts_handle(struct s_data *ctx, int opt)
 {
-	(void)argv;
-	(void)opt;
 	switch (opt) {
 	
 	// specify dir of namedpath creation : -r PATH
 	case 'r':
-		parse_run_directory(ctx, optarg);
+		parse_custom_run_directory(ctx, optarg);
 		break;
 
 	// help option : -h
@@ -75,12 +72,13 @@ bool	parser(struct s_data *ctx, int argc, char *argv[])
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
 		// if opts_handle() returns false, no need to parse anymore
-		if (!opts_handle(ctx, opt, argv)) {
+		if (!opts_handle(ctx, opt)) {
 			exit(ctx->exit_code);
 		}
 	}
+	// if -r not used, then used default
 	if (ctx->run_directory[0] == '\0')
-		check_and_set_run_dir_default(ctx);
+		set_run_dir_default(ctx);
 	argc -= optind;
 	argv += optind;
 	return true;
