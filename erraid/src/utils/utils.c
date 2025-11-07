@@ -1,0 +1,95 @@
+#include "utils/utils.h"
+
+/**
+ * @brief Print usage string on stdout : -h option
+ */
+void	print_help(void)
+{
+	printf("\
+Usage: erraid [OPTION...]\n\
+Spawns a deamon that receives tasks to perform at specific times.\n\
+\n\
+Options Valid for the deamon :\n\
+\n\
+ -r, --run-directory=PATH\n\
+ -h, --help\n\
+ -l, --little-endian\n\
+\n\
+Mandatory or optional arguments to long options are also mandatory or optional\
+ for short options\n\
+\n\
+Made with Love by Iyan, Theo, and Florian.\n\
+");
+}
+
+/**
+ * @brief prints on stderr a custom error msg
+ *
+ * @param msg the custom error message
+ *
+ * @note this is internal function, and location is usually
+ * a macro expanding to file and line number
+ */
+void	_write_perr(const char *func, const char *location)
+{
+	char	buf[256] = {0};
+	strcpy(buf, "erraid: ");
+	strcat(buf, func);
+	strcat(buf, ": ");
+	strcat(buf, strerror(errno));
+	strcat(buf, location);
+
+	write(STDERR_FILENO, buf, sizeof(buf));
+}
+
+/**
+ * @brief prints on stderr a custom error msg
+ *
+ * @param msg the custom error message
+ *
+ * @note this is internal function, and location is usually
+ * a macro expanding to file and line number
+ */
+void		_write_err(const char *msg, const char *location)
+{
+	char	buf[256] = {0};
+	strcpy(buf, "erraid: ");
+	strcat(buf, msg);
+	strcat(buf, ": ");
+	strcat(buf, location);
+
+	write(STDERR_FILENO, buf, sizeof(buf));
+}
+
+/**
+ * @brief prints a NULL-terminated double array of strings
+ *
+ * @param tab the double array to print
+ */
+void	print_darr(char **tab)
+{
+	printf("tab = {");
+	while (*tab) {
+		printf("\"%s\", ", *tab);
+		tab++;
+	}
+	printf("\b\b}\n");
+}
+
+/**
+ * @brief Frees a NULL-terminated double array
+ *
+ * @param darr the double array to free
+ */
+void	free_darr(char **darr)
+{
+	char	**tmp;
+
+	tmp = darr;
+	while (*tmp)
+	{
+		free(*tmp);
+		tmp++;
+	}
+	free(darr);
+}

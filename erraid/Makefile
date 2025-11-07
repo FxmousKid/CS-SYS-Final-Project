@@ -7,14 +7,17 @@ DOCS_DIR	= docs
 SRC_FILES_NAMES = main.c
 
 SRC_FILES_NAMES += parser/parse_cli.c
+SRC_FILES_NAMES += parser/parse_tree.c
+SRC_FILES_NAMES += parser/parse_cmd.c
 
-SRC_FILES_NAMES += utils.c
+SRC_FILES_NAMES += utils/utils.c
+SRC_FILES_NAMES += utils/utils_endian.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
 
 # .o files for compilation
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
 # .d files for dependencies
 DEP_FILES := $(OBJ_FILES:.o=.d)

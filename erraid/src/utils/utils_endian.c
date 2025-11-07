@@ -1,27 +1,4 @@
-#include "utils.h"
-
-
-/**
- * @brief Print usage string on stdout : -h option
- */
-void	print_help(void)
-{
-	printf("\
-Usage: erraid [OPTION...]\n\
-Spawns a deamon that receives tasks to perform at specific times.\n\
-\n\
-Options Valid for the deamon :\n\
-\n\
- -r, --run-directory=PATH\n\
- -h, --help\n\
- -l, --little-endian\n\
-\n\
-Mandatory or optional arguments to long options are also mandatory or optional\
- for short options\n\
-\n\
-Made with Love by Iyan, Theo, and Florian.\n\
-");
-}
+#include "utils/utils.h"
 
 /**
  * @brief checks if host byte order is little endian
@@ -30,7 +7,7 @@ Made with Love by Iyan, Theo, and Florian.\n\
  *  @retval true if host byte order is little endian 
  *  @retval false if host byte order is big endian
  */
-bool	is_little_endian(void)
+static bool	is_little_endian(void)
 {
 	unsigned short x = 1;
 	char *c = (char *)&x;
@@ -44,7 +21,7 @@ bool	is_little_endian(void)
  * @param nbytes number of bytes to convert
  * @param is_data_le true if data is in little endian, false if in big endian
  */
-static void	convert_from_endian(void *buf, size_t nbytes, bool is_data_le)
+static void	convert_from_all_endian(void *buf, size_t nbytes, bool is_data_le)
 {
 	unsigned int *buf_int = buf;
 	while (nbytes > 0) {
@@ -110,8 +87,8 @@ static void	convert_from_endian(void *buf, size_t nbytes, bool is_data_le)
  * @param nbytes number of bytes to read
  * @param is_data_le true if data is in little endian, false if in big endian
  *
- * @return ssize_t number of bytes read, or -1 on error
- */
+ * @return the return of the read(2) call
+ * */
 ssize_t	read_endian(int fd, void *buf, size_t nbytes, bool is_data_le)
 {
 	ssize_t	n = read(fd, buf, nbytes);
@@ -121,6 +98,6 @@ ssize_t	read_endian(int fd, void *buf, size_t nbytes, bool is_data_le)
 		return (n);
 	if (!is_little_endian() && !is_little_endian())
 		return (n);
-	convert_from_endian(buf, nbytes, is_data_le);
+	convert_from_all_endian(buf, nbytes, is_data_le);
 	return (n);
 }
