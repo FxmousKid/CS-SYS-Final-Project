@@ -16,7 +16,6 @@ static bool	_read_and_alloc_command(struct s_cmd cmd, int fd,
 			MSG_ERR("unexpected EOF when reading");
 			return false;
 		}
-
 		cmd.command[i] = calloc(arg_len, sizeof(char));
 		if (!cmd.command[i]) {
 			SYS_ERR("calloc");
@@ -52,13 +51,13 @@ static bool	_fparse_cmd_si(struct s_data *ctx, int fd, struct s_cmd *cmd)
 		MSG_ERR("unexpected EOF when reading");
 		return false;
 	}
-	if (!_read_and_alloc_command(*cmd, fd, isdle, argc)) {
-		free_darr(cmd->command);
-		return false;
-	}
 	cmd->command = calloc(argc + 1, sizeof(char *));
 	if (!cmd->command) {
 		SYS_ERR("calloc");
+		return false;
+	}
+	if (!_read_and_alloc_command(*cmd, fd, isdle, argc)) {
+		free_darr(cmd->command);
 		return false;
 	}
 	cmd->command[argc] = NULL;
@@ -66,7 +65,7 @@ static bool	_fparse_cmd_si(struct s_data *ctx, int fd, struct s_cmd *cmd)
 	return true;
 }
 
-bool	fparse_cmd(struct s_data *ctx, const char *path, struct s_cmd *cmd)
+bool	parse_cmd(struct s_data *ctx, const char *path, struct s_cmd *cmd)
 {
 	int fd = open(path, O_RDONLY);
 	if (fd < 0) {

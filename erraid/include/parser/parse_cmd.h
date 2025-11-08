@@ -12,6 +12,6 @@
 # include "structs.h"
 # include "structs.h"
 
-bool	fparse_cmd(struct s_data *ctx, const char *path, struct s_cmd *cmd);
+bool	parse_cmd(struct s_data *ctx, const char *path, struct s_cmd *cmd);
 
 #endif
