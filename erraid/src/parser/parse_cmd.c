@@ -1,6 +1,6 @@
 #include <parser/parse_cmd.h>
 
-static bool	_read_and_alloc_command(struct s_cmd cmd, int fd,
+static bool	_read_and_alloc_sub_cmds(struct s_cmd cmd, int fd,
 					bool isdle, uint32_t argc)
 {
 	ssize_t		n;
@@ -16,7 +16,7 @@ static bool	_read_and_alloc_command(struct s_cmd cmd, int fd,
 			MSG_ERR("unexpected EOF when reading");
 			return false;
 		}
-		cmd.command[i] = calloc(arg_len, sizeof(char));
+		cmd.command[i] = calloc(arg_len + 1, sizeof(char));
 		if (!cmd.command[i]) {
 			SYS_ERR("calloc");
 			return (false);
@@ -56,12 +56,11 @@ static bool	_fparse_cmd_si(struct s_data *ctx, int fd, struct s_cmd *cmd)
 		SYS_ERR("calloc");
 		return false;
 	}
-	if (!_read_and_alloc_command(*cmd, fd, isdle, argc)) {
+	if (!_read_and_alloc_sub_cmds(*cmd, fd, isdle, argc)) {
 		free_darr(cmd->command);
 		return false;
 	}
 	cmd->command[argc] = NULL;
-	print_darr(cmd->command);
 	return true;
 }
 
