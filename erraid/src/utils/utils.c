@@ -66,9 +66,9 @@ void		_write_err(const char *msg, const char *location)
  *
  * @param tab the double array to print
  */
-void	print_darr(char **tab)
+void	print_darr(const char *tab_name, char **tab)
 {
-	printf("tab = {");
+	printf("%s = {", tab_name);
 	while (*tab) {
 		printf("\"%s\", ", *tab);
 		tab++;

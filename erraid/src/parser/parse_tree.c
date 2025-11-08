@@ -5,6 +5,7 @@ bool	parse_tree(struct s_data *ctx)
 	struct s_cmd	cmd = {0};
 	if (!parse_cmd(ctx, PATH_CMD, &cmd))
 		return false;	
+	print_darr("command", cmd.command);
 	free_darr(cmd.command);
 
 	return true;
