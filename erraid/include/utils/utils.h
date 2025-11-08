@@ -11,7 +11,7 @@
 # elif defined(__has_include) && __has_include(<sys/endian.h>)
 #  include <sys/endian.h>
 # endif
-# include <errno.h>
+# include <errno.h> // IWYU pragma: keep
 # include <string.h>
 
 # include "structs.h" // IWYU pragma: keep
@@ -38,7 +38,7 @@ ssize_t		read_endian(int fd, void *buf, size_t nbytes, bool is_data_le);
 void		print_help(void);
 
 /** @brief prints to stdout the strings of cmd cleanly. */
-void		print_darr(char **tab);
+void		print_darr(const char *tab_name, char **tab);
 
 /** @brief takes NULL-terminatd **ptr,
  * then frees all elements of darr, then frees dar itself. */
