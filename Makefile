@@ -19,13 +19,13 @@ $(BIN_DIR):
 
 $(TADMOR_DIR)/tadmor:
 	@$(ECHO) "$(BLUE)[BLD] Entering $(TADMOR_DIR)/ Makefile...$(NC)"
-	@$(MAKE) -C $(TADMOR_DIR)
+	@$(MAKE) --no-print-directory -C $(TADMOR_DIR)
 	@mv $(TADMOR_DIR)/tadmor $(BIN_DIR)/
 	@$(ECHO) "$(GREEN)[BLD] Leaving $(TADMOR_DIR)/ Makefile...$(NC)"
 
 $(ERRAID_DIR)/erraid:
 	@$(ECHO) "$(BLUE)[BLD] Entering $(ERRAID_DIR)/ Makefile...$(NC)"
-	@$(MAKE) -C $(ERRAID_DIR)
+	@$(MAKE) --no-print-directory -C $(ERRAID_DIR)
 	@mv $(ERRAID_DIR)/erraid $(BIN_DIR)/
 	@$(ECHO) "$(GREEN)[BLD] Leaving $(ERRAID_DIR)/ Makefile...$(NC)"
 
