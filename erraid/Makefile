@@ -26,7 +26,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 
 NAME 	:= erraid
 CC 	:= cc
-CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP
+CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
 LFLAGS	?=
 
 MKDIR 	:= mkdir -p
