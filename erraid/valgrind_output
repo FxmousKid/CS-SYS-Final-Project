@@ -1,0 +1,28 @@
+==243843== Memcheck, a memory error detector
+==243843== Copyright (C) 2002-2024, and GNU GPL'd, by Julian Seward et al.
+==243843== Using Valgrind-3.25.1 and LibVEX; rerun with -h for copyright info
+==243843== Command: ./erraid -r tasks/1/
+==243843== 
+==243843== 
+==243843== HEAP SUMMARY:
+==243843==     in use at exit: 131,264 bytes in 4 blocks
+==243843==   total heap usage: 21 allocs, 17 frees, 272,070 bytes allocated
+==243843== 
+==243843== 131,264 bytes in 4 blocks are definitely lost in loss record 1 of 1
+==243843==    at 0x48854D0: malloc (vg_replace_malloc.c:446)
+==243843==    by 0x49A92CB: __alloc_dir (opendir.c:115)
+==243843==    by 0x49A92CB: opendir_tail (opendir.c:63)
+==243843==    by 0x40211B: opendir_cmd (dir_cmd_utils.c:16)
+==243843==    by 0x40124F: parse_sub_trees (parse_cmd_tree.c:8)
+==243843==    by 0x401377: parse_sub_trees (parse_cmd_tree.c:27)
+==243843==    by 0x401427: parse_cmd_tree (parse_cmd_tree.c:51)
+==243843==    by 0x400E8B: main (main.c:20)
+==243843== 
+==243843== LEAK SUMMARY:
+==243843==    definitely lost: 131,264 bytes in 4 blocks
+==243843==    indirectly lost: 0 bytes in 0 blocks
+==243843==      possibly lost: 0 bytes in 0 blocks
+==243843==    still reachable: 0 bytes in 0 blocks
+==243843==         suppressed: 0 bytes in 0 blocks
+==243843== 
+==243843== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)

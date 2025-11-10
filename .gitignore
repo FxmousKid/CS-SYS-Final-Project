@@ -12,7 +12,9 @@ modeling/
 build/
 bin/
 tadmor/tadmor
+tadmor/tasks/
 erraid/erraid
+erraid/tasks/
 sujet/
 
 vgcore*

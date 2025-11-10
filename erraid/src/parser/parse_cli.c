@@ -15,12 +15,12 @@ static void	set_run_dir_default(struct s_data *ctx)
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
 	if (!path || !*path) {
-		printf("Error: Invalid run directory path\n");
+		ERR_MSG("Invalid run directory path\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
 	if (strlen(path) >= PATH_MAX) {
-		printf("Error: Run directory path too long\n");
+		ERR_MSG("Run directory path too long\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
@@ -34,7 +34,8 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 	
 	// specify dir of namedpath creation : -r PATH
 	case 'r':
-		parse_custom_run_directory(ctx, optarg);
+		if (!parse_custom_run_directory(ctx, optarg))
+			return false;
 		break;
 
 	// help option : -h
@@ -59,7 +60,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hr:";		
+	char		*shortopts = "hlr:";		
 	int		opt;
 	extern int	opterr;
 
