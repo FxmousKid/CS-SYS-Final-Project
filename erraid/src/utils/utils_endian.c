@@ -23,65 +23,51 @@ static bool	is_little_endian(void)
  */
 static void	convert_from_all_endian(void *buf, size_t nbytes, bool is_data_le)
 {
-	unsigned int *buf_int = buf;
-	while (nbytes > 0) {
-		switch (nbytes) {
-		case 2:
-			if (is_data_le)
-				*buf_int = le16toh(*buf_int);
-			else
-				*buf_int = be16toh(*buf_int);
-			nbytes -= 2;
-			break;
-		case 3:
-			if (is_data_le)
-				*buf_int = le16toh(*buf_int);
-			else
-				*buf_int = be16toh(*buf_int);
-			nbytes -= 3;
-			break;
-		case 4:
-			if (is_data_le)
-				*buf_int = le32toh(*buf_int);
-			else
-				*buf_int = be32toh(*buf_int);
-			nbytes -= 4;
-			break;
-		case 5:
-			if (is_data_le)
-				*buf_int = le32toh(*buf_int);
-			else
-				*buf_int = be32toh(*buf_int);
-			nbytes -= 5;
-			break;
-		case 6:
-			if (is_data_le)
-				*buf_int = le32toh(*buf_int);
-			else
-				*buf_int = be32toh(*buf_int);
-			nbytes -= 6;
-			break;
-		case 7:
-			if (is_data_le)
-				*buf_int = le32toh(*buf_int);
-			else
-				*buf_int = be32toh(*buf_int);
-			nbytes -= 7;
-			break;
-		default:
-			if (is_data_le)
-				*buf_int = le64toh(*buf_int);
-			else
-				*buf_int = be64toh(*buf_int);
-			nbytes -= 8;
-			break;
-		}
+	if (nbytes == sizeof(uint16_t)) {
+		uint16_t value;
+		memcpy(&value, buf, sizeof(value));
+		value = is_data_le ? le16toh(value) : be16toh(value);
+		memcpy(buf, &value, sizeof(value));
+		return;
+	}
+	if (nbytes == sizeof(uint32_t)) {
+		uint32_t value;
+		memcpy(&value, buf, sizeof(value));
+		value = is_data_le ? le32toh(value) : be32toh(value);
+		memcpy(buf, &value, sizeof(value));
+		return;
+	}
+	if (nbytes == sizeof(uint64_t)) {
+		uint64_t value;
+		memcpy(&value, buf, sizeof(value));
+		value = is_data_le ? le64toh(value) : be64toh(value);
+		memcpy(buf, &value, sizeof(value));
+		return;
+	}
+
+	// if nbytes is not power of 2
+	uint8_t	*bytes = buf;
+	size_t		i = 0;
+	while (i + sizeof(uint32_t) <= nbytes) {
+		uint32_t value;
+		memcpy(&value, bytes + i, sizeof(value));
+		value = is_data_le ? le32toh(value) : be32toh(value);
+		memcpy(bytes + i, &value, sizeof(value));
+		i += sizeof(uint32_t);
+	}
+	if (nbytes - i >= sizeof(uint16_t)) {
+		uint16_t value;
+		memcpy(&value, bytes + i, sizeof(value));
+		value = is_data_le ? le16toh(value) : be16toh(value);
+		memcpy(bytes + i, &value, sizeof(value));
+		i += sizeof(uint16_t);
 	}
 }
 
 /**
  * @brief calls read(2) and converts (if needed) data to host byte order
  *
+ * k
  * @param fd file descriptor to read from
  * @param buf pointer to data buffer
  * @param nbytes number of bytes to read
@@ -96,7 +82,7 @@ ssize_t	read_endian(int fd, void *buf, size_t nbytes, bool is_data_le)
 		return (n);
 	if (is_little_endian() && is_data_le)
 		return (n);
-	if (!is_little_endian() && !is_little_endian())
+	if (!is_little_endian() && !is_data_le)
 		return (n);
 	convert_from_all_endian(buf, nbytes, is_data_le);
 	return (n);
