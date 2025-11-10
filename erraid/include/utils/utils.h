@@ -4,6 +4,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+# include <stdint.h>
 
 // basically using the compiler to check for apple vs linux 
 # if defined(__has_include) && __has_include(<endian.h>)
@@ -19,8 +20,8 @@
 # define STRINGIFY(x) #x
 # define TOSTRING(x) STRINGIFY(x)
 # define DBG " [" __FILE__ " @ " TOSTRING(__LINE__) "]\n"
-# define SYS_ERR(func) _write_perr(func, DBG)
-# define MSG_ERR(msg) _write_err(msg, DBG)
+# define ERR_SYS(func) _write_perr(func, DBG)
+# define ERR_MSG(msg) _write_err(msg, DBG)
 
 /**
  * @brief calls read(2) and converts (if needed) data to host byte order
@@ -43,6 +44,12 @@ void		print_darr(const char *tab_name, char **tab);
 /** @brief takes NULL-terminatd **ptr,
  * then frees all elements of darr, then frees dar itself. */
 void		free_darr(char **darr);
+
+/** @brief prints the string representation of a cmd_type enum */
+void		print_cmd_enum(enum cmd_type type, bool newline);
+
+/** @brief appends the string representation of an int to a buffer */
+void	append_int_to_buf(char *buf, int n);
 
 void		_write_perr(const char *func, const char *location);
 void		_write_err(const char *msg, const char *location);

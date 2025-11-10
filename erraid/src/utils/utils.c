@@ -62,6 +62,28 @@ void		_write_err(const char *msg, const char *location)
 }
 
 /**
+ * @brief prints the string representation of a cmd_type enum
+ *
+ * @param type the enum to print
+ * @param newline whether to print a newline after the enum string
+ */
+void	print_cmd_enum(enum cmd_type type, bool newline)
+{
+	if (type == CMD_SI)
+		printf("CMD_SI");
+	else if (type == CMD_SQ)
+		printf("CMD_SQ");
+	else if (type == CMD_IF)
+		printf("CMD_IF");
+	else if (type == CMD_PL)
+		printf("CMD_PL");
+	else
+		printf("UNKNOWN_CMD_TYPE");
+	if (newline)
+		printf("\n");
+}
+
+/**
  * @brief prints a NULL-terminated double array of strings
  *
  * @param tab the double array to print
@@ -92,4 +114,35 @@ void	free_darr(char **darr)
 		tmp++;
 	}
 	free(darr);
+}
+
+/**
+ * @brief Appends the string representation of an integer to a buffer
+ *
+ * @param buf the buffer to append to
+ * @param n the integer to append
+ */
+void	append_int_to_buf(char *buf, int n)
+{
+	char	num_buf[12];
+	int		i;
+	int		j;
+
+	buf += strlen(buf);
+	if (n == 0)
+	{
+		buf[0] = '0';
+		buf[1] = '\0';
+		return ;
+	}
+	i = 0;
+	while (n > 0)
+	{
+		num_buf[i++] = (n % 10) + '0';
+		n /= 10;
+	}
+	j = 0;
+	while (i-- > 0)
+		buf[j++] = num_buf[i];
+	buf[j] = '\0';
 }
