@@ -12,11 +12,10 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		return false;
 	}
 
-	if (cmd->cmd_type == CMD_SI) {	
-		return parse_cmd_si(cmd->path, cmd);
-	}
-
 	switch (cmd->cmd_type) {
+	case CMD_SI:
+		ret_flag |= parse_cmd_si(cmd->path, cmd);
+
 	case CMD_SQ:
 		cmd_sq = &cmd->cmd.cmd_sq;
 		if ((cmd_sq->nb_cmds = count_sub_cmds(cmd->path)) < 0)
