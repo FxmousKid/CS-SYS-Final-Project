@@ -10,7 +10,7 @@
 # include "utils/utils.h" // IWYU pragma: keep
 
 /** @brief extracts the type of cmd dir. */
-enum cmd_type	get_cmd_type(char *path_cmd_dir);
+enum cmd_type	get_cmd_type(const char *path_cmd_dir);
 
 /** @brief allocates and returns a command, NULL on failure */
 struct s_cmd	*get_cmd_struct(void);

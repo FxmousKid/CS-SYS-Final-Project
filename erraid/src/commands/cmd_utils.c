@@ -136,18 +136,19 @@ void	remove_last_file_from_path(char *path)
 /* cmd_path is "...../cmd" or "...../cmd_id", somewhere
  * we are guaranteed to have a "type" file in
  * */
-enum cmd_type	get_cmd_type(char *path_cmd_dir)
+enum cmd_type	get_cmd_type(const char *path_cmd_dir)
 {	
 	int		type_fd;
-	char		buf[PATH_MAX] = {0};
+	char		buf[PATH_MAX + 1] = {0};
 	uint16_t	type = 0;
 
 	// 5 = len("/") + len("type") 
-	if (strlen(path_cmd_dir) + 5 > PATH_MAX) {
+	
+	strcpy(buf, path_cmd_dir);
+	if (strlen(buf) + 5 > PATH_MAX) {
 		ERR_MSG("filename is too big");
 		return false;
 	}
-	strcpy(buf, path_cmd_dir);
 	if (buf[strlen(buf) - 1] != '/')
 		buf[strlen(buf)] = '/'; 
 	strcat(buf, "type");
@@ -159,6 +160,7 @@ enum cmd_type	get_cmd_type(char *path_cmd_dir)
 
 	if (read_endian(type_fd, &type, sizeof(type), isdle) != 2) {
 		ERR_SYS("read");
+		close(type_fd);
 		return (false);
 	}
 	close(type_fd);

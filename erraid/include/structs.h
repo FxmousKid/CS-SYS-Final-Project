@@ -49,7 +49,7 @@ union u_cmd {
 		/** @brief cmd 0 ; ... ; cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
 		struct s_cmd	*cmds;
 		/** @brief number of commands (number of semi-colons + 1). */
-		int	nb_cmds;
+		int		nb_cmds;
 	} cmd_sq;
 };
 

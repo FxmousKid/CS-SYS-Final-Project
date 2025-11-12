@@ -1,4 +1,4 @@
-#include <commands/parse_cmd_si.h>
+#include "commands/parse_cmd_si.h"
 
 // defined in main.c
 extern bool isdle;
@@ -80,25 +80,25 @@ bool	_fparse_cmd_si(int fd, struct s_cmd_si *cmd, int isdle)
  *  @retval true on success
  *  @retval false on failure
  */
-bool	parse_cmd_si(char path[PATH_MAX + 1], struct s_cmd *cmd)
+bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 {
 	int		fd;
+	char		buf[PATH_MAX + 1] = {0};
 
-	if (path[strlen(path) - 1] != '/')
-		path[strlen(path)] = '/'; 
+	strcpy(buf, path);
+	if (buf[strlen(buf) - 1] != '/')
+		buf[strlen(buf)] = '/'; 
 
-	if (strlen(path) + 4 > PATH_MAX) {
+	if (strlen(buf) + 4 > PATH_MAX) {
 		ERR_MSG("path too big");
 		return false;
 	}
 
-	strcat(path, "argv");
-	if ((fd = open(path, O_RDONLY)) < 0) {
+	strcat(buf, "argv");
+	if ((fd = open(buf, O_RDONLY)) < 0) {
 		ERR_SYS("open");
 		return false;
 	}
-
-	remove_last_file_from_path(path);
 
 	if (!_fparse_cmd_si(fd, &cmd->cmd.cmd_si, isdle)) {
 		close(fd);

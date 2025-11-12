@@ -24,6 +24,6 @@ bool	readdir_cmd(struct s_dir *dir, struct dirent **ent);
  * and true if it's a sub directory. */
 bool	is_ent_sub_dir(struct dirent *ent, struct stat *st);
 
-int	count_sub_cmds(char *path);
+int	count_sub_cmds(const char *path);
 
 #endif
