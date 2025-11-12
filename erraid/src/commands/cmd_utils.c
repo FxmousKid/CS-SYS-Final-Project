@@ -72,7 +72,7 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 				   i == child_count - 1);
 }
 
-static void	close_dir_cmd(struct s_cmd *cmd)
+static void	closedir_cmd_rec(struct s_cmd *cmd)
 {
 	if (cmd && cmd->cmd_dir) {
 		closedir(cmd->cmd_dir);
@@ -82,7 +82,7 @@ static void	close_dir_cmd(struct s_cmd *cmd)
 	switch (cmd->cmd_type) {
 	case CMD_SQ:
 		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
-			close_dir_cmd(&cmd->cmd.cmd_sq.cmds[i]);
+			closedir_cmd_rec(&cmd->cmd.cmd_sq.cmds[i]);
 		break;
 	
 	default:
@@ -97,7 +97,7 @@ static void	close_dir_cmd(struct s_cmd *cmd)
  */
 void	free_command_rec(struct s_cmd *cmd)
 {
-	close_dir_cmd(cmd);
+	closedir_cmd_rec(cmd);
 	free_cmd_node(cmd, true);
 }
 
@@ -127,11 +127,12 @@ void	print_cmd_tree(struct s_cmd *cmd)
  */
 void	remove_last_file_from_path(char *path)
 {
-	int n = strlen(path);
+	int	n;
 
+	n = strlen(path);
 	while (path[--n] != '/')
 		path[n] = '\0';
-}	
+}
 
 /* cmd_path is "...../cmd" or "...../cmd_id", somewhere
  * we are guaranteed to have a "type" file in
@@ -142,13 +143,14 @@ enum cmd_type	get_cmd_type(const char *path_cmd_dir)
 	char		buf[PATH_MAX + 1] = {0};
 	uint16_t	type = 0;
 
-	// 5 = len("/") + len("type") 
-	
 	strcpy(buf, path_cmd_dir);
+	// 5 = len("/") + len("type") 
 	if (strlen(buf) + 5 > PATH_MAX) {
 		ERR_MSG("filename is too big");
 		return false;
 	}
+
+	// if path_cmd_dir does not end with '/', add it
 	if (buf[strlen(buf) - 1] != '/')
 		buf[strlen(buf)] = '/'; 
 	strcat(buf, "type");
@@ -174,5 +176,5 @@ enum cmd_type	get_cmd_type(const char *path_cmd_dir)
 		ERR_MSG("Unknown command type");
 	}
 
-	return (false);
+	return false;
 }
