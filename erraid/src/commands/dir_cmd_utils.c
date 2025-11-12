@@ -86,7 +86,7 @@ bool	is_ent_sub_dir(struct dirent *ent, struct stat *st)
  * @param dir The directory structure containing the path and DIR *
  * @return int The number of sub-commands found
  */
-int	count_sub_cmds(char *path)
+int	count_sub_cmds(const char *path)
 {
 	int		count;
 	struct dirent	*ent = NULL;
@@ -101,20 +101,19 @@ int	count_sub_cmds(char *path)
 	count = 0;
 	errno = 0;
 	while ((readdir_cmd(&dir, &ent))) {
-		if (errno)
+		if (errno) {
+			closedir(dir.dir);
 			return -1;
+		}
 
 		if (stat(dir.path, &st)) {
 			ERR_SYS("stat");
+			closedir(dir.dir);
 			return -1;
 		}
-		
-		if (!is_ent_sub_dir(ent, &st)) {
-			remove_last_file_from_path(dir.path);
-			continue;
-		}
-		count++;
+
 		remove_last_file_from_path(dir.path);
+		count += is_ent_sub_dir(ent, &st);
 	}
 	closedir(dir.dir);
 	return (count);

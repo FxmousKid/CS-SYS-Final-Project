@@ -14,7 +14,7 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 
 	switch (cmd->cmd_type) {
 	case CMD_SI:
-		ret_flag |= parse_cmd_si(cmd->path, cmd);
+		ret_flag = parse_cmd_si(cmd->path, cmd);
 		break;
 
 	case CMD_SQ:
