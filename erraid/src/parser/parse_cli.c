@@ -64,7 +64,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 }
 
 
-bool	parser(struct s_data *ctx, int argc, char *argv[])
+bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
 	char		*shortopts = "hlr:";		
 	int		opt;
