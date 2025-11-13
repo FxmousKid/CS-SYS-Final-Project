@@ -10,5 +10,6 @@
 # include "utils/binary_utils.h"
 
 bool	execute_simple_command(struct s_cmd_si *cmd_si, short *exit_code, pid_t *pid);
+bool	execute_command(struct s_cmd *cmd);
 
 #endif
