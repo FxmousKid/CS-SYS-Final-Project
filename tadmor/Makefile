@@ -11,7 +11,7 @@ SRC_FILES_NAMES = main.c
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
 
 # .o files for compilation
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRC_FILES))
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 
 # .d files for dependencies
 DEP_FILES := $(OBJ_FILES:.o=.d)
