@@ -105,6 +105,12 @@ bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 		return false;
 	}
 
+	if (find_binary_path(cmd->cmd.cmd_si.command[0], cmd->cmd.cmd_si.cmd_path) == false) {
+		ERR_MSG("binary not found");
+		close(fd);
+		return false;
+	}
+
 	close(fd);
 	return true;
 }

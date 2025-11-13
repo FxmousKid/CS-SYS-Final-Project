@@ -25,7 +25,7 @@ bool	find_binary_path(const char *command, char *full_path)
 		return false;
 	}
 	
-    // Parse the PATH
+    	// Parse the PATH
 	char *dir = strtok(path_copy, ":");
 	bool found = false;
 	
