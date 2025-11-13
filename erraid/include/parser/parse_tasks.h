@@ -3,6 +3,27 @@
 
 # include <stdbool.h>
 
-# include "structs.h"
+# include "structs.h" // IWYU: pragma keep
+# include "macros.h"
+# include "commands/parse_cmd_tree.h" 
+
+/**
+ * @brief Parses all tasks in the given run_directory and fills
+ * the ctx->tasks linked list
+ *
+ * @param ctx the context containing run_directory and tasks head
+ *
+ * @return 
+ *  @retval true on success
+ *  @retval false on failure
+ */
+bool	parse_tasks(struct s_data *ctx);
+
+/**
+ * @brief Frees the linked list of tasks
+ *
+ * @param tasks the head of the linked list of tasks
+ */
+void	free_tasks(struct s_task *tasks);
 
 #endif 

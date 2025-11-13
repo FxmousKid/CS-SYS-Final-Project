@@ -61,8 +61,8 @@ struct s_task {
 	int		task_id;
 	struct s_timing	timing;
 	struct s_cmd	*cmd;
-	int		stderr_fd;
-	int		stdout_fd;
+	struct s_task	*next;
+	char		path[PATH_MAX + 1];
 };
 
 /* @brief struct representing the daemon data */
@@ -73,7 +73,7 @@ struct s_data {
 	char	run_directory[PATH_MAX + 1];
 	/** @brief flag to indiciate if tasks files are little endian. */
 	bool	is_data_le;
-	/** @brief Ptr to all tasks. */
+	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
 };
 
