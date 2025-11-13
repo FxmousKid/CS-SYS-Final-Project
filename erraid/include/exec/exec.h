@@ -11,5 +11,7 @@
 
 bool	execute_simple_command(struct s_cmd_si *cmd_si, short *exit_code, pid_t *pid);
 bool	execute_command(struct s_cmd *cmd);
+bool	execute_command_with_redirection(struct s_cmd *cmd, const char *stdout_file, const char *stderr_file);
+bool	setup_output_redirection(const char *stdout_file, const char *stderr_file);
 
 #endif
