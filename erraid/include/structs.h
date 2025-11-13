@@ -7,16 +7,6 @@
 # include <stdbool.h>
 # include <dirent.h>
 
-/* @brief struct representing the daemon data */
-struct s_data {
-	/** @brief exit code of the daemon. */
-	short	exit_code;
-	/** @brief provided path to the run directory. */
-	char	run_directory[PATH_MAX + 1];
-	/** @brief flag to indiciate if tasks files are little endian. */
-	bool	is_data_le;
-};
-
 struct s_dir {
 	DIR	*dir;
 	DIR	*old_dir;
@@ -59,8 +49,33 @@ struct s_cmd {
 	char		path[PATH_MAX + 1];
 	enum cmd_type	cmd_type;
 	union u_cmd	cmd;
-	short		exit_code;
 	pid_t		pid;
+	short		exit_code;
+};
+
+struct s_timing {
+
+};
+
+struct s_task {
+	int		task_id;
+	struct s_timing	timing;
+	struct s_cmd	*cmd;
+	struct s_task	*next;
+	char		path[PATH_MAX + 1];
+};
+
+/* @brief struct representing the daemon data */
+struct s_data {
+	/** @brief exit code of the daemon. */
+	short	exit_code;
+	/** @brief provided path to the run directory. */
+	char	run_directory[PATH_MAX + 1];
+	/** @brief flag to indiciate if tasks files are little endian. */
+	bool	is_data_le;
+	/** @brief Ptr to first tasks, linked list like structure*/
+	struct s_task	*tasks;
 };
 
 #endif
+

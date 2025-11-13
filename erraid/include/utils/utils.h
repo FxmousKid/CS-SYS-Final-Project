@@ -2,9 +2,10 @@
 # define UTILS_H
 
 # include <stdio.h>
-# include <stdlib.h>
 # include <unistd.h>
 # include <stdint.h>
+# include <errno.h> // IWYU pragma: keep
+# include <string.h>
 
 // basically using the compiler to check for apple vs linux 
 # if defined(__has_include) && __has_include(<endian.h>)
@@ -12,8 +13,6 @@
 # elif defined(__has_include) && __has_include(<sys/endian.h>)
 #  include <sys/endian.h>
 # endif
-# include <errno.h> // IWYU pragma: keep
-# include <string.h>
 
 # include "structs.h" // IWYU pragma: keep
 

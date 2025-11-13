@@ -11,6 +11,6 @@
 # include "structs.h"
 
 
-bool	parser(struct s_data *ctx, int argc, char *argv[]);
+bool	parser_cli(struct s_data *ctx, int argc, char *argv[]);
 
 #endif 

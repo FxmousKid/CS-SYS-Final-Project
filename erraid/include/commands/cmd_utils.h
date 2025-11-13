@@ -1,8 +1,6 @@
 #ifndef CMD_UTILS_H
 # define CMD_UTILS_H
 
-# include <stdlib.h> // IWYU pragma: keep
-# include <stdint.h>
 # include <fcntl.h>
 # include <sys/stat.h>
 
@@ -23,6 +21,5 @@ void	print_cmd_tree(struct s_cmd *cmd);
 
 /** @brief remove the last file from a path. */
 void	remove_last_file_from_path(char *path);
-
 
 #endif

@@ -32,7 +32,7 @@ bool	opendir_cmd(DIR **dir, const char *path_cmd_dir)
  *  @retval true on success
  *  @retval false on failure
  */
-bool	readdir_cmd(struct s_dir *dir, struct dirent **ent_ptr)
+bool	readdir_s_dir(struct s_dir *dir, struct dirent **ent_ptr)
 {
 	errno = 0;
 	struct dirent *ent = readdir(dir->dir);	
@@ -58,12 +58,11 @@ bool	readdir_cmd(struct s_dir *dir, struct dirent **ent_ptr)
 }
 
 
-void	closedir_cmd(struct s_dir *dir)
+void	closedir_s_dir(struct s_dir *dir)
 {
-	if (dir->dir)
-		closedir(dir->dir);
+	if (dir->dir && closedir(dir->dir) == -1)
+		ERR_SYS("closedir");
 	dir->dir = NULL;
-	dir->path[0] = '\0';
 }
 
 bool	is_ent_sub_dir(struct dirent *ent, struct stat *st)
@@ -75,7 +74,6 @@ bool	is_ent_sub_dir(struct dirent *ent, struct stat *st)
 	// if name == ".." or name == "."
 	if (!strcmp(ent->d_name, "..") || !strcmp(ent->d_name, "."))
 		return false;
-	
 
 	return true;
 }
@@ -100,9 +98,9 @@ int	count_sub_cmds(const char *path)
 
 	count = 0;
 	errno = 0;
-	while ((readdir_cmd(&dir, &ent))) {
+	while ((readdir_s_dir(&dir, &ent))) {
 		if (errno) {
-			closedir(dir.dir);
+			closedir_s_dir(&dir);
 			return -1;
 		}
 
@@ -115,8 +113,6 @@ int	count_sub_cmds(const char *path)
 		remove_last_file_from_path(dir.path);
 		count += is_ent_sub_dir(ent, &st);
 	}
-	closedir(dir.dir);
+	closedir_s_dir(&dir);
 	return (count);
 }
-
-
