@@ -8,6 +8,6 @@
 # include <string.h>
 # include <unistd.h>
 
-bool find_binary_path(const char *command, char *full_path);
+bool	find_binary_path(const char* restrict bin_name, char* restrict bin_path);
 
 #endif
