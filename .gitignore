@@ -12,9 +12,11 @@ modeling/
 build/
 bin/
 tadmor/tadmor
+tadmor/tasks/
 erraid/erraid
+erraid/tasks/
+sujet/
 
-inetutils-2.0/
 vgcore*
 
 #------------- template .gitignore file C projects. -------------

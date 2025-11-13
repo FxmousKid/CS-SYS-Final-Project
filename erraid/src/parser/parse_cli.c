@@ -1,8 +1,7 @@
 #include "parser/parse_cli.h"
-#include "utils.h"
-#include "macros.h"
+#include "utils/utils.h"
 
-static void	check_and_set_run_dir_default(struct s_data *ctx)
+static void	set_run_dir_default(struct s_data *ctx)
 {
 	char *user;
 
@@ -11,34 +10,38 @@ static void	check_and_set_run_dir_default(struct s_data *ctx)
 	if (user)
 		strcat(ctx->run_directory, user);
 	strcat(ctx->run_directory, "/erraid");	
-
 }
 
-static bool	parse_run_directory(struct s_data *ctx, const char *path)
+static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
+	char	*ctx_rd;
+
 	if (!path || !*path) {
-		fprintf(stderr, "Error: Invalid run directory path\n");
+		ERR_MSG("Invalid run directory path\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	if (strlen(path) >= PATH_MAX) {
-		fprintf(stderr, "Error: Run directory path too long\n");
+	if (strlen(path) > PATH_MAX) {
+		ERR_MSG("Run directory path too long\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
+
+	ctx_rd = ctx->run_directory;
 	strcpy(ctx->run_directory, path);
+	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
+		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;
 }
 
-static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
+static bool	opts_handle(struct s_data *ctx, int opt)
 {
-	(void)argv;
-	(void)opt;
 	switch (opt) {
 	
 	// specify dir of namedpath creation : -r PATH
 	case 'r':
-		parse_run_directory(ctx, optarg);
+		if (!parse_custom_run_directory(ctx, optarg))
+			return false;
 		break;
 
 	// help option : -h
@@ -46,10 +49,14 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		print_help();
 		return false;
 
+	// data is little-endian : -l
+	case 'l':
+		ctx->is_data_le = true;
+		break;
+
 	// Unknown option
 	case '?':
-		// fprintf(stderr, "Unknown option: %c\n", optopt);
-		fprintf(stderr, "Check usage with -h, --help\n");
+		printf("Check usage with -h, --help\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
@@ -57,25 +64,28 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 }
 
 
-bool	parser(struct s_data *ctx, int argc, char *argv[])
+bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hr:";		
+	char		*shortopts = "hlr:";		
 	int		opt;
 	extern int	opterr;
 
 	struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
+		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'r'},
 		{NULL, 0, NULL, 0}
 	};
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
 		// if opts_handle() returns false, no need to parse anymore
-		if (!opts_handle(ctx, opt, argv)) {
+		if (!opts_handle(ctx, opt)) {
 			exit(ctx->exit_code);
 		}
 	}
-	check_and_set_run_dir_default(ctx);
+	// if -r not used, then used default
+	if (ctx->run_directory[0] == '\0')
+		set_run_dir_default(ctx);
 	argc -= optind;
 	argv += optind;
 	return true;
