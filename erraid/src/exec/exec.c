@@ -58,8 +58,8 @@ bool	execute_command(struct s_cmd *cmd)
 			// if the command fails the loop continues
 		}
 		// command sequence exit code should be the last command's exit code
-		if (cmd->cmd.cmd_sq.nb_cmds > 0) {
-			cmd->exit_code = cmd->cmd.cmd_sq.cmds[cmd->cmd.cmd_sq.nb_cmds - 1].exit_code;
+		if (cmd_sq->nb_cmds > 0) {
+			cmd->exit_code = cmd_sq->cmds[cmd_sq->nb_cmds - 1].exit_code;
 		}
 		break;
 		
@@ -80,19 +80,19 @@ bool	exec_cmd_with_redir(struct s_cmd *cmd,
 	bool	success;
 
     	switch((pid = fork())){
-		case -1:
-			ERR_SYS("fork");
-			return false;
-		case 0:
-			if (!setup_output_redir(stdout_path, stderr_path))
-				exit(EXIT_FAILURE);
-			success = execute_command(cmd);
-			exit(success ? cmd->exit_code : EXIT_FAILURE);
-		default:
-			cmd->pid = pid;
-			waitpid(pid, &status, 0);
-			cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
-			return true;
+	case -1:
+		ERR_SYS("fork");
+		return false;
+	case 0:
+		if (!setup_output_redir(stdout_path, stderr_path))
+			exit(EXIT_FAILURE);
+		success = execute_command(cmd);
+		exit(success ? cmd->exit_code : EXIT_FAILURE);
+	default:
+		cmd->pid = pid;
+		waitpid(pid, &status, 0);
+		cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
+		return true;
     	}
 }
 
