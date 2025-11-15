@@ -11,19 +11,6 @@
 // set by parser()
 bool	isdle;
 
-
-
-// /**
-//  * @brief Builds complete paths to stdout and stderr files of a given task
-//  */
-// static void build_output_paths(const char *task_path, char *stdout_path, char *stderr_path)
-// {
-// 	if (!build_safe_path(stdout_path, PATH_MAX+1, task_path, STDOUT_FILE))
-// 		ERR_MSG("Failed to build stdout path");
-// 	if (!build_safe_path(stderr_path, PATH_MAX+1, task_path, STDERR_FILE))
-// 		ERR_MSG("Failed to build stderr path");
-// }
-
 void	exec_test(struct s_data *ctx)
 {
 	struct s_task *current_task;
@@ -51,7 +38,7 @@ void	exec_test(struct s_data *ctx)
 		printf("  stdout: %s\n", current_task->stdout_path);
 		printf("  stderr: %s\n", current_task->stderr_path);
 
-		if (exec_cmd_with_redir(current_task->cmd, current_task->stdout_path, current_task->stderr_path)) {
+		if (exec_task(current_task)) {
 			// Debug lines
 			printf("Task %d executed successfully\n", task_id);
 			printf("Exit code: %d\n", current_task->cmd->exit_code);
