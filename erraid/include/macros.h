@@ -4,5 +4,6 @@
 # define CMD_DIR "cmd/"
 # define STDOUT_FILE "stdout"
 # define STDERR_FILE "stderr"
+# define TASKS_DIR "tasks/"
 
 #endif
