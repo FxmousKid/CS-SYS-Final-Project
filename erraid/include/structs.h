@@ -64,6 +64,9 @@ struct s_task {
 	struct s_cmd	*cmd;
 	struct s_task	*next;
 	char		path[PATH_MAX + 1];
+	char		stdout_path[PATH_MAX + 1];
+	char		stderr_path[PATH_MAX + 1];
+
 };
 
 /* @brief struct representing the daemon data */

@@ -159,3 +159,33 @@ void	remove_trailing_slash(char *path)
 	if (len > 0 && path[len - 1] == '/')
 		path[len - 1] = '\0';
 }
+
+
+/**
+ * @brief Builds a path by concatenating two parts safely
+ * 
+ * @param dest 		Destination buffer
+ * @param dest_size 	Size of destination buffer
+ * @param part1 	First part of the path
+ * @param part2 	Second part of the path
+ * @return 		true on success, false if truncation occurred
+ */
+bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2)
+{
+	if (strlcpy(dest, part1, dest_size) >= dest_size)
+		return false;
+	
+	size_t current_len = strlen(dest);
+	
+	// Add a slash if necessary
+	if (current_len > 0 && current_len < dest_size - 1 && dest[current_len - 1] != '/') {
+		dest[current_len] = '/';
+		dest[current_len + 1] = '\0';
+		current_len++;
+	}
+	
+	if (strlcat(dest, part2, dest_size) >= dest_size)
+		return false;
+		
+	return true;
+}
