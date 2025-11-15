@@ -71,6 +71,7 @@ void	exec_test(struct s_data *ctx)
 int main(int argc, char *argv[])
 {
 	struct s_data	ctx = {0};
+
 	parser_cli(&ctx, argc, argv);
 	isdle = ctx.is_data_le;
 
