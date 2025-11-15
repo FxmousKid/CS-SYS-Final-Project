@@ -2,7 +2,7 @@
 
 extern char **environ;
 
-static bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
+static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
 {
 	int	status;
 
@@ -11,11 +11,10 @@ static bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, 
 		return false;
 	}
 	
-	if (cmd_si->cmd_path[0] == '\0') {
-		if (!find_binary_path(cmd_si->command[0], cmd_si->cmd_path)) {
+	if (cmd_si->cmd_path[0] == '\0' &&
+	    !find_binary_path(cmd_si->command[0], cmd_si->cmd_path)) {
 		ERR_MSG("binary not found");
 		return false;
-		}
 	}
 	
 	status = 0;
@@ -47,7 +46,7 @@ static bool	execute_command(struct s_cmd *cmd)
 	
 	switch (cmd->cmd_type) {
 	case CMD_SI:
-		success = execute_simple_command(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
+		success = exec_cmd_si(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
 		break;
 		
 	case CMD_SQ:
@@ -55,9 +54,7 @@ static bool	execute_command(struct s_cmd *cmd)
 		// printf("Executing sequence of %d commands...\n", cmd->cmd.cmd_sq.nb_cmds);
 		cmd_sq = &cmd->cmd.cmd_sq;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			///printf("Command %d/%d:\n", i + 1, cmd->cmd.cmd_sq.nb_cmds);
-			// if the command fails the loop continues
-			success &= execute_command(&cmd_sq->cmds[i]);
+			success = execute_command(&cmd_sq->cmds[i]);
 				
 		// command sequence exit code should be the last command's exit code
 		if (cmd_sq->nb_cmds > 0)
