@@ -26,17 +26,17 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 
 	print_cmd_tree(ctx.tasks->cmd);
-	
+
 
 	/* Exec tests */
 	printf("\nExecution\n");
 	path_to_stdout[0] = '\0';
 	strncat(path_to_stdout, ctx.tasks->path, PATH_MAX);
-	strncat(path_to_stdout, "stdout", PATH_MAX - strlen(path_to_stdout));
+	strncat(path_to_stdout, STDOUT_FILE, PATH_MAX - strlen(path_to_stdout));
 
 	path_to_stderr[0] = '\0';
 	strncat(path_to_stderr, ctx.tasks->path, PATH_MAX);
-	strncat(path_to_stderr, "stderr", PATH_MAX - strlen(path_to_stderr));
+	strncat(path_to_stderr, STDERR_FILE, PATH_MAX - strlen(path_to_stderr));
 
 	if (exec_cmd_with_redir(ctx.tasks->cmd, path_to_stdout, path_to_stderr)) {
 		printf("Command executed successfully\n");
