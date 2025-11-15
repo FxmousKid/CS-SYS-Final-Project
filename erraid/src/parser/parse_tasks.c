@@ -26,9 +26,6 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 	}
 
 	while (subtasks_count--) {
-		// *task = tasks_allocated++;
-		// (*task)->next = tasks_allocated;
-		// task = &(*task)->next;
 		*task = tasks_allocated++;
 		if (subtasks_count)
 			(*task)->next = tasks_allocated;
@@ -41,11 +38,11 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 /**
  * @brief Builds complete paths to stdout and stderr files of a given task
  */
-static void build_output_paths(struct s_task *task)
+static void	build_output_paths(struct s_task *task)
 {
-	if (!build_safe_path(task->stdout_path, PATH_MAX+1, task->path, STDOUT_FILE))
+	if (!build_safe_path(task->stdout_path, PATH_MAX + 1, task->path, STDOUT_FILE)) 
 		ERR_MSG("Failed to build stdout path");
-	if (!build_safe_path(task->stderr_path, PATH_MAX+1, task->path, STDERR_FILE))
+	if (!build_safe_path(task->stderr_path, PATH_MAX + 1, task->path, STDERR_FILE))
 		ERR_MSG("Failed to build stderr path");
 }
 
@@ -54,9 +51,9 @@ static void build_output_paths(struct s_task *task)
  */
 static int extract_task_id(const char *task_path)
 {
-	const char *last_slash;
-	const char *id_str;	
-	char path_copy[PATH_MAX + 1];
+	char		path_copy[PATH_MAX + 1];
+	const char	*last_slash;
+	const char	*task_id_ptr;	
 
 	strcpy(path_copy, task_path);
 	remove_trailing_slash(path_copy);
@@ -65,11 +62,11 @@ static int extract_task_id(const char *task_path)
 	if (!last_slash)
 		return -1;
 	
-	id_str = last_slash + 1;
-	if (*id_str == '\0')
+	task_id_ptr = last_slash + 1;
+	if (!*task_id_ptr)
 		return -1;
-	
-	return atoi(id_str);
+
+	return atoi(task_id_ptr);
 }
 
 static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
@@ -103,12 +100,11 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 
 		strcpy(task->path, dir.path);
 		strcat(task->path, "/");
-		// Fill task_id field
+
 		task->task_id = extract_task_id(dir.path);
-		// Fill stdout and stderr fields
 		build_output_paths(task);
-		task = task->next;
 		remove_last_file_from_path(dir.path);
+		task = task->next;
 	}
 	closedir_s_dir(&dir);
 	return true;

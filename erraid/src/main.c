@@ -5,7 +5,6 @@
 #include "parser/parse_tasks.h"
 #include "structs.h"
 #include "exec/exec.h"
-#include "macros.h"
 
 
 // if passed data is made on little-endian architecture
@@ -25,30 +24,17 @@ bool	isdle;
 // 		ERR_MSG("Failed to build stderr path");
 // }
 
-
-
-int main(int argc, char *argv[])
+void	exec_test(struct s_data *ctx)
 {
-	struct s_data	ctx = {0};
 	struct s_task *current_task;
 	int task_count;
-	// char path_to_stdout[PATH_MAX + 1];
-	// char path_to_stderr[PATH_MAX + 1];
 	int task_id;
 
-	parser_cli(&ctx, argc, argv);
-	isdle = ctx.is_data_le;
-
-	if (!parse_tasks(&ctx))
-		return EXIT_FAILURE;
-
-	exec_test(&ctx);
-
 	// Debug lines
-	printf("Found %d tasks\n", count_sub_cmds(ctx.run_directory));
+	printf("Found %d tasks\n", count_sub_cmds(ctx->run_directory));
 	printf("Execution\n");
 	
-	current_task = ctx.tasks;
+	current_task = ctx->tasks;
 	task_count = 0;
 	
 	while (current_task) {
@@ -79,8 +65,20 @@ int main(int argc, char *argv[])
 	}
 	// Debug lines
 	printf("\nTotal: executed %d tasks\n", task_count);
+}
+
+
+int main(int argc, char *argv[])
+{
+	struct s_data	ctx = {0};
+	parser_cli(&ctx, argc, argv);
+	isdle = ctx.is_data_le;
+
+	if (!parse_tasks(&ctx))
+		return EXIT_FAILURE;
+
+	exec_test(&ctx);
 
 	free_tasks(ctx.tasks);
-
 	return EXIT_SUCCESS;
 }
