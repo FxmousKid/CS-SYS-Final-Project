@@ -113,5 +113,4 @@ void	free_tasks(struct s_task *tasks)
 		return;
 	free_command_rec(tasks->cmd);
 	free_tasks(tasks->next);
-	free(tasks);
 }

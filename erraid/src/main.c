@@ -13,20 +13,15 @@
 // set by parser()
 bool	isdle;
 
-
-
-/* 
-
-	A déplacer c'est juste pour tester la liste chainée de tasks rapidos
-
-*/
 /**
  * @brief Builds complete paths to stdout and stderr files of a given task
+ *
+ * @note a deplacer plus tard
  */
 static void build_output_paths(const char *task_path, char *stdout_path, char *stderr_path)
 {
-	char clean_path[PATH_MAX + 1];
-	size_t current_len;
+	char	clean_path[PATH_MAX + 1];
+	size_t	current_len;
 
 	// Init a clean path as a copy of task_path
 	strncpy(clean_path, task_path, PATH_MAX);
@@ -83,25 +78,38 @@ static int extract_task_id(const char *task_path)
 	return atoi(id_str);
 }
 
+void	exec_test(struct s_data *ctx)
+{
+	char		stdout_path[PATH_MAX + 1] = {0};
+	char		stderr_path[PATH_MAX + 1] = {0};
+	int		task_id = 0;
+	struct s_task	*current_task = NULL;
 
+	current_task = ctx->tasks;
+	while (current_task) {
+		task_id = extract_task_id(current_task->path);
+		build_output_paths(current_task->path, stdout_path, stderr_path);
+		if (!exec_cmd_with_redir(current_task->cmd, stdout_path, stderr_path))
+			printf("Task %d execution failed\n", task_id);
+		current_task = current_task->next;
+	}
 
+	stdout_path[0] = '\0';
+	strncat(stdout_path, ctx->tasks->path, PATH_MAX);
+	strncat(stdout_path, STDOUT_FILE, PATH_MAX - strlen(stdout_path));
 
+	stderr_path[0] = '\0';
+	strncat(stderr_path, ctx->tasks->path, PATH_MAX);
+	strncat(stderr_path, STDERR_FILE, PATH_MAX - strlen(stderr_path));
 
-
-
-
-
-
+	if (!exec_cmd_with_redir(ctx->tasks->cmd, stdout_path, stderr_path)) 
+		printf("Command execution failed\n");
+}
 
 
 int main(int argc, char *argv[])
 {
 	struct s_data	ctx = {0};
-	struct s_task *current_task;
-	int task_count;
-	char path_to_stdout[PATH_MAX + 1];
-	char path_to_stderr[PATH_MAX + 1];
-	int task_id;
 
 	parser_cli(&ctx, argc, argv);
 	isdle = ctx.is_data_le;
@@ -109,43 +117,9 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
+	exec_test(&ctx);
 
-	// Debug lines
-	printf("Found %d tasks\n", count_sub_cmds(ctx.run_directory));
-	printf("Execution\n");
-	
-	current_task = ctx.tasks;
-	task_count = 0;
-	
-	while (current_task) {
-		
-		task_id = extract_task_id(current_task->path);
-
-		// Debug lines 
-		printf("\n Executing Task %d\n", task_id);
-		printf("Path: %s\n", current_task->path);
-		print_cmd_tree(current_task->cmd);
-		
-		build_output_paths(current_task->path, path_to_stdout, path_to_stderr);
-		printf("Output files:\n");
-		printf("  stdout: %s\n", path_to_stdout);
-		printf("  stderr: %s\n", path_to_stderr);
-
-		if (exec_cmd_with_redir(current_task->cmd, path_to_stdout, path_to_stderr)) {
-			// Debug lines
-			printf("Task %d executed successfully\n", task_id);
-			printf("Exit code: %d\n", current_task->cmd->exit_code);
-		} else {
-			// Debug lines
-			printf("Task %d execution failed\n", task_id);
-		}
-		
-		current_task = current_task->next;
-		task_count++;
-	}
-	// Debug lines
-	printf("\nTotal: executed %d tasks\n", task_count);
-
+	/* End of exec tests */
 	free_tasks(ctx.tasks);
 
 	return EXIT_SUCCESS;
