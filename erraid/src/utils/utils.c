@@ -155,7 +155,7 @@ void	append_int_to_buf(char *buf, int n)
 void	remove_trailing_slash(char *path)
 {
 	size_t len = strlen(path);
-	if (len > 0 && path[len - 1] == '/') {
+
+	if (len > 0 && path[len - 1] == '/')
 		path[len - 1] = '\0';
-	}
 }

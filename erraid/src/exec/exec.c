@@ -4,6 +4,8 @@ extern char **environ;
 
 static bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
 {
+	int	status;
+
 	if (!cmd_si || !cmd_si->command || !cmd_si->command[0]) {
 		ERR_MSG("Invalid simple command");
 		return false;
@@ -16,32 +18,32 @@ static bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, 
 		}
 	}
 	
-	int	status = 0;
-	switch((*pid = fork())){
-		case -1:
-			ERR_SYS("fork");
-			return false;
-		case 0:
-			execve(cmd_si->cmd_path, cmd_si->command, environ);
-			ERR_SYS("execve");
-			exit(EXIT_FAILURE);
-		default:
-			waitpid(*pid, &status, 0);
-	
-	*exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
-	return true;
+	status = 0;
+	*pid = fork();
+	switch((*pid)){
+	case -1:
+		ERR_SYS("fork");
+		return false;
+	case 0:
+		execve(cmd_si->cmd_path, cmd_si->command, environ);
+		ERR_SYS("execve");
+		exit(EXIT_FAILURE);
+	default:
+		waitpid(*pid, &status, 0);
+		*exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
+		return true;
 	}
 }
 
 static bool	execute_command(struct s_cmd *cmd)
 {
+	bool		success = true;
+	struct s_cmd_sq *cmd_sq = NULL;
+
 	if (!cmd) {
 		ERR_MSG("Null command");
 		return false;
 	}
-	
-	bool		success = true;
-	struct s_cmd_sq *cmd_sq = NULL;
 	
 	switch (cmd->cmd_type) {
 	case CMD_SI:
@@ -52,19 +54,18 @@ static bool	execute_command(struct s_cmd *cmd)
 		// Debug lines
 		// printf("Executing sequence of %d commands...\n", cmd->cmd.cmd_sq.nb_cmds);
 		cmd_sq = &cmd->cmd.cmd_sq;
-		for (int i = 0; i < cmd_sq->nb_cmds; i++) {
+		for (int i = 0; i < cmd_sq->nb_cmds; i++)
 			///printf("Command %d/%d:\n", i + 1, cmd->cmd.cmd_sq.nb_cmds);
-			success &= execute_command(&cmd_sq->cmds[i]);
 			// if the command fails the loop continues
-		}
+			success &= execute_command(&cmd_sq->cmds[i]);
+				
 		// command sequence exit code should be the last command's exit code
-		if (cmd_sq->nb_cmds > 0) {
+		if (cmd_sq->nb_cmds > 0)
 			cmd->exit_code = cmd_sq->cmds[cmd_sq->nb_cmds - 1].exit_code;
-		}
 		break;
 		
 	default:
-		ERR_MSG("Unsupported command type PIPE or IF maybe");
+		ERR_MSG("Unsupported command type");
 		return false;
 	}
 	
@@ -115,7 +116,8 @@ bool	exec_cmd_with_redir(struct s_cmd *cmd,
 	int	status;
 	bool	success;
 
-    	switch((pid = fork())){
+	pid = fork();
+    	switch((pid)){
 	case -1:
 		ERR_SYS("fork");
 		return false;
