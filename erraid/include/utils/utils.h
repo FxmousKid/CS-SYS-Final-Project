@@ -50,6 +50,9 @@ void		print_cmd_enum(enum cmd_type type, bool newline);
 /** @brief appends the string representation of an int to a buffer */
 void	append_int_to_buf(char *buf, int n);
 
+/** @brief remove the last slash of a path if present */
+void	remove_trailing_slash(char *path);
+
 void		_write_perr(const char *func, const char *location);
 void		_write_err(const char *msg, const char *location);
 

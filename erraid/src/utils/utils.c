@@ -146,3 +146,16 @@ void	append_int_to_buf(char *buf, int n)
 		buf[j++] = num_buf[i];
 	buf[j] = '\0';
 }
+
+/**
+ * @brief Removes trailing slash from a path if present
+ * 
+ * @param path The path to clean
+ */
+void	remove_trailing_slash(char *path)
+{
+	size_t len = strlen(path);
+	if (len > 0 && path[len - 1] == '/') {
+		path[len - 1] = '\0';
+	}
+}
