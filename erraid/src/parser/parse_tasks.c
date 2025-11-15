@@ -39,6 +39,17 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 }
 
 /**
+ * @brief Builds complete paths to stdout and stderr files of a given task
+ */
+static void build_output_paths(struct s_task *task)
+{
+	if (!build_safe_path(task->stdout_path, PATH_MAX+1, task->path, STDOUT_FILE))
+		ERR_MSG("Failed to build stdout path");
+	if (!build_safe_path(task->stderr_path, PATH_MAX+1, task->path, STDERR_FILE))
+		ERR_MSG("Failed to build stderr path");
+}
+
+/**
  * @brief Extract task's id from its path
  */
 static int extract_task_id(const char *task_path)
@@ -92,14 +103,16 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 
 		strcpy(task->path, dir.path);
 		strcat(task->path, "/");
+		// Fill task_id field
 		task->task_id = extract_task_id(dir.path);
+		// Fill stdout and stderr fields
+		build_output_paths(task);
 		task = task->next;
 		remove_last_file_from_path(dir.path);
 	}
 	closedir_s_dir(&dir);
 	return true;
 }
-
 
 /* This is the main function that will start the parsing starting from the 
  * root of the given directory, so "xxx/tasks/"
