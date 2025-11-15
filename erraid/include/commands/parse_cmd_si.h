@@ -11,6 +11,7 @@
 # include "utils/utils.h" // IWYU pragma: keep
 # include "commands/cmd_utils.h" // IWYU pragma: keep
 # include "structs.h"
+# include "utils/binary_utils.h"
 
 /** @brief parses the argv file living in the path into the passed
  * struct cmd, at the right union */
