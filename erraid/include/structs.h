@@ -66,6 +66,7 @@ struct s_task {
 	char		path[PATH_MAX + 1];
 	char		stdout_path[PATH_MAX + 1];
 	char		stderr_path[PATH_MAX + 1];
+	char 		texit_path[PATH_MAX + 1];
 
 };
 
