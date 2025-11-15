@@ -38,6 +38,29 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 	return true;
 }
 
+/**
+ * @brief Extract task's id from its path
+ */
+static int extract_task_id(const char *task_path)
+{
+	const char *last_slash;
+	const char *id_str;	
+	char path_copy[PATH_MAX + 1];
+
+	strcpy(path_copy, task_path);
+	remove_trailing_slash(path_copy);
+	
+	last_slash = strrchr(path_copy, '/');
+	if (!last_slash)
+		return -1;
+	
+	id_str = last_slash + 1;
+	if (*id_str == '\0')
+		return -1;
+	
+	return atoi(id_str);
+}
+
 static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 {
 	struct dirent	*ent = NULL;
@@ -69,6 +92,7 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 
 		strcpy(task->path, dir.path);
 		strcat(task->path, "/");
+		task->task_id = extract_task_id(dir.path);
 		task = task->next;
 		remove_last_file_from_path(dir.path);
 	}

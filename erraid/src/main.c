@@ -25,72 +25,12 @@ bool	isdle;
  */
 static void build_output_paths(const char *task_path, char *stdout_path, char *stderr_path)
 {
-	char clean_path[PATH_MAX + 1];
-	size_t current_len;
+	if (!build_safe_path(stdout_path, PATH_MAX+1, task_path, STDOUT_FILE))
+		ERR_MSG("Failed to build stdout path");
+	if (!build_safe_path(stderr_path, PATH_MAX+1, task_path, STDERR_FILE))
+		ERR_MSG("Failed to build stderr path");
 
-	// Init a clean path as a copy of task_path
-	strncpy(clean_path, task_path, PATH_MAX);
-	clean_path[PATH_MAX] = '\0';
-	// Avoid double slash path like ".../15//stdout"
-	remove_trailing_slash(clean_path);
-	
-	// Stdout path
-	strncpy(stdout_path, clean_path, PATH_MAX);
-	stdout_path[PATH_MAX] = '\0';
-	current_len = strlen(stdout_path);
-	if (current_len < PATH_MAX - 1) 
-		strncat(stdout_path, "/", PATH_MAX - current_len);
-	
-	current_len = strlen(stdout_path);
-	if (current_len < PATH_MAX) 
-		strncat(stdout_path, STDOUT_FILE, PATH_MAX - current_len);
-	
-
-	// Stderr path
-	strncpy(stderr_path, clean_path, PATH_MAX);
-	stderr_path[PATH_MAX] = '\0';
-	
-	current_len = strlen(stderr_path);
-	if (current_len < PATH_MAX - 1) 
-		strncat(stderr_path, "/", PATH_MAX - current_len);
-	
-	current_len = strlen(stderr_path);
-	if (current_len < PATH_MAX) 
-		strncat(stderr_path, STDERR_FILE, PATH_MAX - current_len);
-	
 }
-
-/**
- * @brief Extract task's id from its path
- */
-static int extract_task_id(const char *task_path)
-{
-	const char *last_slash;
-	const char *id_str;	
-	char path_copy[PATH_MAX + 1];
-
-	strcpy(path_copy, task_path);
-	remove_trailing_slash(path_copy);
-	
-	last_slash = strrchr(path_copy, '/');
-	if (!last_slash)
-		return -1;
-	
-	id_str = last_slash + 1;
-	if (*id_str == '\0')
-		return -1;
-	
-	return atoi(id_str);
-}
-
-
-
-
-
-
-
-
-
 
 
 
@@ -119,7 +59,7 @@ int main(int argc, char *argv[])
 	
 	while (current_task) {
 		
-		task_id = extract_task_id(current_task->path);
+		task_id = current_task->task_id;
 
 		// Debug lines 
 		printf("\n Executing Task %d\n", task_id);
