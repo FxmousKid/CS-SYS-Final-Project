@@ -2,7 +2,7 @@
 
 extern char **environ;
 
-bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
+static bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
 {
 	if (!cmd_si || !cmd_si->command || !cmd_si->command[0]) {
 		ERR_MSG("Invalid simple command");
@@ -18,22 +18,22 @@ bool execute_simple_command(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *
 	
 	int	status = 0;
 	switch((*pid = fork())){
-	case -1:
-		ERR_SYS("fork");
-		return false;
-	case 0:
-		execve(cmd_si->cmd_path, cmd_si->command, environ);
-		ERR_SYS("execve");
-		exit(EXIT_FAILURE);
-	default:
-		waitpid(*pid, &status, 0);
+		case -1:
+			ERR_SYS("fork");
+			return false;
+		case 0:
+			execve(cmd_si->cmd_path, cmd_si->command, environ);
+			ERR_SYS("execve");
+			exit(EXIT_FAILURE);
+		default:
+			waitpid(*pid, &status, 0);
 	
 	*exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
 	return true;
 	}
 }
 
-bool	execute_command(struct s_cmd *cmd)
+static bool	execute_command(struct s_cmd *cmd)
 {
 	if (!cmd) {
 		ERR_MSG("Null command");
@@ -71,32 +71,7 @@ bool	execute_command(struct s_cmd *cmd)
 	return success;
 }
 
-bool	exec_cmd_with_redir(struct s_cmd *cmd, 
-			    const char *stdout_path, 
-			    const char *stderr_path)
-{
-	pid_t	pid;
-	int	status;
-	bool	success;
-
-    	switch((pid = fork())){
-	case -1:
-		ERR_SYS("fork");
-		return false;
-	case 0:
-		if (!setup_output_redir(stdout_path, stderr_path))
-			exit(EXIT_FAILURE);
-		success = execute_command(cmd);
-		exit(success ? cmd->exit_code : EXIT_FAILURE);
-	default:
-		cmd->pid = pid;
-		waitpid(pid, &status, 0);
-		cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
-		return true;
-    	}
-}
-
-bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
+static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 {
 	int	stdout_fd;
 	int	stderr_fd;
@@ -129,4 +104,30 @@ bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 		close(stderr_fd);
 	}
 	return true;
+}
+
+
+bool	exec_cmd_with_redir(struct s_cmd *cmd, 
+			    const char *stdout_path, 
+			    const char *stderr_path)
+{
+	pid_t	pid;
+	int	status;
+	bool	success;
+
+    	switch((pid = fork())){
+	case -1:
+		ERR_SYS("fork");
+		return false;
+	case 0:
+		if (!setup_output_redir(stdout_path, stderr_path))
+			exit(EXIT_FAILURE);
+		success = execute_command(cmd);
+		exit(success ? cmd->exit_code : EXIT_FAILURE);
+	default:
+		cmd->pid = pid;
+		waitpid(pid, &status, 0);
+		cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
+		return true;
+    	}
 }
