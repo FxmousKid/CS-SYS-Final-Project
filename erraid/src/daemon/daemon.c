@@ -1,5 +1,30 @@
 # include "daemon/daemon.h"
 
+static volatile sig_atomic_t running = 1;
+
+static void sig_handler(int sig) 
+{
+        (void)sig; // For warning (sig not used)
+        running = 0;
+}
+
+void setup_sig_handlers()
+{
+        struct sigaction sa;
+
+	sa.sa_handler = sig_handler;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+
+	sigaction(SIGTERM, &sa, NULL);
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
+}
+
+bool is_daemon_running()
+{
+        return running;
+}
 
 /**
  * @brief daemonize the process (see man 7 daemon for every steps)
