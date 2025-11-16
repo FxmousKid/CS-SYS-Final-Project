@@ -32,7 +32,7 @@ bool    is_daemon_running()
 bool    daemonize()
 {
         pid_t pid;
-        // int fd;
+        int fd;
         switch((pid = fork())){
         case -1:
                 ERR_SYS("fork");
