@@ -53,7 +53,7 @@ bool daemonize()
         }
 
         /* Replace below to redirect stdout and stderr to log files */
-        fd = open("/dev/null", O_RDWR);
+        fd = open(DEV_NULL_DIR, O_RDWR);
         if(dup2(fd, STDIN_FILENO) < 0){
                 ERR_SYS("dup2");
                 return false;

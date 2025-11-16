@@ -6,5 +6,6 @@
 # define STDERR_FILE	"stderr"
 # define TEXIT_FILE     "times-exitcodes"
 # define TASKS_DIR	"tasks/"
+# define DEV_NULL_DIR   "/dev/null"
 
 #endif
