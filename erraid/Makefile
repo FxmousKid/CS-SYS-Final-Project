@@ -21,6 +21,8 @@ SRC_FILES_NAMES += utils/binary_utils.c
 
 SRC_FILES_NAMES += exec/exec.c
 
+SRC_FILES_NAMES += daemon/daemon.c
+
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
 
