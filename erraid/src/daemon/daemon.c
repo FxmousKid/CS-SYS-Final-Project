@@ -2,13 +2,13 @@
 
 static volatile sig_atomic_t running = 1;
 
-static void sig_handler(int sig) 
+static  void sig_handler(int sig) 
 {
         (void)sig; // For warning (sig not used)
         running = 0;
 }
 
-void setup_sig_handlers()
+void    setup_sig_handlers()
 {
         struct sigaction sa;
 
@@ -21,7 +21,7 @@ void setup_sig_handlers()
 	sigaction(SIGQUIT, &sa, NULL);
 }
 
-bool is_daemon_running()
+bool    is_daemon_running()
 {
         return running;
 }
@@ -29,10 +29,10 @@ bool is_daemon_running()
 /**
  * @brief daemonize the process (see man 7 daemon for every steps)
  */
-bool daemonize()
+bool    daemonize()
 {
         pid_t pid;
-        int fd;
+        // int fd;
         switch((pid = fork())){
         case -1:
                 ERR_SYS("fork");
@@ -83,11 +83,11 @@ bool daemonize()
                 ERR_SYS("dup2");
                 return false;
         }
-        if (dup2(fd, STDOUT_FILENO)){
+        if (dup2(fd, STDOUT_FILENO) < 0){
                 ERR_SYS("dup2");
                 return false;
         }
-        if (dup2(fd, STDERR_FILENO)){
+        if (dup2(fd, STDERR_FILENO) < 0){
                 ERR_SYS("dup2");
                 return false;
         }

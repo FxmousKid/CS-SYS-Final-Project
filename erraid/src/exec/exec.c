@@ -75,7 +75,7 @@ static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 	int	stderr_fd;
 
 	if (stdout_file) {
-		stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 		if (stdout_fd == -1) {
 			ERR_SYS("open stdout");
 			return false;
@@ -89,7 +89,7 @@ static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 	}
     
 	if (stderr_file) {
-		stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+		stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 		if (stderr_fd == -1) {
 			ERR_SYS("open stderr");
 			return false;
