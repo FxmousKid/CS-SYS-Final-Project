@@ -34,7 +34,9 @@ static void     exec_tasks_loop(struct s_data *ctx)
 			// Debug lines
 			printf("Task %d execution failed\n", task_id);
 		}
-
+                // Debug line
+                task_count++;
+                
                 current_task = current_task->next;
         }
         // Debug line
