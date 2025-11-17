@@ -9,7 +9,7 @@ static void	set_run_dir_default(struct s_data *ctx)
 	strcpy(ctx->run_directory, "/tmp/");
 	if (user)
 		strcat(ctx->run_directory, user);
-	strcat(ctx->run_directory, "/erraid");	
+	strcat(ctx->run_directory, "/erraid/");	
 }
 
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
