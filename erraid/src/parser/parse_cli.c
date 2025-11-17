@@ -15,7 +15,7 @@ static void	set_run_dir_default(struct s_data *ctx)
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
 	char	*ctx_rd;
-	char absolute_path[PATH_MAX + 1];
+	char	abs_path[PATH_MAX + 1];
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid run directory path\n");
@@ -23,7 +23,7 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 		return false;
 	}
 
-	if (!convert_to_absolute_path(path, absolute_path)) {
+	if (!convert_to_absolute_path(path, abs_path)) {
 		ERR_MSG("Failed to convert to absolute path: %s\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
@@ -36,7 +36,7 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 	}
 
 	ctx_rd = ctx->run_directory;
-	strcpy(ctx->run_directory, absolute_path);
+	strcpy(ctx->run_directory, abs_path);
 	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
 		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;

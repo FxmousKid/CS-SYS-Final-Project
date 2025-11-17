@@ -13,6 +13,7 @@
 # include "structs.h"
 # include "utils/binary_utils.h"
 
+
 /** @brief parses the argv file living in the path into the passed
  * struct cmd, at the right union */
 bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd);

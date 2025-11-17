@@ -134,6 +134,6 @@ static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 bool exec_task(struct s_task *task)
 {
 	return exec_cmd_with_redir(task->cmd,
-		 		task->stdout_path, 
-		 		task->stderr_path);
+		 		   task->stdout_path, 
+		 		   task->stderr_path);
 }

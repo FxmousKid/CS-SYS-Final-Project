@@ -29,9 +29,8 @@ bool	find_binary_path(const char* restrict bin_name, char* restrict bin_path)
 			continue;
 		}
 		
-		if (access(bin_path, X_OK) == 0) {
+		if (access(bin_path, X_OK) == 0)
 			found = true;
-		}
 
 		path_tmp = strtok(NULL, ":");
 	}

@@ -10,8 +10,9 @@
 # include <macros.h>
 # include <signal.h>
 
-bool daemonize();
-bool is_daemon_running();
-void setup_sig_handlers();
+
+bool 	daemonize();
+bool 	is_daemon_running();
+void 	setup_sig_handlers();
 
 #endif

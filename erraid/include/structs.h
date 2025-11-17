@@ -59,27 +59,26 @@ struct s_timing {
 };
 
 struct s_task {
-	int		task_id;
-	struct s_timing	timing;
-	struct s_cmd	*cmd;
-	struct s_task	*next;
 	char		path[PATH_MAX + 1];
 	char		stdout_path[PATH_MAX + 1];
 	char		stderr_path[PATH_MAX + 1];
 	char 		texit_path[PATH_MAX + 1];
-
+	struct s_timing	timing;
+	struct s_cmd	*cmd;
+	struct s_task	*next;
+	int		task_id;
 };
 
 /* @brief struct representing the daemon data */
 struct s_data {
+	/** @brief Ptr to first tasks, linked list like structure*/
+	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
 	uint8_t	exit_code;
 	/** @brief provided path to the run directory. */
 	char	run_directory[PATH_MAX + 1];
 	/** @brief flag to indiciate if tasks files are little endian. */
 	bool	is_data_le;
-	/** @brief Ptr to first tasks, linked list like structure*/
-	struct s_task	*tasks;
 };
 
 #endif
