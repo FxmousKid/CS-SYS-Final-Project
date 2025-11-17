@@ -199,20 +199,20 @@ bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char
  */
 bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
 {
-	char    *real_path;
+	char    *tmp;
 
 	if (relative_path[0] == '/') {
 		strlcpy(absolute_path, relative_path, PATH_MAX + 1);
 		return true;
 	}
 
-	real_path = realpath(relative_path, NULL);
-	if (!real_path) {
+	tmp = realpath(relative_path, NULL);
+	if (!tmp) {
 		ERR_SYS("realpath");
 		return false;
 	}
 
-	strlcpy(absolute_path, real_path, PATH_MAX + 1);
-	free(real_path);
+	strlcpy(absolute_path, tmp, PATH_MAX + 1);
+	free(tmp);
 	return true;
 }
