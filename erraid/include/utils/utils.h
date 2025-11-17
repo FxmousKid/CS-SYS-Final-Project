@@ -6,6 +6,8 @@
 # include <stdint.h>
 # include <errno.h> // IWYU pragma: keep
 # include <string.h>
+# include <stdlib.h>
+# include <limits.h>
 
 // basically using the compiler to check for apple vs linux 
 # if defined(__has_include) && __has_include(<endian.h>)
@@ -55,6 +57,9 @@ void	remove_trailing_slash(char *path);
 
 /** @brief builds a path in dest by concatening part1 and part2 */
 bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2);
+
+/** @brief convert a relative path to an absolute path */
+bool	convert_to_absolute_path(const char *relative_path, char *absolute_path);
 
 void	_write_perr(const char *func, const char *location);
 void	_write_err(const char *msg, const char *location);

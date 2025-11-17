@@ -58,10 +58,12 @@ bool    daemonize()
                 exit(EXIT_SUCCESS);
         }
 
+        
         if (chdir("/") < 0){
                 ERR_SYS("chdir");
                 return false;
         }
+        
         umask(0); // Always succeds (see man 2 umask)
 
         if (close(STDIN_FILENO) < 0){
