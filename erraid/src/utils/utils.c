@@ -189,3 +189,30 @@ bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char
 		
 	return true;
 }
+
+/**
+ * @brief Convert a relative path to an absolute path
+ * 
+ * @param relative_path	relative path to convert
+ * @param absolute_path	buffer to write the absolute path
+ * @return 		true on success, false otherwise
+ */
+bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
+{
+	char    *real_path;
+
+	if (relative_path[0] == '/') {
+		strlcpy(absolute_path, relative_path, PATH_MAX + 1);
+		return true;
+	}
+
+	real_path = realpath(relative_path, NULL);
+	if (!real_path) {
+		ERR_SYS("realpath");
+		return false;
+	}
+
+	strlcpy(absolute_path, real_path, PATH_MAX + 1);
+	free(real_path);
+	return true;
+}
