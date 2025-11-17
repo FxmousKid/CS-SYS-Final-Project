@@ -31,39 +31,37 @@ bool    is_daemon_running()
  */
 bool    daemonize()
 {
-        pid_t pid;
-        int fd;
-        switch((pid = fork())){
-        case -1:
+        pid_t	pid;
+        int	fd;
+
+	pid = fork();
+	if (pid < 0) {
                 ERR_SYS("fork");
                 return false;
-        case 0:
-                break;
-        default:
-                exit(EXIT_SUCCESS);
-        }
+	}
+	// to free correctly in the future
+	if (pid > 0)
+		exit(EXIT_SUCCESS);
 
         if (setsid() < 0){
                 ERR_SYS("setsid");
                 return false;
         }
 
-        switch((pid = fork())){
-        case -1:
+	pid = fork();
+	if (pid < 0) {
                 ERR_SYS("fork");
                 return false;
-        case 0:
-                break;
-        default:
-                exit(EXIT_SUCCESS);
-        }
+	}
+	// to free correctly in the future
+	if (pid > 0)
+		exit(EXIT_SUCCESS);
 
         
         if (chdir("/") < 0){
                 ERR_SYS("chdir");
                 return false;
         }
-        
         umask(0); // Always succeds (see man 2 umask)
 
         if (close(STDIN_FILENO) < 0){

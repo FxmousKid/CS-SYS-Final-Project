@@ -50,18 +50,18 @@ void		free_darr(char **darr);
 void		print_cmd_enum(enum cmd_type type, bool newline);
 
 /** @brief appends the string representation of an int to a buffer */
-void	append_int_to_buf(char *buf, int n);
+void		append_int_to_buf(char *buf, int n);
 
 /** @brief remove the last slash of a path if present */
-void	remove_trailing_slash(char *path);
+void		remove_trailing_slash(char *path);
 
 /** @brief builds a path in dest by concatening part1 and part2 */
-bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2);
+bool		build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2);
 
 /** @brief convert a relative path to an absolute path */
-bool	convert_to_absolute_path(const char *relative_path, char *absolute_path);
+bool		convert_to_absolute_path(const char *relative_path, char *absolute_path);
 
-void	_write_perr(const char *func, const char *location);
-void	_write_err(const char *msg, const char *location);
+void		_write_perr(const char *func, const char *location);
+void		_write_err(const char *msg, const char *location);
 
 #endif
