@@ -9,6 +9,6 @@
 # include "structs.h"
 # include "utils/binary_utils.h"
 
-bool	exec_cmd_with_redir(struct s_cmd *cmd, const char *stdout_file, const char *stderr_file);
+bool	exec_task(struct s_task *task);
 
 #endif
