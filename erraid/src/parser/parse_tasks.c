@@ -117,10 +117,13 @@ bool	parse_tasks(struct s_data *ctx)
 {
 	int		subtasks_count = 0;
 	struct s_task	**task = NULL;
+	char		tasks_path[PATH_MAX + 1] = {0};
 
 	// little hack, tasks have the same criteria 
 	// to be counted as a sub-command dir
-	subtasks_count = count_sub_cmds(ctx->run_directory);
+	strcpy(tasks_path, ctx->run_directory);
+	strcat(tasks_path, TASKS_DIR);
+	subtasks_count = count_sub_cmds(tasks_path);
 	if (subtasks_count < 0)
 		return false;
 
@@ -130,7 +133,7 @@ bool	parse_tasks(struct s_data *ctx)
 
 	// parsing actual sub commands by reading through the dir
 	task = &ctx->tasks;
-	if (!parse_sub_tasks_path(*task, ctx->run_directory))
+	if (!parse_sub_tasks_path(*task, tasks_path))
 		return false;
 
 	if (!parse_sub_tasks_cmd(*task))

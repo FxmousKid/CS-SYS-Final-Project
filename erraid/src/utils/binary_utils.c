@@ -5,7 +5,7 @@ bool	find_binary_path(const char* restrict bin_name, char* restrict bin_path)
 {
 	bool	found;
 	char	*path_tmp = NULL;
-	char	path_copy[PATH_MAX + 1] = {0};
+	char	*path_copy = NULL;
 
 	// if binary is relative or absolute
 	if (access(bin_name, X_OK) == 0) {
@@ -19,8 +19,13 @@ bool	find_binary_path(const char* restrict bin_name, char* restrict bin_path)
 		ERR_MSG("PATH environment variable not found");
 		return false;
 	}
-	
+
+	if (!(path_copy = calloc(strlen(path_env) + 1, sizeof(char)))) {
+		ERR_MSG("calloc failed");
+		return false;
+	}
 	strcpy(path_copy, path_env);
+
 	path_tmp = strtok(path_copy, ":");
 	found = false;
 	while (path_tmp && !found) {
