@@ -8,6 +8,7 @@ SRC_FILES_NAMES = main.c
 
 SRC_FILES_NAMES += parser/parse_cli.c
 SRC_FILES_NAMES += parser/parse_tasks.c
+SRC_FILES_NAMES += parser/parse_timing.c
 
 SRC_FILES_NAMES += commands/parse_cmd_tree.c
 SRC_FILES_NAMES += commands/parse_cmd_si.c

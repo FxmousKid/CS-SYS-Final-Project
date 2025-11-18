@@ -12,5 +12,6 @@
 
 
 void    daemon_loop(struct s_data *ctx);
+int	check_date(struct s_task *task);
 
 #endif
