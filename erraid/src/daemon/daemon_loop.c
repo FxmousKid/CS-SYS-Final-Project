@@ -12,7 +12,6 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	int task_id;
         task_count = 0;
         // Debug lines (remove them)
-	printf("Found %d tasks\n", count_sub_cmds(ctx->run_directory));
 	printf("Execution\n");
 
         while (current_task){
