@@ -55,7 +55,9 @@ struct s_cmd {
 };
 
 struct s_timing {
-
+	uint64_t	minutes;
+	uint32_t	hours;
+	uint8_t		days;
 };
 
 struct s_task {

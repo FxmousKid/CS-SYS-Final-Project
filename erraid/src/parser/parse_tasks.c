@@ -106,6 +106,10 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 		task->task_id = extract_task_id(dir.path);
 		build_output_paths(task);
 		remove_last_file_from_path(dir.path);
+		if (!parse_timing(task)) {
+			ERR_MSG("parse_timing fail");
+			return false;
+		}
 		task = task->next;
 	}
 	closedir_s_dir(&dir);
