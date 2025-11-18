@@ -51,7 +51,7 @@ struct s_cmd {
 	enum cmd_type	cmd_type;
 	union u_cmd	cmd;
 	pid_t		pid;
-	uint8_t		exit_code;
+	uint16_t	exit_code;
 };
 
 struct s_timing {
