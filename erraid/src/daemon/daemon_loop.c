@@ -6,11 +6,11 @@
  */
 static bool     append_texit(struct s_task *task)
 {
-        int fd;
-        uint16_t exit_code;
-        uint16_t exit_code_be;
-        int64_t timestamp;
-        int64_t timestamp_be;
+        int		fd;
+        uint16_t	exit_code;
+        uint16_t	exit_code_be;
+        int64_t		timestamp; // for serialization requirements
+        int64_t		timestamp_be; // same here
 
         fd = open(task->texit_path, O_WRONLY | O_CREAT | O_APPEND, 0644);
         if (fd < 0){
@@ -72,16 +72,10 @@ static void     exec_tasks_loop(struct s_data *ctx)
 			printf("Exit code: %d\n", current_task->cmd->exit_code);
                         
                         // Append times-exitcodes file
-                        if (append_texit(current_task)){
-                                // Debug line to delete
+                        if (append_texit(current_task))
                                 printf("append_texit succeeds\n");
-                        }
-                        else{
-                                // Debug lines to delete
-                                printf("append_texit fails :\n");
-                                printf("\ttexit_path = %s", current_task->texit_path);
-                        }
-                
+                        else
+                                printf("append_texit failed\ttexit_path = %s", current_task->texit_path);
                 } else {
 			// Debug lines
 			printf("Task %d execution failed\n", task_id);
