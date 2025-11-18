@@ -19,7 +19,7 @@ bool	parse_timing(struct s_task *task)
 		return false;
 	}
 
-	if (read(fd, timing, 13) < 13) {
+	if (read_endian(fd, timing, 13, true) < 13) {
 		ERR_MSG("fail read");
 		return false;
 	}
