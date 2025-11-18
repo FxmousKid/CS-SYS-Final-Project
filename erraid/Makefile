@@ -19,6 +19,7 @@ SRC_FILES_NAMES += commands/dir_cmd_utils.c
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
 SRC_FILES_NAMES += utils/binary_utils.c
+SRC_FILES_NAMES += utils/utils_timing.c
 
 SRC_FILES_NAMES += exec/exec.c
 

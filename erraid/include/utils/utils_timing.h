@@ -1,5 +1,6 @@
-#ifndef PARSE_TIMING_H
-# define PARSE_TIMING_H
+#ifndef UTILS_TIMING_H
+# define UTILS_TIMING_H
+
 
 # include <limits.h>
 # include <stdbool.h>
@@ -12,10 +13,7 @@
 # include <sys/stat.h>
 
 # include "structs.h"
-# include "utils/utils_timing.h"
-# include "utils/utils.h"
 
-bool	parse_timing(struct s_task *task);
-void	test_timing_exemple();
+void	print_timing(struct s_timing timing);
 
-#endif 
+#endif
