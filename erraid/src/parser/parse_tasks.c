@@ -44,6 +44,8 @@ static void	build_output_paths(struct s_task *task)
 		ERR_MSG("Failed to build stdout path");
 	if (!build_safe_path(task->stderr_path, PATH_MAX + 1, task->path, STDERR_FILE))
 		ERR_MSG("Failed to build stderr path");
+	if (!build_safe_path(task->texit_path, PATH_MAX + 1, task->path, TEXIT_FILE))
+		ERR_MSG("Failed to build times-exitcodes path");
 }
 
 /**
@@ -111,7 +113,7 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 }
 
 /* This is the main function that will start the parsing starting from the 
- * root of the given directory, so "xxx/tasks/"
+ * root of the given directory.
  * */
 bool	parse_tasks(struct s_data *ctx)
 {
