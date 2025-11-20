@@ -29,7 +29,7 @@ bool    is_daemon_running()
 /**
  * @brief daemonize the process (see man 7 daemon for every steps)
  */
-bool    daemonize()
+bool    daemonize(bool debug_mode)
 {
         pid_t	pid;
         int	fd;
@@ -43,7 +43,7 @@ bool    daemonize()
 	if (pid > 0)
 		exit(EXIT_SUCCESS);
 
-        if (setsid() < 0){
+        if (!debug_mode && setsid() < 0){
                 ERR_SYS("setsid");
                 return false;
         }
@@ -64,6 +64,10 @@ bool    daemonize()
         }
         umask(0); // Always succeds (see man 2 umask)
 
+	// if we're debugging, don't close stdin, stdout, stderr
+	if (debug_mode)
+		return true;
+
         if (close(STDIN_FILENO) < 0){
                 ERR_SYS("close stdin");
                 return false;
@@ -79,19 +83,15 @@ bool    daemonize()
 
         /* Replace below to redirect stdout and stderr to log files */
         fd = open(DEV_NULL_DIR, O_RDWR);
-        if(dup2(fd, STDIN_FILENO) < 0){
+
+        if (dup2(fd, STDIN_FILENO) < 0 ||
+	    dup2(fd, STDOUT_FILENO) < 0 ||
+	    dup2(fd, STDERR_FILENO) < 0) {
                 ERR_SYS("dup2");
                 return false;
         }
-        if (dup2(fd, STDOUT_FILENO) < 0){
-                ERR_SYS("dup2");
-                return false;
-        }
-        if (dup2(fd, STDERR_FILENO) < 0){
-                ERR_SYS("dup2");
-                return false;
-        }
-        if (fd > 2 && (close(fd) < 0)){
+
+        if (fd > 2 && (close(fd) < 0)) {
                 ERR_SYS("close");
                 return false;
         }

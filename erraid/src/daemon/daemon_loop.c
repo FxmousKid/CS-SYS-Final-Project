@@ -13,7 +13,7 @@ static bool     append_texit(struct s_task *task)
         int64_t		timestamp_be; // same here
 
         fd = open(task->texit_path, O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (fd < 0){
+        if (fd < 0) {
                 ERR_SYS("open");
                 return false;
         }
@@ -49,7 +49,7 @@ static int	check_date(struct s_task *task) {
 		((task->timing.days >> t->tm_wday) & 1));
 }
 
-static void     exec_tasks_loop(struct s_data *ctx)
+static void	exec_tasks_loop_debug(struct s_data *ctx)
 {
 	struct s_task *current_task;
 
@@ -104,6 +104,20 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	printf("\nTotal: executed %d tasks\n", task_count);
 }
 
+static void     exec_tasks_loop(struct s_data *ctx)
+{
+	struct s_task *current_task;
+
+	current_task = ctx->tasks;
+	while (current_task){
+		if (check_date(current_task)) {
+			exec_task(current_task);
+                        append_texit(current_task);
+		}
+		current_task = current_task->next;
+	}
+}
+
 
 void    daemon_loop(struct s_data *ctx)
 {
@@ -121,8 +135,7 @@ void    daemon_loop(struct s_data *ctx)
 		// Check every minute if a task can be executed
 		if (current_time - last_execution >= 60) {
 			last_execution = current_time;
-
-			exec_tasks_loop(ctx);
+			ctx->debug_mode ? exec_tasks_loop_debug(ctx) : exec_tasks_loop(ctx);
 		}
 		// Wait 1 sec, maybe change it to 30s or 60s.
 		sleep(1);

@@ -57,6 +57,11 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 		print_help();
 		return false;
 
+	// debug mode : daemon writes to stdout;
+	case 'd':
+		ctx->debug_mode = true;
+		break;
+
 	// data is little-endian : -l
 	case 'l':
 		ctx->is_data_le = true;
@@ -74,12 +79,13 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hlr:";		
+	char		*shortopts = "hdlr:";		
 	int		opt;
 	extern int	opterr;
 
 	struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
+		{"debug", no_argument, NULL, 'd'},
 		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'r'},
 		{NULL, 0, NULL, 0}

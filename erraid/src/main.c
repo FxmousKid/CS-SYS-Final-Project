@@ -4,7 +4,6 @@
 #include "utils/utils.h" // IWYU pragma: keep
 #include "parser/parse_tasks.h"
 #include "structs.h"
-#include "exec/exec.h"
 #include "daemon/daemon_loop.h"
 #include "daemon/daemon.h"
 
@@ -12,7 +11,6 @@
 // if passed data is made on little-endian architecture
 // set by parser()
 bool	isdle;
-
 
 int main(int argc, char *argv[])
 {
@@ -24,7 +22,7 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
-	if (!daemonize()){
+	if (!daemonize(ctx.debug_mode)) {
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;
 	}
