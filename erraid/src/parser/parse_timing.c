@@ -1,5 +1,7 @@
 # include "parser/parse_timing.h"
 
+#include <inttypes.h>
+
 bool	parse_timing(struct s_task *task) 
 {
 	char		buf[PATH_MAX + 1] = {0};
@@ -35,7 +37,9 @@ bool	parse_timing(struct s_task *task)
 	task->timing.hours = (hours_le);
 	task->timing.days = (uint8_t)timing[12];
 	
-	printf("minutes: %lx hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
+
+	// printf("minutes: %lx hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
+	printf("minutes: %" PRIu64 "hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
 	close(fd);
 
 	print_timing(task->timing);
