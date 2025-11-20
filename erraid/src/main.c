@@ -24,7 +24,6 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
-	// Comment daemonize to debug easily with stdout and stderr
 	if (!daemonize()){
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;

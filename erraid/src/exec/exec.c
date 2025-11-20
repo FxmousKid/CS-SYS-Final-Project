@@ -2,7 +2,7 @@
 
 extern char **environ;
 
-static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint8_t *exit_code, pid_t *pid)
+static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid)
 {
 	int	status;
 
