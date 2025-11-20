@@ -10,7 +10,15 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/stat.h>
-# include <endian.h>
+
+// basically using the compiler to check for apple vs linux 
+# if defined(__has_include) && __has_include(<endian.h>)
+#  include <endian.h>
+# elif defined(__has_include) && __has_include(<sys/endian.h>)
+#  include <sys/endian.h>
+# endif
+
+
 
 # include "structs.h"
 # include "utils/utils_timing.h"
