@@ -6,9 +6,9 @@
 # include <fcntl.h>
 # include <unistd.h>
 
-# include "utils/utils.h"
 # include "structs.h"
-# include "utils/binary_utils.h"
+# include "utils/utils.h" // IWYU pragma: keep
+# include "utils/binary_utils.h" // IWYU pragma: keep
 
 
 bool	exec_task(struct s_task *task);

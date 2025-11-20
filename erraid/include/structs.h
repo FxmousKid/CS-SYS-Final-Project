@@ -81,6 +81,8 @@ struct s_data {
 	char	run_directory[PATH_MAX + 1];
 	/** @brief flag to indiciate if tasks files are little endian. */
 	bool	is_data_le;
+	/** @brief flag to indicate if debug mode is enabled. */
+	bool	debug_mode;
 };
 
 #endif

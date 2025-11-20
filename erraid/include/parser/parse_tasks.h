@@ -3,10 +3,9 @@
 
 # include <stdbool.h>
 
-# include "structs.h" // IWYU: pragma keep
-# include "macros.h"
-# include "commands/parse_cmd_tree.h" 
-# include "parser/parse_timing.h"
+# include "structs.h"
+# include "commands/parse_cmd_tree.h" // IWYU pragma: keep
+# include "parser/parse_timing.h" // IWYU pragma: keep
 
 /**
  * @brief Parses all tasks in the given run_directory and fills

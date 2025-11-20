@@ -18,12 +18,10 @@
 #  include <sys/endian.h>
 # endif
 
-
-
 # include "structs.h"
-# include "utils/utils_timing.h"
-# include "utils/utils.h"
-# include "macros.h"
+# include "utils/utils_timing.h" // IWYU pragma: keep
+# include "utils/utils.h" // IWYU pragma: keep
+# include "macros.h" // IWYU pragma: keep
 
 bool	parse_timing(struct s_task *task);
 void	test_timing_exemple();
