@@ -29,8 +29,8 @@ bool	parse_timing(struct s_task *task)
 	memcpy(&minutes_be, timing, 8);
 	memcpy(&hours_be, timing + 8, 4);
 
-	task->timing.minutes = (minutes_be);
-	task->timing.hours = (hours_be);
+	task->timing.minutes = htobe64(minutes_be);
+	task->timing.hours = htobe32(hours_be);
 	task->timing.days = (uint8_t)timing[12];
 	
 
