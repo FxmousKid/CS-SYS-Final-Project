@@ -35,7 +35,7 @@ bool	parse_timing(struct s_task *task)
 	
 
 	// printf("minutes: %lx hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
-	printf("minutes: %" PRIu64 "hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
+	printf("minutes: %" PRIx64 " hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
 	close(fd);
 
 	print_timing(task->timing);
