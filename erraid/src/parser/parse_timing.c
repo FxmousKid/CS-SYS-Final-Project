@@ -5,14 +5,10 @@
 bool	parse_timing(struct s_task *task) 
 {
 	char		buf[PATH_MAX + 1] = {0};
-	char		timing[13] = {0};
+	char		timing[TIMING_SIZE] = {0};
 	int		fd;
-	uint64_t	minutes_le;
-	uint32_t	hours_le;
-
-	task->timing.minutes = 0;
-	task->timing.hours = 0;
-	task->timing.days = 0;
+	uint64_t	minutes_be;
+	uint32_t	hours_be;
 
 	if (!build_safe_path(buf, PATH_MAX + 1, task->path, TIMING_FILE))
 		ERR_MSG("failed to build timing file");
@@ -21,20 +17,20 @@ bool	parse_timing(struct s_task *task)
 
 	fd = open(buf, O_RDONLY);
 	if (fd <= 0) {
-		ERR_MSG("fail open");
+		ERR_SYS("open");
 		return false;
 	}
 
-	if (read(fd, timing, 13) < 13) {
-		ERR_MSG("fail read");
+	if (read(fd, timing, TIMING_SIZE) < TIMING_SIZE) {
+		ERR_SYS("fail read");
 		return false;
 	}
 
-	memcpy(&minutes_le, timing, 8);
-	memcpy(&hours_le, &timing[8], 4);
+	memcpy(&minutes_be, timing, 8);
+	memcpy(&hours_be, timing + 8, 4);
 
-	task->timing.minutes = (minutes_le);
-	task->timing.hours = (hours_le);
+	task->timing.minutes = (minutes_be);
+	task->timing.hours = (hours_be);
 	task->timing.days = (uint8_t)timing[12];
 	
 
