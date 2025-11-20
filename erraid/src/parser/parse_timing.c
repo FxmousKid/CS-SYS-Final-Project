@@ -5,10 +5,10 @@
 bool	parse_timing(struct s_task *task) 
 {
 	char		buf[PATH_MAX + 1] = {0};
-	char		timing[TIMING_SIZE] = {0};
+	unsigned char	timing[TIMING_SIZE] = {0};
 	int		fd;
-	uint64_t	minutes_be;
-	uint32_t	hours_be;
+	uint64_t	minutes_he; // Host endian
+	uint32_t	hours_he; // Host endian
 
 	if (!build_safe_path(buf, PATH_MAX + 1, task->path, TIMING_FILE))
 		ERR_MSG("failed to build timing file");
@@ -26,11 +26,11 @@ bool	parse_timing(struct s_task *task)
 		return false;
 	}
 
-	memcpy(&minutes_be, timing, 8);
-	memcpy(&hours_be, timing + 8, 4);
+	memcpy(&minutes_he, timing, 8);
+	memcpy(&hours_he, timing + 8, 4);
 
-	task->timing.minutes = htobe64(minutes_be);
-	task->timing.hours = htobe32(hours_be);
+	task->timing.minutes = htobe64(minutes_he);
+	task->timing.hours = htobe32(hours_he);
 	task->timing.days = (uint8_t)timing[12];
 	
 
