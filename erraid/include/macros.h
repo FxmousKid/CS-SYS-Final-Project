@@ -7,5 +7,6 @@
 # define TEXIT_FILE     "times-exitcodes"
 # define TASKS_DIR	"tasks/"
 # define DEV_NULL_DIR   "/dev/null"
+# define TIMING_FILE    "timing"
 
 #endif

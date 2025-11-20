@@ -44,6 +44,8 @@ static void	build_output_paths(struct s_task *task)
 		ERR_MSG("Failed to build stdout path");
 	if (!build_safe_path(task->stderr_path, PATH_MAX + 1, task->path, STDERR_FILE))
 		ERR_MSG("Failed to build stderr path");
+	if (!build_safe_path(task->texit_path, PATH_MAX + 1, task->path, TEXIT_FILE))
+		ERR_MSG("Failed to build times-exitcodes path");
 }
 
 /**
@@ -104,6 +106,10 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 		task->task_id = extract_task_id(dir.path);
 		build_output_paths(task);
 		remove_last_file_from_path(dir.path);
+		if (!parse_timing(task)) {
+			ERR_MSG("parse_timing fail");
+			return false;
+		}
 		task = task->next;
 	}
 	closedir_s_dir(&dir);
@@ -111,7 +117,7 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path)
 }
 
 /* This is the main function that will start the parsing starting from the 
- * root of the given directory, so "xxx/tasks/"
+ * root of the given directory.
  * */
 bool	parse_tasks(struct s_data *ctx)
 {
