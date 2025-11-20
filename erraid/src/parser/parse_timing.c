@@ -1,8 +1,6 @@
 # include "parser/parse_timing.h"
 
-#include <inttypes.h>
-
-bool	parse_timing(struct s_task *task) 
+bool	parse_timing(struct s_task *task, bool debug) 
 {
 	char		buf[PATH_MAX + 1] = {0};
 	unsigned char	timing[TIMING_SIZE] = {0};
@@ -12,11 +10,12 @@ bool	parse_timing(struct s_task *task)
 
 	if (!build_safe_path(buf, PATH_MAX + 1, task->path, TIMING_FILE))
 		ERR_MSG("failed to build timing file");
-	
-	printf("path task : %s\n", buf);
+
+	if (debug)
+		printf("path task : %s\n", buf);
 
 	fd = open(buf, O_RDONLY);
-	if (fd <= 0) {
+	if (fd < 0) {
 		ERR_SYS("open");
 		return false;
 	}
@@ -35,11 +34,11 @@ bool	parse_timing(struct s_task *task)
 	
 
 	// printf("minutes: %lx hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
-	printf("minutes: %" PRIx64 " hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
+	if (debug) {
+		printf("minutes: %" PRIx64 " hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
+		print_timing(task->timing);
+	}
 	close(fd);
-
-	print_timing(task->timing);
-
 	return true;
 }
 

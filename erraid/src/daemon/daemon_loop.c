@@ -40,7 +40,8 @@ static bool     append_texit(struct s_task *task)
         return true;
 }       
 
-static int	check_date(struct s_task *task) {
+static int	check_date(struct s_task *task)
+{
 	time_t		now = time(NULL);
 	struct tm	*t = localtime(&now);
 
@@ -109,7 +110,7 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	struct s_task *current_task;
 
 	current_task = ctx->tasks;
-	while (current_task){
+	while (current_task) {
 		if (check_date(current_task)) {
 			exec_task(current_task);
                         append_texit(current_task);
@@ -128,7 +129,7 @@ void    daemon_loop(struct s_data *ctx)
 
 	setup_sig_handlers();
 
-	while (is_daemon_running()){
+	while (is_daemon_running()) {
 
 		current_time = time(NULL);
 

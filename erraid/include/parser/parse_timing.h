@@ -3,13 +3,13 @@
 
 # include <limits.h>
 # include <stdbool.h>
-# include <getopt.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <string.h>
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/stat.h>
+# include <inttypes.h>
 
 // basically using the compiler to check for apple vs linux 
 # if defined(__has_include) && __has_include(<endian.h>)
@@ -23,7 +23,7 @@
 # include "utils/utils.h" // IWYU pragma: keep
 # include "macros.h" // IWYU pragma: keep
 
-bool	parse_timing(struct s_task *task);
+bool	parse_timing(struct s_task *task, bool debug);
 void	test_timing_exemple();
 
 #endif 
