@@ -11,10 +11,10 @@ modeling/
 # build
 build/
 bin/
-code/tadmor/tadmor
-code/erraid/erraid
 erraid
 tadmor
+!erraid/
+!tadmor/
 erraid/tasks/
 sujet/
 rundir/

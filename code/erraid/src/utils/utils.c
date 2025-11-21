@@ -14,6 +14,7 @@ Options Valid for the deamon :\n\
  -r, --run-directory=PATH\n\
  -h, --help\n\
  -l, --little-endian\n\
+ -d, --debug\n\
 \n\
 Mandatory or optional arguments to long options are also mandatory or optional\
  for short options\n\
