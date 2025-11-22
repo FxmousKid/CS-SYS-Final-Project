@@ -39,5 +39,6 @@ bool	find_binary_path(const char* restrict bin_name, char* restrict bin_path)
 
 		path_tmp = strtok(NULL, ":");
 	}
+	free(path_copy);
 	return found;
 }
