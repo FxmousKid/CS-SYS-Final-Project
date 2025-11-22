@@ -24,7 +24,7 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		if (!alloc_and_fill_sq_sub_dirs(cmd_sq, cmd->path))
 			goto exit;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			ret_flag |= parse_sub_trees(&cmd_sq->cmds[i]);
+			ret_flag &= parse_sub_trees(&cmd_sq->cmds[i]);
 		break;
 
 	default:
