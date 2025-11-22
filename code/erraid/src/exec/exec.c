@@ -54,7 +54,7 @@ static bool	execute_command(struct s_cmd *cmd)
 		// printf("Executing sequence of %d commands...\n", cmd->cmd.cmd_sq.nb_cmds);
 		cmd_sq = &cmd->cmd.cmd_sq;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			success = execute_command(&cmd_sq->cmds[i]);
+			success &= execute_command(&cmd_sq->cmds[i]);
 				
 		// command sequence exit code should be the last command's exit code
 		if (cmd_sq->nb_cmds > 0)
