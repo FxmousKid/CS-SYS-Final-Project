@@ -24,6 +24,7 @@ bool	parse_timing(struct s_task *task, bool debug)
 
 	if (read(fd, timing, TIMING_SIZE) < TIMING_SIZE) {
 		ERR_SYS("fail read");
+		close(fd);
 		return false;
 	}
 
