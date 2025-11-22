@@ -29,14 +29,14 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 		return false;
 	}
 
-	if (strlen(path) > PATH_MAX) {
+	if (strlen(abs_path) > PATH_MAX) {
 		ERR_MSG("Run directory path too long\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
 
 	ctx_rd = ctx->run_directory;
-	strcpy(ctx->run_directory, abs_path);
+	strcpy(ctx_rd, abs_path);
 	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
 		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;
