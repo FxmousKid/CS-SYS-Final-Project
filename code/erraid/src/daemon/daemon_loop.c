@@ -4,6 +4,7 @@
  * @brief       appends the times-exitcodes file of the task with
  *              the current time and its exit code.
  */
+
 static bool     append_texit(struct s_task *task)
 {
         int		fd;

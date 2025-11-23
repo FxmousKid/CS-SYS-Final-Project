@@ -8,6 +8,10 @@
 # include <string.h>
 # include <stdlib.h>
 # include <limits.h>
+# include <fcntl.h>
+
+# include "macros.h" // IWYU pragma: keep
+
 
 // basically using the compiler to check for apple vs linux 
 # if defined(__has_include) && __has_include(<endian.h>)
@@ -61,6 +65,7 @@ bool		build_safe_path(char *dest, size_t dest_size, const char *part1, const cha
 /** @brief convert a relative path to an absolute path */
 bool		convert_to_absolute_path(const char *relative_path, char *absolute_path);
 
+int		get_logfd(void);
 void		_write_perr(const char *func, const char *location);
 void		_write_err(const char *msg, const char *location);
 

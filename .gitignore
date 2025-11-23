@@ -21,6 +21,7 @@ sujet/
 rundir/
 
 vgcore*
+.sy5-2025-2026-projet-erraid-autotests.nosync
 
 #------------- template .gitignore file C projects. -------------
 

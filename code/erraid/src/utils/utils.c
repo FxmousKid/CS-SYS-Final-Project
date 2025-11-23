@@ -23,6 +23,21 @@ Made with Love by Iyan, Theo, and Florian.\n\
 ");
 }
 
+int	get_logfd(void)
+{
+	static int fd = 0;
+
+	if (fd == 0)
+		fd = open(LOGFILE_PATH, O_RDWR | O_CREAT | O_TRUNC, 0644);
+
+	if (fd < 0) {
+		printf("Could not create logfile\n");
+		exit(2);
+	}
+
+	return fd;
+}
+
 /**
  * @brief prints on stderr a custom error msg
  *
@@ -40,7 +55,7 @@ void	_write_perr(const char *func, const char *location)
 	strcat(buf, strerror(errno));
 	strcat(buf, location);
 
-	write(STDERR_FILENO, buf, sizeof(buf));
+	write(get_logfd(), buf, sizeof(buf));
 }
 
 /**
@@ -59,7 +74,7 @@ void		_write_err(const char *msg, const char *location)
 	strcat(buf, ": ");
 	strcat(buf, location);
 
-	write(STDERR_FILENO, buf, sizeof(buf));
+	write(get_logfd(), buf, sizeof(buf));
 }
 
 /**

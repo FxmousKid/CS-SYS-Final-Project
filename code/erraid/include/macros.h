@@ -9,5 +9,8 @@
 # define DEV_NULL_DIR   "/dev/null"
 # define TIMING_FILE    "timing"
 # define TIMING_SIZE    13
+# ifndef LOGFILE_PATH 
+#  define LOGFILE_PATH	"/tmp/logfile_erraid"
+# endif
 
 #endif
