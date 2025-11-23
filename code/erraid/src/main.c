@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
-	if (!daemonize(ctx.debug_mode)) {
-		ERR_MSG("deamonize");
-		return EXIT_FAILURE;
-	}
+	// if (!daemonize(ctx.debug_mode)) {
+	// 	ERR_MSG("deamonize");
+	// 	return EXIT_FAILURE;
+	// }
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
