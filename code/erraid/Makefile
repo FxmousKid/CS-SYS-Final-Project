@@ -40,6 +40,10 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 NAME 	:= erraid
 CC 	:= cc
 CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
+
+LOGFILE_PATH ?= $(PWD)/erraid.log
+CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
+
 LFLAGS	?=
 
 MKDIR 	:= mkdir -p
