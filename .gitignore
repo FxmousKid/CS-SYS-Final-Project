@@ -10,6 +10,8 @@ modeling/
 .editorconfig
 
 # build
+erraid.log
+tadmor.log
 build/
 bin/
 erraid
