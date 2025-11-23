@@ -7,13 +7,15 @@
 **.clangd
 modeling/
 *.drawio
+.editorconfig
 
 # build
 build/
 bin/
-tadmor/tadmor
-tadmor/tasks/
-erraid/erraid
+erraid
+tadmor
+!erraid/
+!tadmor/
 erraid/tasks/
 sujet/
 rundir/
