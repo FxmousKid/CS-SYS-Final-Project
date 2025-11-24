@@ -8,6 +8,7 @@ SRC_FILES_NAMES = main.c
 
 SRC_FILES_NAMES += parser/parse_cli.c
 SRC_FILES_NAMES += parser/parse_tasks.c
+SRC_FILES_NAMES += parser/parse_timing.c
 
 SRC_FILES_NAMES += commands/parse_cmd_tree.c
 SRC_FILES_NAMES += commands/parse_cmd_si.c
@@ -17,6 +18,13 @@ SRC_FILES_NAMES += commands/dir_cmd_utils.c
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
+SRC_FILES_NAMES += utils/binary_utils.c
+SRC_FILES_NAMES += utils/utils_timing.c
+
+SRC_FILES_NAMES += exec/exec.c
+
+SRC_FILES_NAMES += daemon/daemon.c
+SRC_FILES_NAMES += daemon/daemon_loop.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
@@ -32,6 +40,10 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 NAME 	:= erraid
 CC 	:= cc
 CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
+
+LOGFILE_PATH ?= $(PWD)/erraid.log
+CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
+
 LFLAGS	?=
 
 MKDIR 	:= mkdir -p

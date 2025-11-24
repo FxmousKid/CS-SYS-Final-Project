@@ -14,12 +14,28 @@ Options Valid for the deamon :\n\
  -r, --run-directory=PATH\n\
  -h, --help\n\
  -l, --little-endian\n\
+ -d, --debug\n\
 \n\
 Mandatory or optional arguments to long options are also mandatory or optional\
  for short options\n\
 \n\
 Made with Love by Iyan, Theo, and Florian.\n\
 ");
+}
+
+int	get_logfd(void)
+{
+	static int fd = 0;
+
+	if (fd == 0)
+		fd = open(LOGFILE_PATH, O_RDWR | O_CREAT | O_TRUNC, 0644);
+
+	if (fd < 0) {
+		printf("Could not create logfile\n");
+		exit(2);
+	}
+
+	return fd;
 }
 
 /**
@@ -39,7 +55,7 @@ void	_write_perr(const char *func, const char *location)
 	strcat(buf, strerror(errno));
 	strcat(buf, location);
 
-	write(STDERR_FILENO, buf, sizeof(buf));
+	write(get_logfd(), buf, sizeof(buf));
 }
 
 /**
@@ -58,7 +74,7 @@ void		_write_err(const char *msg, const char *location)
 	strcat(buf, ": ");
 	strcat(buf, location);
 
-	write(STDERR_FILENO, buf, sizeof(buf));
+	write(get_logfd(), buf, sizeof(buf));
 }
 
 /**
@@ -145,4 +161,74 @@ void	append_int_to_buf(char *buf, int n)
 	while (i-- > 0)
 		buf[j++] = num_buf[i];
 	buf[j] = '\0';
+}
+
+/**
+ * @brief Removes trailing slash from a path if present
+ * 
+ * @param path The path to clean
+ */
+void	remove_trailing_slash(char *path)
+{
+	size_t len = strlen(path);
+
+	if (len > 0 && path[len - 1] == '/')
+		path[len - 1] = '\0';
+}
+
+
+/**
+ * @brief Builds a path by concatenating two parts safely
+ * 
+ * @param dest 		Destination buffer
+ * @param dest_size 	Size of destination buffer
+ * @param part1 	First part of the path
+ * @param part2 	Second part of the path
+ * @return 		true on success, false if truncation occurred
+ */
+bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2)
+{
+	if (strlcpy(dest, part1, dest_size) >= dest_size)
+		return false;
+	
+	size_t current_len = strlen(dest);
+	
+	// Add a slash if necessary
+	if (current_len > 0 && current_len < dest_size - 1 && dest[current_len - 1] != '/') {
+		dest[current_len] = '/';
+		dest[current_len + 1] = '\0';
+		current_len++;
+	}
+	
+	if (strlcat(dest, part2, dest_size) >= dest_size)
+		return false;
+		
+	return true;
+}
+
+/**
+ * @brief Convert a relative path to an absolute path
+ * 
+ * @param relative_path	relative path to convert
+ * @param absolute_path	buffer to write the absolute path
+ * @return 		true on success, false otherwise
+ */
+bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
+{
+	char    *tmp;
+
+	if (relative_path[0] == '/') {
+		strlcpy(absolute_path, relative_path, PATH_MAX + 1);
+		return true;
+	}
+
+	tmp = realpath(relative_path, NULL);
+	if (!tmp) {
+		ERR_SYS("realpath");
+		return false;
+	}
+
+	strlcpy(absolute_path, tmp, PATH_MAX + 1);
+	free(tmp);
+	return true;
 }
