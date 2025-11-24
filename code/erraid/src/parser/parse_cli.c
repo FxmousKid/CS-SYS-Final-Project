@@ -9,26 +9,34 @@ static void	set_run_dir_default(struct s_data *ctx)
 	strcpy(ctx->run_directory, "/tmp/");
 	if (user)
 		strcat(ctx->run_directory, user);
-	strcat(ctx->run_directory, "/erraid");	
+	strcat(ctx->run_directory, "/erraid/");	
 }
 
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
 	char	*ctx_rd;
+	char	abs_path[PATH_MAX + 1];
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid run directory path\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	if (strlen(path) > PATH_MAX) {
+
+	if (!convert_to_absolute_path(path, abs_path)) {
+		ERR_MSG("Failed to convert to absolute path: %s\n");
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+
+	if (strlen(abs_path) > PATH_MAX) {
 		ERR_MSG("Run directory path too long\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
 
 	ctx_rd = ctx->run_directory;
-	strcpy(ctx->run_directory, path);
+	strcpy(ctx_rd, abs_path);
 	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
 		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;
@@ -49,6 +57,11 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 		print_help();
 		return false;
 
+	// debug mode : daemon writes to stdout;
+	case 'd':
+		ctx->debug_mode = true;
+		break;
+
 	// data is little-endian : -l
 	case 'l':
 		ctx->is_data_le = true;
@@ -66,12 +79,13 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hlr:";		
+	char		*shortopts = "hdlr:";		
 	int		opt;
 	extern int	opterr;
 
 	struct option longopts[] = {
 		{"help", no_argument, NULL, 'h'},
+		{"debug", no_argument, NULL, 'd'},
 		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'r'},
 		{NULL, 0, NULL, 0}

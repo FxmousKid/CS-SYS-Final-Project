@@ -5,12 +5,12 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 	struct s_cmd_sq	*cmd_sq = NULL;
 	bool		ret_flag = true;
 
+	if (!(cmd->cmd_type = get_cmd_type(cmd->path)))
+		return false;
+
 	if (!opendir_cmd(&cmd->cmd_dir, cmd->path))
 		return false;
 	
-	if (!(cmd->cmd_type = get_cmd_type(cmd->path))) {
-		return false;
-	}
 
 	switch (cmd->cmd_type) {
 	case CMD_SI:
@@ -24,7 +24,7 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		if (!alloc_and_fill_sq_sub_dirs(cmd_sq, cmd->path))
 			goto exit;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			ret_flag |= parse_sub_trees(&cmd_sq->cmds[i]);
+			ret_flag &= parse_sub_trees(&cmd_sq->cmds[i]);
 		break;
 
 	default:

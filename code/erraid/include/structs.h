@@ -3,6 +3,7 @@
 # define STRUCT_H
 
 # include <stdlib.h>
+# include <stdint.h>
 # include <limits.h>
 # include <stdbool.h>
 # include <dirent.h>
@@ -50,31 +51,38 @@ struct s_cmd {
 	enum cmd_type	cmd_type;
 	union u_cmd	cmd;
 	pid_t		pid;
-	short		exit_code;
+	uint16_t	exit_code;
 };
 
 struct s_timing {
-
+	uint64_t	minutes;
+	uint32_t	hours;
+	uint8_t		days;
 };
 
 struct s_task {
-	int		task_id;
+	char		path[PATH_MAX + 1];
+	char		stdout_path[PATH_MAX + 1];
+	char		stderr_path[PATH_MAX + 1];
+	char 		texit_path[PATH_MAX + 1];
 	struct s_timing	timing;
 	struct s_cmd	*cmd;
 	struct s_task	*next;
-	char		path[PATH_MAX + 1];
+	int		task_id;
 };
 
 /* @brief struct representing the daemon data */
 struct s_data {
+	/** @brief Ptr to first tasks, linked list like structure*/
+	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
-	short	exit_code;
+	uint8_t	exit_code;
 	/** @brief provided path to the run directory. */
 	char	run_directory[PATH_MAX + 1];
 	/** @brief flag to indiciate if tasks files are little endian. */
 	bool	is_data_le;
-	/** @brief Ptr to first tasks, linked list like structure*/
-	struct s_task	*tasks;
+	/** @brief flag to indicate if debug mode is enabled. */
+	bool	debug_mode;
 };
 
 #endif

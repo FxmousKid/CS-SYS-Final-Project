@@ -13,6 +13,7 @@
 # include "commands/dir_cmd_utils.h" // IWYU pragma: keep
 # include "structs.h"
 
+
 bool	alloc_and_fill_sq_sub_dirs(struct s_cmd_sq *cmd_sq, const char *path);
 
 #endif
