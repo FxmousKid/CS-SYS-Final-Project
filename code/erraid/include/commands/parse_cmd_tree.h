@@ -14,6 +14,7 @@
 # include "commands/parse_cmd_sq.h" // IWYU pragma: keep
 # include "commands/dir_cmd_utils.h" // IWYU pragma: keep
 
+
 /** @brief parses the commands from the top-level cmd/ dir. */
 struct s_cmd	*parse_cmd_tree(const char *path_cmd_dir);
 

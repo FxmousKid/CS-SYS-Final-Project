@@ -7,17 +7,23 @@
 **.clangd
 modeling/
 *.drawio
+.editorconfig
 
 # build
+erraid.log
+tadmor.log
 build/
 bin/
-tadmor/tadmor
-tadmor/tasks/
-erraid/erraid
+erraid
+tadmor
+!erraid/
+!tadmor/
 erraid/tasks/
 sujet/
+rundir/
 
 vgcore*
+.sy5-2025-2026-projet-erraid-autotests.nosync
 
 #------------- template .gitignore file C projects. -------------
 
