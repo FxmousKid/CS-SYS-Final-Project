@@ -32,13 +32,13 @@ CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
 
 MKDIR 	:= mkdir -p
 RM_RF	:= rm -rf
-ECHO	:= echo -e
+ECHO	:= printf '%b\n'
 
-BLUE	:= $(shell $(ECHO) "\033[34m") 
-BROWN	:= $(shell $(ECHO) "\033[33m")
-GREEN	:= $(shell $(ECHO) "\033[32m")
-RED	:= $(shell $(ECHO) "\033[31m")
-NC	:= $(shell $(ECHO) "\033[0m")
+BLUE	:= \033[34m
+BROWN	:= \033[33m
+GREEN	:= \033[32m
+RED	:= \033[31m
+NC	:= \033[0m
 
 #<><><><><><><> Recipes <><><><><><><><><><><><><><><><><><>
 
