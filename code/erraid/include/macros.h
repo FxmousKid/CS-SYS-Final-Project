@@ -10,7 +10,7 @@
 # define TIMING_FILE    "timing"
 # define TIMING_SIZE    13
 # ifndef LOGFILE_PATH 
-#  define LOGFILE_PATH	"/tmp/logfile_erraid"
+#  define LOGFILE_PATH	"/tmp/erraid.log"
 # endif
 
 #endif
