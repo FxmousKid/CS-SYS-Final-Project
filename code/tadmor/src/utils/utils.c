@@ -206,7 +206,7 @@ bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
 
 	tmp = realpath(relative_path, NULL);
 	if (!tmp) {
-		// ERR_SYS("realpath");
+		ERR_SYS("realpath : %s", relative_path);
 		return false;
 	}
 

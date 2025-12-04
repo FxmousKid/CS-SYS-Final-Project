@@ -1,19 +1,59 @@
 #include "parser/parse_cli.h"
 
+static void	set_pipes_dir_default(struct s_data *ctx)
+{
+	char *user;
+
+	user = getenv("USER");
+	strcpy(ctx->pipes_dir, "/tmp/");
+	if (user)
+		strcat(ctx->pipes_dir, user);
+	strcat(ctx->pipes_dir, "/erraid/pipe");
+}
+
+
+static bool	parse_custom_pipes_dir(struct s_data *ctx, const char *path)
+{
+	char	*ctx_rd;
+	char	abs_path[PATH_MAX + 1];
+
+	if (!path || !*path) {
+		ERR_MSG("Invalid pipes dir path\n");
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+
+	if (!convert_to_absolute_path(path, abs_path)) {
+		ERR_MSG("Failed to convert to absolute path: %s\n", path);
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+
+	if (strlen(abs_path) > PATH_MAX) {
+		ERR_MSG("Pipes directory path too long\n");
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+
+	ctx_rd = ctx->pipes_dir;
+	strcpy(ctx_rd, abs_path);
+	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
+		ctx_rd[strlen(ctx_rd)] = '/';
+	return true;
+}
+
 static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 {
 	char	*taskid = NULL;
 	char	*minutes = NULL;
 	char	*hours = NULL;
 	char	*daysofweek = NULL;
-	char	*pipes_dir = NULL;
 
 	// for -Werror...
 	(void)taskid;
 	(void)minutes;
 	(void)hours;
 	(void)daysofweek;
-	(void)pipes_dir;
 
 	switch(opt) {
 	
@@ -74,7 +114,8 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	
 	// the directory for storing named pipes
 	case 'p':
-		pipes_dir = optarg;
+		if (!parse_custom_pipes_dir(ctx, optarg))
+			return false;
 		break;
 
 	// if launched in debug mode
@@ -143,7 +184,10 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 {
 	parse_options(ctx, argc, argv);
 	argc -= optind;
-	argv += optind;
+	argv += optind;	
+	if (ctx->pipes_dir[0] == '\0')
+		set_pipes_dir_default(ctx);
+
 
 	// add cmd and tasks parsing
 	// parse_arguments(ctx, argc, argv);
