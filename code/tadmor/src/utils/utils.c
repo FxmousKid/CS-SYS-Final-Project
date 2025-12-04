@@ -1,0 +1,216 @@
+#include "utils/utils.h"
+
+/**
+ * @brief Print usage string on stdout : -h option
+ */
+void	print_help(void)
+{
+	printf("\
+Usage: tadmor [OPTION...]\n\
+A client that can interact the erraid daemon\n\
+\n\
+Options Valid for tadmor :\n\
+\n\
+ -l, --list-tasks\n\
+ -r, --remove-task=TASKID\n\
+ -x, --show-exit-code-history=TASKID\n\
+ -o, --show-last-stdout=TASKID\n\
+ -e, --show-last-stderr=TASKID\n\
+\n\
+Options to create tasks :\n\
+ -c, --create-simple-command\n\
+ -s, --create-sequence-command\n\
+ -m, --minutes=MINUTES\n\
+ -H, --hours=HOURS\n\
+ -d, --days-of-week=DAYSOFWEEK\n\
+ -n, --no-time\n\
+\n\
+Miscellenaeous options :\n\
+ -q, --stop-daemon\n\
+ -p, --pipes-directory=PATH\n\
+ -b, --debug\n\
+ -h, --help\n\
+\n\
+Mandatory or optional arguments to long options are also mandatory or optional\
+ for short options\n\
+\n\
+Made with Love by Iyan, Theo, and Florian.\n\
+");
+}
+
+int	get_logfd(void)
+{
+	static int fd = 0;
+
+	if (fd == 0)
+		fd = open(LOGFILE_PATH, O_RDWR | O_CREAT | O_TRUNC, 0644);
+
+	if (fd < 0) {
+		printf("Could not create logfile\n");
+		exit(2);
+	}
+
+	return fd;
+}
+
+/**
+ * @brief prints on stderr a custom error msg
+ *
+ * @param location the macro that wraps __FILE__ and __LINE__
+ *
+ * @note this is internal function, and location is usually
+ * a macro expanding to file and line number
+ */
+void	_write_perr(const char *location)
+{
+	dprintf(get_logfd(), ": %s [%s]\n", strerror(errno), location);
+}
+
+/**
+ * @brief prints on stderr a custom error msg
+ *
+ * @param msg the custom error message
+ *
+ * @note this is internal function, and location is usually
+ * a macro expanding to file and line number
+ */
+void	_write_err(const char *location)
+{
+
+	dprintf(get_logfd(), "[%s]\n", location);
+}
+
+
+/**
+ * @brief prints a NULL-terminated double array of strings
+ *
+ * @param tab the double array to print
+ */
+void	print_darr(const char *tab_name, char **tab)
+{
+	printf("%s = {", tab_name);
+	while (*tab) {
+		printf("\"%s\", ", *tab);
+		tab++;
+	}
+	printf("\b\b}\n");
+}
+
+/**
+ * @brief Frees a NULL-terminated double array
+ *
+ * @param darr the double array to free
+ */
+void	free_darr(char **darr)
+{
+	char	**tmp;
+
+	tmp = darr;
+	while (*tmp)
+	{
+		free(*tmp);
+		tmp++;
+	}
+	free(darr);
+}
+
+/**
+ * @brief Appends the string representation of an integer to a buffer
+ *
+ * @param buf the buffer to append to
+ * @param n the integer to append
+ */
+void	append_int_to_buf(char *buf, int n)
+{
+	char	num_buf[12];
+	int		i;
+	int		j;
+
+	buf += strlen(buf);
+	if (n == 0)
+	{
+		buf[0] = '0';
+		buf[1] = '\0';
+		return ;
+	}
+	i = 0;
+	while (n > 0)
+	{
+		num_buf[i++] = (n % 10) + '0';
+		n /= 10;
+	}
+	j = 0;
+	while (i-- > 0)
+		buf[j++] = num_buf[i];
+	buf[j] = '\0';
+}
+
+/**
+ * @brief Removes trailing slash from a path if present
+ * 
+ * @param path The path to clean
+ */
+void	remove_trailing_slash(char *path)
+{
+	size_t len = strlen(path);
+
+	if (len > 0 && path[len - 1] == '/')
+		path[len - 1] = '\0';
+}
+
+
+/**
+ * @brief Builds a path by concatenating two parts safely
+ * 
+ * @param dest 		Destination buffer
+ * @param dest_size 	Size of destination buffer
+ * @param part1 	First part of the path
+ * @param part2 	Second part of the path
+ * @return 		true on success, false if truncation occurred
+ */
+bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char *part2)
+{
+	if (strlcpy(dest, part1, dest_size) >= dest_size)
+		return false;
+	
+	size_t current_len = strlen(dest);
+	
+	// Add a slash if necessary
+	if (current_len > 0 && current_len < dest_size - 1 && dest[current_len - 1] != '/') {
+		dest[current_len] = '/';
+		dest[current_len + 1] = '\0';
+		current_len++;
+	}
+	
+	if (strlcat(dest, part2, dest_size) >= dest_size)
+		return false;
+		
+	return true;
+}
+
+/**
+ * @brief Convert a relative path to an absolute path
+ * 
+ * @param relative_path	relative path to convert
+ * @param absolute_path	buffer to write the absolute path
+ * @return 		true on success, false otherwise
+ */
+bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
+{
+	char    *tmp;
+
+	if (relative_path[0] == '/') {
+		strlcpy(absolute_path, relative_path, PATH_MAX + 1);
+		return true;
+	}
+
+	tmp = realpath(relative_path, NULL);
+	if (!tmp) {
+		ERR_SYS("realpath : %s", relative_path);
+		return false;
+	}
+
+	strlcpy(absolute_path, tmp, PATH_MAX + 1);
+	free(tmp);
+	return true;
+}
