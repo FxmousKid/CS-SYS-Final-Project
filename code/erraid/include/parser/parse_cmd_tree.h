@@ -10,9 +10,9 @@
 
 # include "structs.h" // IWYU pragma: keep
 # include "utils/utils.h" // IWYU pragma: keep
-# include "commands/parse_cmd_si.h" // IWYU pragma: keep
-# include "commands/parse_cmd_sq.h" // IWYU pragma: keep
-# include "commands/dir_cmd_utils.h" // IWYU pragma: keep
+# include "parser/parse_cmd_si.h" // IWYU pragma: keep
+# include "parser/parse_cmd_sq.h" // IWYU pragma: keep
+# include "utils/dir_cmd_utils.h" // IWYU pragma: keep
 
 
 /** @brief parses the commands from the top-level cmd/ dir. */

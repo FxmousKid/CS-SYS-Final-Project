@@ -1,4 +1,4 @@
-#include "commands/cmd_utils.h"
+#include "utils/cmd_utils.h"
 
 // defined in main.c
 extern bool isdle;

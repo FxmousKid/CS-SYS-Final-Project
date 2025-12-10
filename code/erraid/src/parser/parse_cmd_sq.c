@@ -1,4 +1,4 @@
-#include "commands/parse_cmd_sq.h"
+#include "parser/parse_cmd_sq.h"
 
 bool	alloc_and_fill_sq_sub_dirs(struct s_cmd_sq *cmd_sq, const char *path)
 {

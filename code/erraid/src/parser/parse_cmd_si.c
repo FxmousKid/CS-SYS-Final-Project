@@ -1,4 +1,4 @@
-#include "commands/parse_cmd_si.h"
+#include "parser/parse_cmd_si.h"
 
 // defined in main.c
 extern bool isdle;

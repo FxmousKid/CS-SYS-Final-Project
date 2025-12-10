@@ -9,22 +9,26 @@ SRC_FILES_NAMES = main.c
 SRC_FILES_NAMES += parser/parse_cli.c
 SRC_FILES_NAMES += parser/parse_tasks.c
 SRC_FILES_NAMES += parser/parse_timing.c
-
-SRC_FILES_NAMES += commands/parse_cmd_tree.c
-SRC_FILES_NAMES += commands/parse_cmd_si.c
-SRC_FILES_NAMES += commands/parse_cmd_sq.c
-SRC_FILES_NAMES += commands/cmd_utils.c
-SRC_FILES_NAMES += commands/dir_cmd_utils.c
+SRC_FILES_NAMES += parser/parse_cmd_tree.c
+SRC_FILES_NAMES += parser/parse_cmd_si.c
+SRC_FILES_NAMES += parser/parse_cmd_sq.c
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
 SRC_FILES_NAMES += utils/binary_utils.c
 SRC_FILES_NAMES += utils/utils_timing.c
+SRC_FILES_NAMES += utils/cmd_utils.c
+SRC_FILES_NAMES += utils/dir_cmd_utils.c
 
 SRC_FILES_NAMES += exec/exec.c
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c
+
+SRC_FILES_NAMES += communication/fifo_api.c
+
+SRC_FILES_NAMES += commands/list_tasks.c
+SRC_FILES_NAMES += commands/commands.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
