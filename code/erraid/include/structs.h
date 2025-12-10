@@ -8,11 +8,37 @@
 # include <stdbool.h>
 # include <dirent.h>
 
+# include "macros.h"
+
 struct s_dir {
 	DIR	*dir;
 	DIR	*old_dir;
 	char	path[PATH_MAX + 1];
 
+};
+
+struct s_reply {
+	uint8_t	*buf;
+	size_t	buf_size;
+};
+
+enum req_opcode {
+	/** @brief List all tasks. */
+	OPCODE_LS = 0x4c53,
+	/** @brief Create a new simple task. */
+	OPCODE_CR = 0x4352,
+	/** @brief Create a new task by combining existing tasks. */
+	OPCODE_CB = 0x4342,
+	/** @brief Remove a task. */
+	OPCODE_RM = 0x524d,
+	/** @brief List execution times and exit codes of all previous runs of a task. */
+	OPCODE_TX = 0x5458,
+	/** @brief Display the standard output of the last complete execution of a task. */
+	OPCODE_SO = 0x534f,
+	/** @brief Display the standard error output of the last complete execution of a task. */
+	OPCODE_SE = 0x5345,
+	/** @brief Terminate the daemon. */
+	OPCODE_TM = 0x4b49,
 };
 
 enum	cmd_type {
@@ -76,13 +102,18 @@ struct s_data {
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
-	uint8_t	exit_code;
-	/** @brief provided path to the run directory. */
-	char	run_directory[PATH_MAX + 1];
+	uint8_t		exit_code;
+	/** @brief provided or default path to the run directory. *
+	 * '- 100' to keep space for dedicated folders like tasks/ */
+	char		run_directory[PATH_MAX + 1 - 100];
+	/** @brief Full path for reply fifo.  */
+	char		fifo_reply[PATH_MAX + 1 - sizeof(REPLY_FIFO_NAME)];
+	/** @brief Full path for request fifo.  */
+	char		fifo_request[PATH_MAX + 1 - sizeof(REQUEST_FIFO_NAME)];
 	/** @brief flag to indiciate if tasks files are little endian. */
-	bool	is_data_le;
+	bool		is_data_le;
 	/** @brief flag to indicate if debug mode is enabled. */
-	bool	debug_mode;
+	bool		debug_mode;
 };
 
 #endif

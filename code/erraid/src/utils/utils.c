@@ -41,21 +41,14 @@ int	get_logfd(void)
 /**
  * @brief prints on stderr a custom error msg
  *
- * @param msg the custom error message
+ * @param location the macro that wraps __FILE__ and __LINE__
  *
  * @note this is internal function, and location is usually
  * a macro expanding to file and line number
  */
-void	_write_perr(const char *func, const char *location)
+void	_write_perr(const char *location)
 {
-	char	buf[256] = {0};
-	strcpy(buf, "erraid: ");
-	strcat(buf, func);
-	strcat(buf, ": ");
-	strcat(buf, strerror(errno));
-	strcat(buf, location);
-
-	write(get_logfd(), buf, sizeof(buf));
+	dprintf(get_logfd(), ": %s [%s]\n", strerror(errno), location);
 }
 
 /**
@@ -66,15 +59,10 @@ void	_write_perr(const char *func, const char *location)
  * @note this is internal function, and location is usually
  * a macro expanding to file and line number
  */
-void		_write_err(const char *msg, const char *location)
+void	_write_err(const char *location)
 {
-	char	buf[256] = {0};
-	strcpy(buf, "erraid: ");
-	strcat(buf, msg);
-	strcat(buf, ": ");
-	strcat(buf, location);
 
-	write(get_logfd(), buf, sizeof(buf));
+	dprintf(get_logfd(), "[%s]\n", location);
 }
 
 /**
