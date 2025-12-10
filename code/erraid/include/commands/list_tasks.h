@@ -1,10 +1,7 @@
 #ifndef LIST_TASKS_H
-# define LIST_TASKS_H 
+# define LIST_TASKS_H
 
 # include <stdbool.h>
-# include <string.h> // IWYU pragma: keep
-# include <unistd.h>
-# include <fcntl.h>
 
 # include "structs.h" // IWYU pragma: keep
 # include "utils/utils.h" // IWYU pragma: keep

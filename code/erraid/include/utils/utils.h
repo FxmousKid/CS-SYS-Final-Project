@@ -24,9 +24,11 @@
 
 # define STRINGIFY(x) #x
 # define TOSTRING(x) STRINGIFY(x)
-# define DBG " [" __FILE__ " @ " TOSTRING(__LINE__) "]\n"
-# define ERR_SYS(func) _write_perr(func, DBG)
-# define ERR_MSG(msg) _write_err(msg, DBG)
+# define DBG __FILE__ " @ " TOSTRING(__LINE__)
+// # define ERR_SYS(func) _write_perr(func, DBG) // <-- deprecated
+// # define ERR_MSG(msg) _write_err(msg, DBG) // <-- deprecated
+# define ERR_SYS(...) do { dprintf(get_logfd(), __VA_ARGS__); _write_perr(DBG); } while (0);
+# define ERR_MSG(...) do { dprintf(get_logfd(), __VA_ARGS__); _write_err(DBG); } while (0);
 
 /**
  * @brief calls read(2) and converts (if needed) data to host byte order
@@ -66,7 +68,8 @@ bool		build_safe_path(char *dest, size_t dest_size, const char *part1, const cha
 bool		convert_to_absolute_path(const char *relative_path, char *absolute_path);
 
 int		get_logfd(void);
-void		_write_perr(const char *func, const char *location);
-void		_write_err(const char *msg, const char *location);
+void		_write_perr(const char *location);
+void		_write_err(const char *location);
+
 
 #endif

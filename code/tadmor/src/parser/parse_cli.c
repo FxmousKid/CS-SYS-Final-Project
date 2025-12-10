@@ -1,21 +1,25 @@
 #include "parser/parse_cli.h"
 
-static void	set_pipes_dir_default(struct s_data *ctx)
+static void	set_fifos_path_default(struct s_data *ctx)
 {
-	char *user;
+	char	*user;
+	// should be more than enough for /tmp/$USER/erraid/pipes/
+	char	buf[512] = {0};
 
 	user = getenv("USER");
-	strcpy(ctx->pipes_dir, "/tmp/");
+	strcpy(buf, "/tmp/");
 	if (user)
-		strcat(ctx->pipes_dir, user);
-	strcat(ctx->pipes_dir, "/erraid/pipe");
+		strcat(buf, user);
+	strcat(buf, "/erraid/pipes");
+	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s/%s", buf, REQUEST_FIFO_NAME);
+	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply), "%s/%s", buf, REPLY_FIFO_NAME);
 }
 
-
-static bool	parse_custom_pipes_dir(struct s_data *ctx, const char *path)
+static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
-	char	*ctx_rd;
-	char	abs_path[PATH_MAX + 1];
+	// 'PATH_MAX + 1' for the biggest path, 
+	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
+	char	abs_path[PATH_MAX + 1 - sizeof(REQUEST_FIFO_NAME)] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");
@@ -24,21 +28,19 @@ static bool	parse_custom_pipes_dir(struct s_data *ctx, const char *path)
 	}
 
 	if (!convert_to_absolute_path(path, abs_path)) {
-		ERR_MSG("Failed to convert to absolute path: %s\n", path);
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
 
-	if (strlen(abs_path) > PATH_MAX) {
-		ERR_MSG("Pipes directory path too long\n");
+	if (abs_path[strlen(abs_path) - 1] != '/' && strlen(abs_path) < PATH_MAX - 1)
+		abs_path[strlen(abs_path)] = '/';
+	if (strlen(abs_path) + strlen(REQUEST_FIFO_NAME) + 1 >= PATH_MAX) {
+		ERR_MSG("Full fifo path too long : %s\n", abs_path);
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-
-	ctx_rd = ctx->pipes_dir;
-	strcpy(ctx_rd, abs_path);
-	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
-		ctx_rd[strlen(ctx_rd)] = '/';
+	snprintf(ctx->fifo_reply, PATH_MAX + 1 , "%s%s", abs_path, REPLY_FIFO_NAME);
+	snprintf(ctx->fifo_request, PATH_MAX + 1, "%s%s", abs_path, REQUEST_FIFO_NAME);
 	return true;
 }
 
@@ -59,11 +61,12 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	
 	// list tasks
 	case 'l':
+		ctx->communication_func = list_tasks;
 		break;
 
 	// remove a task
 	case 'r':
-		taskid = optarg;
+		ctx->task_id = atol(optarg);
 		break;
 
 	// show exit code history of a task
@@ -114,13 +117,13 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	
 	// the directory for storing named pipes
 	case 'p':
-		if (!parse_custom_pipes_dir(ctx, optarg))
+		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
 		break;
 
 	// if launched in debug mode
 	case 'b':
-		ctx->debug = true;
+		ctx->debug_mode = true;
 		break;
 	
 	// display help dialog
@@ -185,9 +188,8 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	parse_options(ctx, argc, argv);
 	argc -= optind;
 	argv += optind;	
-	if (ctx->pipes_dir[0] == '\0')
-		set_pipes_dir_default(ctx);
-
+	if (ctx->fifo_request[0] == '\0')
+		set_fifos_path_default(ctx);
 
 	// add cmd and tasks parsing
 	// parse_arguments(ctx, argc, argv);

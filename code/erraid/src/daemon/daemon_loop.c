@@ -120,7 +120,6 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	}
 }
 
-
 void    daemon_loop(struct s_data *ctx)
 {
 	time_t	next_execution ;
@@ -135,6 +134,8 @@ void    daemon_loop(struct s_data *ctx)
 	
 	while (is_daemon_running()) {
 
+		handle_all_requests(ctx);
+		
 		current_time = time(NULL);
 
 		// Check every minute if a task can be executed

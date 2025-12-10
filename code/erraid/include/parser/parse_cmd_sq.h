@@ -9,8 +9,8 @@
 # include <inttypes.h>
 
 # include "utils/utils.h" // IWYU pragma: keep
-# include "commands/cmd_utils.h" // IWYU pragma: keep
-# include "commands/dir_cmd_utils.h" // IWYU pragma: keep
+# include "utils/cmd_utils.h" // IWYU pragma: keep
+# include "utils/dir_cmd_utils.h" // IWYU pragma: keep
 # include "structs.h"
 
 

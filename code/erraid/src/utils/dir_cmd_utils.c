@@ -1,4 +1,4 @@
-#include "commands/dir_cmd_utils.h"
+#include "utils/dir_cmd_utils.h"
 
 /**
  * @brief Opens a directory in dir->dir and copies in dir->path
@@ -14,7 +14,7 @@
 bool	opendir_cmd(DIR **dir, const char *path_cmd_dir)
 {
 	if (!(*dir = opendir(path_cmd_dir))) {
-		ERR_SYS("opendir");
+		ERR_SYS("opendir: can't open %s", path_cmd_dir);
 		return false;
 	}
 	// if dir->path is empty (opening first cmd/ )
@@ -115,4 +115,28 @@ int	count_sub_cmds(const char *path)
 	}
 	closedir_s_dir(&dir);
 	return (count);
+}
+
+
+/* creates the run_directory if it doesn't exist
+ * then creates $RUN_DIR/tasks/ and $RUN_DIR/pipes/  */
+bool	create_initial_dirs(const char *run_dir)
+{
+	char	buf[PATH_MAX + 1] = {0};
+
+	if (mkdir(run_dir, 0755) < 0 && errno != EEXIST) {
+		ERR_SYS("mkdir(%s, 0755)", run_dir);
+		return false;
+	}
+	snprintf(buf, sizeof(buf), "%stasks", run_dir);
+	if (mkdir(buf, 0755) < 0 && errno != EEXIST) {
+		ERR_SYS("mkdir(%s, 0755)", buf);
+		return false;
+	}
+	snprintf(buf, sizeof(buf), "%spipes", run_dir);
+	if (mkdir(buf, 0755) < 0 && errno != EEXIST) {
+		ERR_SYS("mkdir(%s, 0755)", buf);
+		return false;
+	}
+	return true;
 }

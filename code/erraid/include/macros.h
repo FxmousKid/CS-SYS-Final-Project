@@ -12,5 +12,7 @@
 # ifndef LOGFILE_PATH 
 #  define LOGFILE_PATH	"/tmp/erraid.log"
 # endif
+# define REQUEST_FIFO_NAME "erraid-request-pipe"
+# define REPLY_FIFO_NAME   "erraid-reply-pipe"
 
 #endif
