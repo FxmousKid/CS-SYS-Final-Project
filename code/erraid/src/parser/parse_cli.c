@@ -2,7 +2,6 @@
 
 static void	set_fifos_path_default(struct s_data *ctx)
 {
-
 	if(!build_safe_path(ctx->pipes_directory, PATH_MAX + 1, ctx->run_directory, PIPES_DIR)) {
 		ERR_MSG("Failed to build pipes directory path");
 		return;
