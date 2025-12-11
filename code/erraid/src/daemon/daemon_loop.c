@@ -57,18 +57,14 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 
 	current_task = ctx->tasks;
 
-	// Debug variables (remove them)
-	int task_count;
-	int task_id;
-        task_count = 0;
-        // Debug lines (remove them)
+	int		task_count = 0;
+	taskid_t	task_id;
 	printf("Execution\n");
 
 	while (current_task){
 
-		// Debug lines (remove them)
 		task_id = current_task->task_id;
-		printf("\n Executing Task %d\n", task_id);
+		printf("\n Executing Task %lld\n", task_id);
 		printf("Path: %s\n", current_task->path);
 		print_cmd_tree(current_task->cmd);
 		printf("Output files:\n");
@@ -76,11 +72,9 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 		printf("  stderr: %s\n", current_task->stderr_path);
                 printf("  times-exitcodes: %s\n", current_task->texit_path);
 
-                // Clean these if else later 
 		if (check_date(current_task)) {
 			if (exec_task(current_task)) {
-				// Debug lines
-				printf("Task %d executed successfully\n", task_id);
+				printf("Task %lld executed successfully\n", task_id);
 				printf("Exit code: %d\n", current_task->cmd->exit_code);
                                 
                                 // Append times-exitcodes file
@@ -90,19 +84,15 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
                                         printf("append_texit failed\ttexit_path = %s", current_task->texit_path);
                         }
 			else {
-				// Debug lines
-				printf("Task %d execution failed\n", task_id);
+				printf("Task %lld execution failed\n", task_id);
 			}
 		} else {
-			printf("Task %d not yet executed", task_id);
+			printf("Task %lld not yet executed", task_id);
 		}
 		
-		// Debug line
 		task_count++;
-		
 		current_task = current_task->next;
 	}
-	// Debug line
 	printf("\nTotal: executed %d tasks\n", task_count);
 }
 
