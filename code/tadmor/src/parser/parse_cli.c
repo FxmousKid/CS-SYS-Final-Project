@@ -19,7 +19,7 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
 	// 'PATH_MAX + 1' for the biggest path, 
 	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
-	char	abs_path[sizeof(ctx->fifo_request)] = {0};
+	char	abs_path[sizeof(ctx->fifo_request) - REQUEST_FIFO_NAME_LEN] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");

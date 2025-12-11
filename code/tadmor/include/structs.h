@@ -64,9 +64,9 @@ struct s_cmd {
 
 struct s_data {
 	/** @brief Full path for reply fifo.  */
-	char		fifo_reply[PATH_MAX + 1 - REPLY_FIFO_NAME_LEN];
+	char		fifo_reply[PATH_MAX + 1];
 	/** @brief Full path for request fifo.  */
-	char		fifo_request[PATH_MAX + 1 - REQUEST_FIFO_NAME_LEN];
+	char		fifo_request[PATH_MAX + 1];
 	/** @brief exit code of the daemon. */
 	uint8_t			exit_code;
 	/** @brief the constructed command object to send. */
