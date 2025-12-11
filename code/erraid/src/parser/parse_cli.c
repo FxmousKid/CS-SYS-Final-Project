@@ -2,17 +2,16 @@
 
 static void	set_fifos_path_default(struct s_data *ctx)
 {
-	char	*user;
-	// should be more than enough for /tmp/$USER/erraid/pipes/
-	char	buf[512] = {0};
+	char pipes_dir_path[PATH_MAX + 1];
 
-	user = getenv("USER");
-	strcpy(buf, "/tmp/");
-	if (user)
-		strcat(buf, user);
-	strcat(buf, "/erraid/pipes");
-	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s/%s", buf, REQUEST_FIFO_NAME);
-	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply), "%s/%s", buf, REPLY_FIFO_NAME);
+	if(!build_safe_path(pipes_dir_path, PATH_MAX + 1, ctx->run_directory, PIPES_DIR)) {
+		ERR_MSG("Failed to build pipes directory path");
+		return;
+	}
+	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, pipes_dir_path, REQUEST_FIFO_NAME))
+		ERR_MSG("Failed to build request fifo path");
+	if (!build_safe_path(ctx->fifo_reply, PATH_MAX + 1, pipes_dir_path, REPLY_FIFO_NAME))
+		ERR_MSG("Failed to build reply fifo path");
 }
 
 static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
@@ -128,7 +127,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hdlr:p:";		
+	char		*shortopts = "hdlr:p:";
 	int		opt;
 	extern int	opterr;
 
