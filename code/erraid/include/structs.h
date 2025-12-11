@@ -10,6 +10,8 @@
 
 # include "macros.h"
 
+typedef uint64_t	taskid_t;
+
 struct s_dir {
 	DIR	*dir;
 	DIR	*old_dir;
@@ -94,7 +96,7 @@ struct s_task {
 	struct s_timing	timing;
 	struct s_cmd	*cmd;
 	struct s_task	*next;
-	int		task_id;
+	taskid_t	task_id;
 };
 
 /* @brief struct representing the daemon data */

@@ -51,7 +51,7 @@ static void	build_output_paths(struct s_task *task)
 /**
  * @brief Extract task's id from its path
  */
-static int extract_task_id(const char *task_path)
+static taskid_t extract_task_id(const char *task_path)
 {
 	char		path_copy[PATH_MAX + 1];
 	const char	*last_slash;
@@ -62,13 +62,13 @@ static int extract_task_id(const char *task_path)
 	
 	last_slash = strrchr(path_copy, '/');
 	if (!last_slash)
-		return -1;
+		return 0;
 	
 	task_id_ptr = last_slash + 1;
 	if (!*task_id_ptr)
-		return -1;
+		return 0;
 
-	return atoi(task_id_ptr);
+	return (taskid_t)atol(task_id_ptr);
 }
 
 static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug)
