@@ -107,9 +107,9 @@ struct s_data {
 	 * '- 100' to keep space for dedicated folders like tasks/ */
 	char		run_directory[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
-	char		fifo_reply[PATH_MAX + 1 - sizeof(REPLY_FIFO_NAME)];
+	char		fifo_reply[PATH_MAX + 1 - REPLY_FIFO_NAME_LEN];
 	/** @brief Full path for request fifo.  */
-	char		fifo_request[PATH_MAX + 1 - sizeof(REQUEST_FIFO_NAME)];
+	char		fifo_request[PATH_MAX + 1 - REQUEST_FIFO_NAME_LEN];
 	/** @brief flag to indiciate if tasks files are little endian. */
 	bool		is_data_le;
 	/** @brief flag to indicate if debug mode is enabled. */
