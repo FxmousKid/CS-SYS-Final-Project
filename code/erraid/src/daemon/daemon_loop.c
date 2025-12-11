@@ -64,7 +64,7 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 	while (current_task){
 
 		task_id = current_task->task_id;
-		printf("\n Executing Task %" PRId64 "\n", task_id);
+		printf("\n Executing Task %lld\n", task_id);
 		printf("Path: %s\n", current_task->path);
 		print_cmd_tree(current_task->cmd);
 		printf("Output files:\n");
@@ -74,7 +74,7 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 
 		if (check_date(current_task)) {
 			if (exec_task(current_task)) {
-				printf("Task %" PRId64 "executed successfully\n", task_id);
+				printf("Task %lld executed successfully\n", task_id);
 				printf("Exit code: %d\n", current_task->cmd->exit_code);
                                 
                                 // Append times-exitcodes file
@@ -84,10 +84,10 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
                                         printf("append_texit failed\ttexit_path = %s", current_task->texit_path);
                         }
 			else {
-				printf("Task %" PRId64 "execution failed\n", task_id);
+				printf("Task %lld execution failed\n", task_id);
 			}
 		} else {
-			printf("Task %" PRId64 "not yet executed", task_id);
+			printf("Task %lld not yet executed", task_id);
 		}
 		
 		task_count++;
@@ -115,9 +115,9 @@ static void     exec_tasks_loop(struct s_data *ctx)
 void    daemon_loop(struct s_data *ctx)
 {
 	struct pollfd	pfds[1] = {0};
-	time_t	next_execution ;
-	time_t	current_time;
-	time_t now;
+	time_t		next_execution ;
+	time_t		current_time;
+	time_t		now;
 
 
 	pfds[0].fd = open(ctx->fifo_request, O_RDONLY | O_NONBLOCK);	
