@@ -6,6 +6,8 @@
 # include <limits.h>
 # include <stdio.h>
 
+# include "macros.h"
+
 typedef uint64_t	taskid_t;
 typedef uint64_t	minutes_t;
 typedef uint32_t	hours_t;
@@ -62,9 +64,9 @@ struct s_cmd {
 
 struct s_data {
 	/** @brief Full path for reply fifo.  */
-	char			fifo_reply[PATH_MAX + 1];
+	char		fifo_reply[PATH_MAX + 1];
 	/** @brief Full path for request fifo.  */
-	char			fifo_request[PATH_MAX + 1];
+	char		fifo_request[PATH_MAX + 1];
 	/** @brief exit code of the daemon. */
 	uint8_t			exit_code;
 	/** @brief the constructed command object to send. */
