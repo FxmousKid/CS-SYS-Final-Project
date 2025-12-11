@@ -117,26 +117,73 @@ int	count_sub_cmds(const char *path)
 	return (count);
 }
 
-
-/* creates the run_directory if it doesn't exist
- * then creates $RUN_DIR/tasks/ and $RUN_DIR/pipes/  */
 bool	create_initial_dirs(const char *run_dir)
 {
-	char	buf[PATH_MAX + 1] = {0};
-
-	if (mkdir(run_dir, 0755) < 0 && errno != EEXIST) {
-		ERR_SYS("mkdir(%s, 0755)", run_dir);
+	char buf[PATH_MAX + 1];
+	if (!create_dirs_recursive(run_dir, 0755)) {
 		return false;
 	}
-	snprintf(buf, sizeof(buf), "%stasks", run_dir);
-	if (mkdir(buf, 0755) < 0 && errno != EEXIST) {
+
+	if (!build_safe_path(buf, PATH_MAX + 1, run_dir, TASKS_DIR))
+		ERR_MSG("Failed to build tasks path");
+	if(mkdir(buf, 0755) < 0 && errno != EEXIST) {
 		ERR_SYS("mkdir(%s, 0755)", buf);
 		return false;
 	}
-	snprintf(buf, sizeof(buf), "%spipes", run_dir);
-	if (mkdir(buf, 0755) < 0 && errno != EEXIST) {
+	// Always create pipes dir in run_dir even if -p specified
+	if (!build_safe_path(buf, PATH_MAX + 1, run_dir, PIPES_DIR))
+		ERR_MSG("Failed to build pipes path");
+	if(mkdir(buf, 0755) < 0 && errno != EEXIST) {
 		ERR_SYS("mkdir(%s, 0755)", buf);
 		return false;
 	}
 	return true;
+}
+
+bool create_dirs_recursive(const char *path, mode_t mode)
+{
+    char *path_copy;
+    char *p;
+    struct stat st;
+
+    // Check if path already exists
+    if (stat(path, &st) == 0) {
+        if (S_ISDIR(st.st_mode))
+            return true;
+        return false; // If it's a file
+    }
+
+    path_copy = strdup(path);
+    if (!path_copy)
+        return false;
+
+    for (p = path_copy + 1; *p; p++)
+    {
+        if (*p == '/') {
+            *p = '\0';
+
+            // Create intermediate dir if it does not exist
+            if (stat(path_copy, &st) != 0 &&
+		mkdir(path_copy, mode) != 0 && errno != EEXIST) {
+
+		free(path_copy);
+		return false;
+
+            }else if (!S_ISDIR(st.st_mode)) {
+                // File exists with this name
+                free(path_copy);
+                return false;
+            }
+            *p = '/';
+        }
+    }
+
+    // Create final directory
+    if (mkdir(path_copy, mode) != 0 && errno != EEXIST) {
+        free(path_copy);
+        return false;
+    }
+
+    free(path_copy);
+    return true;
 }
