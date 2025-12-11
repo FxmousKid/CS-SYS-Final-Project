@@ -19,7 +19,7 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
 	// 'PATH_MAX + 1' for the biggest path, 
 	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
-	char	abs_path[PATH_MAX + 1 - sizeof(REQUEST_FIFO_NAME)] = {0};
+	char	abs_path[sizeof(ctx->fifo_request)] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");
@@ -39,8 +39,8 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	snprintf(ctx->fifo_reply, PATH_MAX + 1 , "%s%s", abs_path, REPLY_FIFO_NAME);
-	snprintf(ctx->fifo_request, PATH_MAX + 1, "%s%s", abs_path, REQUEST_FIFO_NAME);
+	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply) , "%s%s", abs_path, REPLY_FIFO_NAME);
+	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s%s", abs_path, REQUEST_FIFO_NAME);
 	return true;
 }
 
