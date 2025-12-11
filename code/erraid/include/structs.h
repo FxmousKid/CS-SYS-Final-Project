@@ -108,6 +108,7 @@ struct s_data {
 	/** @brief provided or default path to the run directory. *
 	 * '- 100' to keep space for dedicated folders like tasks/ */
 	char		run_directory[PATH_MAX + 1 - 100];
+	/** @brief provided or default path to the pipes directory */
 	char		pipes_directory[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
 	char		fifo_reply[PATH_MAX + 1];
