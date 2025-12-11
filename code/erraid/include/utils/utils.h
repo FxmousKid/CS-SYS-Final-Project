@@ -6,6 +6,7 @@
 # include <stdint.h>
 # include <errno.h> // IWYU pragma: keep
 # include <string.h>
+# include <bsd/string.h>
 # include <stdlib.h>
 # include <limits.h>
 # include <fcntl.h>

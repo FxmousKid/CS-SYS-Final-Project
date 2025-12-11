@@ -29,7 +29,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 NAME 	:= tadmor
 CC 	:= cc
 CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP
-LFLAGS	?=
+LFLAGS	?= -lbsd
 
 LOGFILE_PATH ?= $(PWD)/tadmor.log
 CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
