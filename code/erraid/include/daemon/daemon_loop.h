@@ -4,6 +4,7 @@
 # include <time.h> // IWYU pragma: keep
 # include <fcntl.h>
 # include <unistd.h>
+# include <inttypes.h>
 
 # include "structs.h"
 # include "utils/utils.h" // IWYU pragma: keep
