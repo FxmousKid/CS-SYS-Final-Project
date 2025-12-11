@@ -48,7 +48,7 @@ CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
 LOGFILE_PATH ?= $(PWD)/erraid.log
 CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
 
-LFLAGS	?= -lbsd
+LFLAGS	?=
 
 MKDIR 	:= mkdir -p
 RM_RF	:= rm -rf
