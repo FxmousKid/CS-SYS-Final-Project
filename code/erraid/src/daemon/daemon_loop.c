@@ -110,11 +110,22 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	}
 }
 
+#include <poll.h>
+
 void    daemon_loop(struct s_data *ctx)
 {
+	struct pollfd	pfds[1] = {0};
 	time_t	next_execution ;
 	time_t	current_time;
 	time_t now;
+
+
+	pfds[0].fd = open(ctx->fifo_request, O_RDONLY | O_NONBLOCK);	
+	pfds[0].events = POLLIN;
+	if (pfds[0].fd < 0) {
+		ERR_SYS("open fifo_request: %s", ctx->fifo_request);
+		return ;
+	}
 
 	setup_sig_handlers();
 
@@ -124,7 +135,8 @@ void    daemon_loop(struct s_data *ctx)
 	
 	while (is_daemon_running()) {
 
-		handle_all_requests(ctx);
+		handle_all_requests(ctx, pfds);
+		printf("no blocking\n");
 		
 		current_time = time(NULL);
 

@@ -33,7 +33,7 @@ static int	openfifo(const char *fifo_path, bool to_read)
 	int	fd = -1;
 	int	mode = -1;
 
-	mode = to_read ? O_RDONLY : O_WRONLY;
+	mode = to_read ? O_RDONLY | O_NONBLOCK : O_WRONLY;
 	if ((fd = open(fifo_path, mode)) < 0) {
 		ERR_SYS("open: can't open %s", fifo_path)
 		return -1;
