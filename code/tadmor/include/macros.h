@@ -8,6 +8,8 @@
 # define REQUEST_FIFO_NAME_LEN	20
 # define REPLY_FIFO_NAME	"erraid-reply-pipe"
 # define REPLY_FIFO_NAME_LEN	18
+# define MAX_LINE_LEN           2048
+# define MAX_TIMING_LEN         512
 
 
 
