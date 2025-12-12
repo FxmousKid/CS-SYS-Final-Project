@@ -16,7 +16,7 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
 	// 'PATH_MAX + 1' for the biggest path, 
 	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
-	char	abs_path[sizeof(ctx->fifo_request) - REQUEST_FIFO_NAME_LEN] = {0};
+	char	abs_path[PATH_MAX + 1];
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");
@@ -28,19 +28,13 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-
-	if (abs_path[strlen(abs_path) - 1] != '/' && strlen(abs_path) < PATH_MAX - 1)
-		abs_path[strlen(abs_path)] = '/';
-	if (strlen(abs_path) + strlen(REQUEST_FIFO_NAME) + 1 >= PATH_MAX) {
-		ERR_MSG("Full fifo path too long : %s\n", abs_path);
-		ctx->exit_code = EXIT_FAILURE;
-		return false;
-	}
 	if (!build_safe_path(ctx->pipes_directory, PATH_MAX + 1, "", abs_path))
 		ERR_MSG("Failed to build pipes directory path");
-	// snprintf(ctx->pipes_directory, sizeof(ctx->pipes_directory), "%s", abs_path);
-	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply) , "%s%s", abs_path, REPLY_FIFO_NAME);
-	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s%s", abs_path, REQUEST_FIFO_NAME);
+	if (!build_safe_path(ctx-> fifo_reply, PATH_MAX + 1, abs_path, REPLY_FIFO_NAME))
+		ERR_MSG("Failed to build fifo reply path");
+	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, abs_path, REQUEST_FIFO_NAME))
+		ERR_MSG("Failed to build fifo request path");
+
 	return true;
 }
 
