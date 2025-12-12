@@ -39,7 +39,7 @@ static bool     append_texit(struct s_task *task)
                 return false;
         }
         return true;
-}       
+}
 
 static int	check_date(struct s_task *task)
 {
