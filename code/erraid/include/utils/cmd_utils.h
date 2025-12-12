@@ -22,4 +22,7 @@ void	print_cmd_tree(struct s_cmd *cmd);
 /** @brief remove the last file from a path. */
 void	remove_last_file_from_path(char *path);
 
+/** @brief Returns the command line string from a structured command tree. */
+char    *cmd_to_string(const struct s_cmd *cmd);
+
 #endif
