@@ -136,7 +136,7 @@ void    daemon_loop(struct s_data *ctx)
 	while (is_daemon_running()) {
 
 		handle_all_requests(ctx, pfds);
-		printf("no blocking\n");
+		// printf("no blocking\n");
 		
 		current_time = time(NULL);
 
