@@ -19,7 +19,7 @@ struct s_dir {
 
 };
 
-struct s_reply {
+struct s_request {
 	uint8_t	*buf;
 	size_t	buf_size;
 };
@@ -42,6 +42,14 @@ enum req_opcode {
 	/** @brief Terminate the daemon. */
 	OPCODE_TM = 0x4b49,
 };
+
+enum reply_opcode {
+	/** @brief Request executed successfully */
+	OPCODE_OK = 0x4f4b,
+	/** @brief Request didn't executed successfully */
+	OPCODE_ER = 0x4552,
+};
+
 
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */

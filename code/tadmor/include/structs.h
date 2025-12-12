@@ -32,6 +32,13 @@ enum req_opcode {
 	OPCODE_TM = 0x4b49,
 };
 
+enum reply_opcode {
+	/** @brief Request executed successfully */
+	OPCODE_OK = 0x4f4b,
+	/** @brief Request didn't executed successfully */
+	OPCODE_ER = 0x4552,
+};
+
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
 	CMD_SI = 0x5349,
