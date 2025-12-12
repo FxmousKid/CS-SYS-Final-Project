@@ -153,7 +153,7 @@ void	append_int_to_buf(char *buf, int n)
 
 /**
  * @brief Removes trailing slash from a path if present
- * 
+ *
  * @param path The path to clean
  */
 void	remove_trailing_slash(char *path)
@@ -167,7 +167,7 @@ void	remove_trailing_slash(char *path)
 
 /**
  * @brief Builds a path by concatenating two parts safely
- * 
+ *
  * @param dest 		Destination buffer
  * @param dest_size 	Size of destination buffer
  * @param part1 	First part of the path
@@ -196,7 +196,7 @@ bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char
 
 /**
  * @brief Convert a relative path to an absolute path
- * 
+ *
  * @param relative_path	relative path to convert
  * @param absolute_path	buffer to write the absolute path
  * @return 		true on success, false otherwise
