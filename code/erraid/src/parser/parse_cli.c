@@ -14,9 +14,7 @@ static void	set_fifos_path_default(struct s_data *ctx)
 
 static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
-	// 'PATH_MAX + 1' for the biggest path, 
-	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
-	char	abs_path[PATH_MAX + 1];
+	char	abs_path[PATH_MAX + 1] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");
@@ -28,12 +26,19 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	if (!build_safe_path(ctx->pipes_directory, PATH_MAX + 1, "", abs_path))
+	if (!build_safe_path(ctx->pipes_directory, PATH_MAX + 1, "", abs_path)) {
 		ERR_MSG("Failed to build pipes directory path");
-	if (!build_safe_path(ctx-> fifo_reply, PATH_MAX + 1, abs_path, REPLY_FIFO_NAME))
+		return false;
+	}
+	if (!build_safe_path(ctx-> fifo_reply, PATH_MAX + 1, abs_path, REPLY_FIFO_NAME)) {
 		ERR_MSG("Failed to build fifo reply path");
-	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, abs_path, REQUEST_FIFO_NAME))
+		return false;
+	}
+		
+	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, abs_path, REQUEST_FIFO_NAME)) {
 		ERR_MSG("Failed to build fifo request path");
+		return false;
+	}
 
 	return true;
 }
@@ -46,12 +51,11 @@ static void	set_run_dir_default(struct s_data *ctx)
 	strcpy(ctx->run_directory, "/tmp/");
 	if (user)
 		strcat(ctx->run_directory, user);
-	strcat(ctx->run_directory, "/erraid/");	
+	strcat(ctx->run_directory, "/erraid/");
 }
 
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
-	char	*ctx_rd;
 	char	abs_path[PATH_MAX + 1] = {0};
 
 	if (!path || !*path) {
@@ -66,16 +70,11 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 		return false;
 	}
 
-	if (strlen(abs_path) > PATH_MAX) {
-		ERR_MSG("Run directory path too long\n");
-		ctx->exit_code = EXIT_FAILURE;
+	if (!build_safe_path(ctx->run_directory, PATH_MAX + 1, "", abs_path)) {
+		ERR_MSG("Failed to build run directory path");
 		return false;
 	}
 
-	ctx_rd = ctx->run_directory;
-	strcpy(ctx_rd, abs_path);
-	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
-		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;
 }
 
