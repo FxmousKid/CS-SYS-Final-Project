@@ -11,6 +11,7 @@
 # include <fcntl.h>
 # include <stdbool.h>
 # include <stdarg.h>
+#include <inttypes.h> // For PRIu64
 
 # include "macros.h" // IWYU pragma: keep
 
@@ -53,6 +54,16 @@ bool		build_safe_path(char *dest, size_t dest_size, const char *part1, const cha
 
 /** @brief convert a relative path to an absolute path */
 bool		convert_to_absolute_path(const char *relative_path, char *absolute_path);
+
+/**
+ * @brief Converts binary timing fields (bitmasks) to a crontab-like string.
+ * @param timing The s_timing structure.
+ * @return A dynamically allocated string (e.g., "0,30 * 1" or "- - -"). Must be freed.
+ */
+char	*timing_to_string(const struct s_timing *timing);
+
+bool	write_task_output(uint64_t task_id, const char *timing_str, const char *cmd_str);
+
 
 int		get_logfd(void);
 void		_write_perr(const char *location);
