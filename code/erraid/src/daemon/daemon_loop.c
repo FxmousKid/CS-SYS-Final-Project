@@ -110,8 +110,6 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	}
 }
 
-#include <poll.h>
-
 void    daemon_loop(struct s_data *ctx)
 {
 	struct pollfd	pfds[1] = {0};
