@@ -13,13 +13,13 @@
  *
  * @param ctx the structure that contains the path of both FIFOs
  *
- * @return 
- *  @retval true on success
- *  @retval false on failure and logs error
+ * @return
+ * @retval true on success
+ * @retval false on failure and logs error
  */
 bool	create_fifos_safe(struct s_data *ctx);
 bool	writefifo(const char *path, const void *buf, size_t len);
-bool	readfifo(const char *path, struct s_reply *reply);
+bool	readfifo(const char *path, struct s_request *req);
 
 
 #endif
