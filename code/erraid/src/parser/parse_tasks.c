@@ -125,10 +125,13 @@ bool	parse_tasks(struct s_data *ctx)
 	struct s_task	**task = NULL;
 	char		tasks_path[PATH_MAX + 1] = {0};
 
-	// little hack, tasks have the same criteria 
+	if (!build_safe_path(tasks_path, sizeof(tasks_path), ctx->run_directory, TASKS_DIR)) {
+		ERR_MSG("Failed to build tasks path %s", tasks_path);
+		return false;
+	}
+
+	// little hack, tasks have the same criteria
 	// to be counted as a sub-command dir
-	strcpy(tasks_path, ctx->run_directory);
-	strcat(tasks_path, TASKS_DIR);
 	subtasks_count = count_sub_cmds(tasks_path);
 	if (subtasks_count < 0)
 		return false;
