@@ -4,6 +4,9 @@
 # ifndef LOGFILE_PATH 
 #  define LOGFILE_PATH	"/tmp/tadmor.log"
 # endif
+# define TMP_PATH               "/tmp/"
+# define ERRAID_PATH            "erraid/"
+# define PIPES_DIR              "pipes/"
 # define REQUEST_FIFO_NAME	"erraid-request-pipe"
 # define REQUEST_FIFO_NAME_LEN	20
 # define REPLY_FIFO_NAME	"erraid-reply-pipe"
