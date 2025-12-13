@@ -2,24 +2,36 @@
 
 static void	set_fifos_path_default(struct s_data *ctx)
 {
-	char	*user;
-	// should be more than enough for /tmp/$USER/erraid/pipes/
-	char	buf[512] = {0};
+	char    *user;
+	char    part1[PATH_MAX + 1] = {0};
+	char 	part2[PATH_MAX + 1] = {0};
 
 	user = getenv("USER");
-	strcpy(buf, "/tmp/");
-	if (user)
-		strcat(buf, user);
-	strcat(buf, "/erraid/pipes");
-	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s/%s", buf, REQUEST_FIFO_NAME);
-	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply), "%s/%s", buf, REPLY_FIFO_NAME);
+	if (!user) {
+		ERR_SYS("getenv");
+		return;
+	}
+	if (!build_safe_path(part1, sizeof(part1), TMP_PATH, user) ||
+	!build_safe_path(part2, sizeof(part2), ERRAID_PATH, PIPES_DIR)) {
+		ERR_MSG("Failed to build part1 or part2 of the default pipes path");
+		return;
+	}
+
+	if (!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), part1, part2)) {
+		ERR_MSG("Failed to build the default pipes path %s", ctx->pipes_dir);
+		return;
+	}
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), ctx->pipes_dir, REQUEST_FIFO_NAME)) {
+		ERR_MSG("Failed to build request fifo path %s", ctx->fifo_request);
+	}
+	if (!build_safe_path(ctx->fifo_reply, sizeof(ctx->fifo_reply), ctx->pipes_dir, REPLY_FIFO_NAME)) {
+		ERR_MSG("Failed to build reply fifo path %s", ctx->fifo_reply);
+	}
 }
 
 static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 {
-	// 'PATH_MAX + 1' for the biggest path, 
-	// '- sizeof(REQUEST_FIFO_NAME)' to make sure it fits
-	char	abs_path[sizeof(ctx->fifo_request) - REQUEST_FIFO_NAME_LEN] = {0};
+	char	abs_path[PATH_MAX + 1] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid pipes dir path\n");
@@ -32,15 +44,20 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 		return false;
 	}
 
-	if (abs_path[strlen(abs_path) - 1] != '/' && strlen(abs_path) < PATH_MAX - 1)
-		abs_path[strlen(abs_path)] = '/';
-	if (strlen(abs_path) + strlen(REQUEST_FIFO_NAME) + 1 >= PATH_MAX) {
-		ERR_MSG("Full fifo path too long : %s\n", abs_path);
-		ctx->exit_code = EXIT_FAILURE;
+	if (!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), "", abs_path)) {
+		ERR_MSG("Failed to build pipes directory path");
 		return false;
 	}
-	snprintf(ctx->fifo_reply, sizeof(ctx->fifo_reply) , "%s%s", abs_path, REPLY_FIFO_NAME);
-	snprintf(ctx->fifo_request, sizeof(ctx->fifo_request), "%s%s", abs_path, REQUEST_FIFO_NAME);
+	if (!build_safe_path(ctx-> fifo_reply, sizeof(ctx->fifo_reply), abs_path, REPLY_FIFO_NAME)) {
+		ERR_MSG("Failed to build fifo reply path");
+		return false;
+	}
+		
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), abs_path, REQUEST_FIFO_NAME)) {
+		ERR_MSG("Failed to build fifo request path");
+		return false;
+	}
+	
 	return true;
 }
 
@@ -187,8 +204,8 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 {
 	parse_options(ctx, argc, argv);
 	argc -= optind;
-	argv += optind;	
-	if (ctx->fifo_request[0] == '\0')
+	argv += optind;
+	if (ctx->pipes_dir[0] == '\0')
 		set_fifos_path_default(ctx);
 
 	// add cmd and tasks parsing

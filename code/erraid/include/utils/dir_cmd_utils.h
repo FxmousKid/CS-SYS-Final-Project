@@ -40,4 +40,8 @@ int	count_sub_cmds(const char *path);
  *  @retval false on failure and logs error
  */
 bool	create_initial_dirs(const char *run_dir);
+
+/** @brief performs a recursive mkdir like mkdir -p */
+bool    create_dirs_recursive(const char *path, mode_t mode);
+
 #endif

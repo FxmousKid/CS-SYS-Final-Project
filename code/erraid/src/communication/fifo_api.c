@@ -85,7 +85,7 @@ bool	writefifo(const char *path, const void *buf, size_t len)
 	return true;
 }
 
-bool	readfifo(const char *path, struct s_reply *reply)
+bool	readfifo(const char *path, struct s_request *req)
 {
 	int	fd = -1;
 	int	read_qty = 0;
@@ -95,17 +95,17 @@ bool	readfifo(const char *path, struct s_reply *reply)
 	if ((fd = openfifo(path, 1)) < 0)
 		return false;
 	
-	if (!(reply->buf = calloc(read_interval, sizeof(uint8_t)))) {
+	if (!(req->buf = calloc(read_interval, sizeof(uint8_t)))) {
 		ERR_SYS("Failed to calloc");
 		goto exit;
 	}
 
-	reply->buf_size = 0;
-	while ((read_qty = read(fd, reply->buf + reply->buf_size, read_interval)) > 0) {
-		reply->buf_size += read_qty;
+	req->buf_size = 0;
+	while ((read_qty = read(fd, req->buf + req->buf_size, read_interval)) > 0) {
+		req->buf_size += read_qty;
 
 		if (read_qty == read_interval)
-			tmp = realloc(reply->buf, reply->buf_size + read_interval);
+			tmp = realloc(req->buf, req->buf_size + read_interval);
 		else
 			break;
 
@@ -113,7 +113,7 @@ bool	readfifo(const char *path, struct s_reply *reply)
 			ERR_SYS("realloc failed");
 			goto exit;
 		}
-		reply->buf = tmp;
+		req->buf = tmp;
 	}
 	if (read_qty < 0) {
 		ERR_SYS("failed to read(%d, buf, %d)", fd, read_interval)
@@ -124,6 +124,6 @@ bool	readfifo(const char *path, struct s_reply *reply)
 
 exit:
 	if (fd >= 0) close(fd);
-	if (reply->buf) free(reply->buf);
+	if (req->buf) free(req->buf);
 	return false;
 }
