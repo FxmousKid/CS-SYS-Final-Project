@@ -1,10 +1,78 @@
 #include "commands/list_tasks.h"
 
+
+/**
+ * @brief Serializes the <arguments> structure for a simple command (CMD_SI).
+ * Format: ARGC <uint32>, ARGV[0] <string>, ..., ARGV[ARGC-1] <string>
+ *
+ * @param buf 		Pointer to the serialization buffer.
+ * @param command	The array of string arguments (char **command).
+ * @return true on success, false otherwise.
+ */
+static bool serialize_arguments(struct s_buffer *buf, char **command)
+{
+    // Find ARGC
+    uint32_t argc = 0;
+    for (char **p = command; *p != NULL; p++) {
+        argc++;
+    }
+
+    // ARGC <uint32>
+    if (!buffer_append_uint32(buf, argc))
+        return false;
+
+    // Write each argument as a <string>
+    for (uint32_t i = 0; i < argc; i++) {
+        // buffer_append_string handles LENGTH <uint32> + DATA <string>
+        if (!buffer_append_string(buf, command[i]))
+            return false;
+    }
+
+    return true;
+}
+
+/**
+ * @brief Recursively serializes the <command> structure for a task.
+ *
+ * @param buf 		Pointer to the serialization buffer.
+ * @param cmd 		Pointer to the s_cmd structure.
+ * @return true on success, false otherwise.
+ */
+static bool serialize_command(struct s_buffer *buf, const struct s_cmd *cmd)
+{
+	if (!cmd)
+		return false;
+
+	// TYPE <uint16>
+	if (!buffer_append_uint16(buf, cmd->cmd_type))
+		return false;
+	// Simple Command: ARGS <arguments>
+	if (cmd->cmd_type == CMD_SI) {
+		return serialize_arguments(buf, cmd->cmd.cmd_si.command);
+	}
+	// Sequence Command: NBCMDS <uint32>, CMD[0] <command>, ...
+	else if (cmd->cmd_type == CMD_SQ) {
+		// NBCMDS <uint32>
+		if (!buffer_append_uint32(buf, cmd->cmd.cmd_sq.nb_cmds))
+			return false;
+
+		// CMD[0] <command>, ..., CMD[N-1] <command>
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++) {
+			// Recursive call for the sub-command
+			if (!serialize_command(buf, &(cmd->cmd.cmd_sq.cmds[i])))
+				return false;
+		}
+		return true;
+	}
+	
+	return true;
+}
+
 /**
  * @brief Serializes all tasks data into a binary buffer.
  *
- * @param ctx	Pointer to the daemon context structure.
- * @param buf	Pointer to the s_buffer structure used for dynamic serialization.
+ * @param ctx		Pointer to the daemon context structure.
+ * @param buf		Pointer to the s_buffer structure..
  * @return	true on successful serialization of all tasks,
  * 		false on any buffer write or command string reconstruction failure.
  */
@@ -29,7 +97,6 @@ static bool	serialize_task_list(struct s_data *ctx, struct s_buffer *buf)
 	// Iterate over all tasks to serialize each one data
 	current_task = ctx->tasks;
 	while (current_task) {
-		char	*cmd_str;
 
 		/* TASKID (uint64 BE) */
 		if (!buffer_append_uint64(buf, current_task->task_id))
@@ -43,16 +110,10 @@ static bool	serialize_task_list(struct s_data *ctx, struct s_buffer *buf)
 		if (!buffer_append(buf, &(current_task->timing.days), sizeof(uint8_t)))
 			return false;
 		
-		/* COMMANDLINE (string: LENGTH <uint32 BE> + DATA [bytes]) */
-		cmd_str = cmd_to_string(current_task->cmd);
-		if (!cmd_str)
+		/* COMMANDLINE <command> */
+		if (!serialize_command(buf, current_task->cmd))
 			return false;
-		
-		if (!buffer_append_string(buf, cmd_str)) {
-			free(cmd_str);
-			return false;
-		}
-		free(cmd_str);
+
 		current_task = current_task->next;
 	}
 
