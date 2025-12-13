@@ -80,3 +80,8 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Personal files to ignore
+autotests/
+exemples/
+test.sh
