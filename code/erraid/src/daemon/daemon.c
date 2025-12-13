@@ -2,7 +2,7 @@
 
 static volatile sig_atomic_t running = 1;
 
-static  void sig_handler(int sig) 
+static  void sig_handler(int sig)
 {
         (void)sig; // For warning (sig not used)
         running = 0;

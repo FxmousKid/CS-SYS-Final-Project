@@ -8,13 +8,13 @@ bool	parse_timing(struct s_task *task, bool debug)
 	uint64_t	minutes_he; // Host endian
 	uint32_t	hours_he; // Host endian
 
+	if (debug)
+		printf("path task : %s\n", task->path);
+
 	if (!build_safe_path(buf, PATH_MAX + 1, task->path, TIMING_FILE)) {
 		ERR_MSG("failed to build timing file");
 		return false;
 	}
-
-	if (debug)
-		printf("path task : %s\n", buf);
 
 	fd = open(buf, O_RDONLY);
 	if (fd < 0) {
