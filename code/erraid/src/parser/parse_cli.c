@@ -2,13 +2,13 @@
 
 static void	set_fifos_path_default(struct s_data *ctx)
 {
-	if(!build_safe_path(ctx->pipes_dir, PATH_MAX + 1, ctx->run_directory, PIPES_DIR)) {
+	if(!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), ctx->run_directory, PIPES_DIR)) {
 		ERR_MSG("Failed to build pipes directory path");
 		return;
 	}
-	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, ctx->pipes_dir, REQUEST_FIFO_NAME))
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), ctx->pipes_dir, REQUEST_FIFO_NAME))
 		ERR_MSG("Failed to build request fifo path");
-	if (!build_safe_path(ctx->fifo_reply, PATH_MAX + 1, ctx->pipes_dir, REPLY_FIFO_NAME))
+	if (!build_safe_path(ctx->fifo_reply, sizeof(ctx->fifo_reply), ctx->pipes_dir, REPLY_FIFO_NAME))
 		ERR_MSG("Failed to build reply fifo path");
 }
 
@@ -26,16 +26,16 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	if (!build_safe_path(ctx->pipes_dir, PATH_MAX + 1, "", abs_path)) {
+	if (!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), "", abs_path)) {
 		ERR_MSG("Failed to build pipes directory path");
 		return false;
 	}
-	if (!build_safe_path(ctx-> fifo_reply, PATH_MAX + 1, abs_path, REPLY_FIFO_NAME)) {
+	if (!build_safe_path(ctx-> fifo_reply, sizeof(ctx->fifo_reply), abs_path, REPLY_FIFO_NAME)) {
 		ERR_MSG("Failed to build fifo reply path");
 		return false;
 	}
 		
-	if (!build_safe_path(ctx->fifo_request, PATH_MAX + 1, abs_path, REQUEST_FIFO_NAME)) {
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), abs_path, REQUEST_FIFO_NAME)) {
 		ERR_MSG("Failed to build fifo request path");
 		return false;
 	}
@@ -69,7 +69,7 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-	if (!build_safe_path(ctx->run_directory, PATH_MAX + 1, "", abs_path)) {
+	if (!build_safe_path(ctx->run_directory, sizeof(ctx->run_directory), "", abs_path)) {
 		ERR_MSG("Failed to build run directory path");
 		return false;
 	}
