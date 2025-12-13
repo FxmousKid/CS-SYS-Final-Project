@@ -70,6 +70,8 @@ struct s_cmd {
 
 
 struct s_data {
+	/** @brief provided or default path to the pipes directory */
+	char		pipes_dir[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
 	char		fifo_reply[PATH_MAX + 1];
 	/** @brief Full path for request fifo.  */
