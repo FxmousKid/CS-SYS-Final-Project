@@ -1,38 +1,6 @@
 #include "commands/list_tasks.h"
 
 /**
- * @brief Reads a protocol-compliant string from the FIFO.
- * The string format is LENGTH <uint32_t> followed by DATA <LENGTH bytes>.
- *
- * @param fd 	The file descriptor to read from.
- * @param str 	Pointer to a char* where the string will be stored.
- * @return true on success, false on read or allocation failure.
- */
-static bool	read_protocol_string(int fd, char **str)
-{
-	uint32_t	len;
-	
-	// Read the length (uint32)
-	if (!read_uint32(fd, &len))
-		return false;
-	
-	// Allocate buffer (len + 1 for '\0')
-	if (!(*str = malloc(len + 1))) {
-		ERR_SYS("malloc");
-		return false;
-	}
-
-	// Read data (len bytes)
-	if (!read_exact(fd, *str, len)) {
-		free(*str);
-		*str = NULL;
-		return false;
-	}
-	(*str)[len] = '\0'; // Null-terminate the string
-	return true;
-}
-
-/**
  * @brief Sends the LIST request (OPCODE_LS) to the daemon via the request FIFO.
  * The OPCODE is sent in BE format as required by the protocol.
  *
@@ -104,10 +72,9 @@ static bool	handle_list_tasks_reply(struct s_data *ctx)
 		if (!read_exact(fd_reply, &timing.days, sizeof(uint8_t)))
 			goto error;
 
-
-		/* Read COMMANDLINE (string) */
-		if (!read_protocol_string(fd_reply, &cmd_str))
-			goto error;
+		/* Read COMMANDLINE */
+		if (!read_cmd_reconstruct_str(fd_reply, &cmd_str))
+       			goto error;
 
 		// Convert timing to a formatted string
 		timing_str = timing_to_string(&timing);
