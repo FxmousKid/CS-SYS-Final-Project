@@ -105,6 +105,7 @@ struct s_task {
 	struct s_cmd	*cmd;
 	struct s_task	*next;
 	taskid_t	task_id;
+	int64_t		launch_time;
 };
 
 /* @brief struct representing the daemon data */
