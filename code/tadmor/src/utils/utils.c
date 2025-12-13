@@ -216,47 +216,85 @@ bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
 }
 
 /**
- * @brief Converts a binary bitmask into a string format, or '*' or '-' for special cases.
+ * @brief Converts a binary bitmask into a string format, using ranges, '*' or '-' for special cases.
  *
  * @param mask      The uint64_t, uint32_t, or uint8_t bitmask (MINUTES HOURS DAYSOFWEEK).
  * @param max_val   The maximum index to check (59 for MINUTES, 23 for HOURS, 6 for DAYSOFWEEK).
- * @return          A dynamically allocated string (for example "0,5,10", "*", or "-").
+ * @return          A dynamically allocated string (for example "1,3-6,9-15", "*", or "-").
  */
 static char	*mask_to_str(uint64_t mask, int max_val)
 {
-	char	*str;
+	char	*str = {0};
 	int	count = 0;
 	size_t	len = 0;
-
+    	int     range_start = -1; // Index start of the sequence of consecutive numbers
+    
 	str = malloc(MAX_TIMING_LEN);
 	if (!str) {
 		ERR_SYS("malloc");
 		return NULL;
 	}
-	str[0] = '\0';
+	for (int i = 0; i <= max_val + 1; i++) {
+	        bool is_set; // Flag indicating if the current value is in the mask
 
-	for (int i = 0; i <= max_val; i++) {
-		if ((mask >> i) & 1) {
+		is_set = (mask >> i) & 1;
+		
+		if (is_set) {
 			count++;
-			if (len > 0)
-				len += snprintf(str + len, MAX_TIMING_LEN - len, ",%d", i);
-			else
-				len += snprintf(str + len, MAX_TIMING_LEN - len, "%d", i);
+			if (range_start == -1)
+				// Start of a new sequence or single number
+				range_start = i;
+		}
+		else {
+			// End of a sequence
+			if (range_start != -1) {
+				int range_end = i - 1; // Last value included
+				
+				// Sequence of length > 1 (not a single element in the sequence)
+				if (range_end != range_start) {
+					// Sequence length
+					int range_len = range_end - range_start + 1;
+
+					// If the sequence has at least 2 numbers
+					if (range_len >= 2) {
+						// Add the separator if the string is not empty
+						if (len > 0)
+							len += snprintf(str + len, MAX_TIMING_LEN - len, ",");
+						// Add the sequence range_start-range_end
+						len += snprintf(str + len, MAX_TIMING_LEN - len, "%d-%d", range_start, range_end);
+					}
+					// If the sequence has only a single number
+					else {
+						// Add the separator if the string is not empty
+						if (len > 0)
+							len += snprintf(str + len, MAX_TIMING_LEN - len, ",");
+						// Add number individually
+						len += snprintf(str + len, MAX_TIMING_LEN - len, "%d", range_start);
+					}
+				}
+			// Not in a sequence
+			else {
+				if (len > 0)
+					len += snprintf(str + len, MAX_TIMING_LEN - len, ",");
+				// Add the number individually
+				len += snprintf(str + len, MAX_TIMING_LEN - len, "%d", range_start);
+				}
+				// Reset sequence index
+				range_start = -1;
+			}
 		}
 	}
-	// Special cases: No execution time ('-') or every time ('*')
+    	// Handle special cases (no numbers ('-') or every number ('*'))
 	if (count == 0) {
 		free(str);
-		// strdup is used to respect the dynamic allocation
 		return strdup("-");
 	} else if (count == (max_val + 1)) {
 		free(str);
-		// strdup is used to respect the dynamic allocation
 		return strdup("*");
 	}
-
 	return str;
 }
+
 /**
  * @brief Converts the s_timing structure (bitmasks) into a formatted string.
  *
