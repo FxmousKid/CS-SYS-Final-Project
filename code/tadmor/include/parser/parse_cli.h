@@ -8,7 +8,7 @@
 # include "structs.h"
 # include "utils/utils.h" // IWYU pragma: keep
 # include "commands/list_tasks.h" // IWYU pragma: keep
-
+# include "macros.h"
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[]);
 
