@@ -10,6 +10,7 @@ SRC_FILES_NAMES += parser/parse_cli.c
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/buffer_utils.c
+SRC_FILES_NAMES += utils/cmd_utils.c
 
 SRC_FILES_NAMES += commands/list_tasks.c
 
