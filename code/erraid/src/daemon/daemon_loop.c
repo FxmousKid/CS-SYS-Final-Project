@@ -39,7 +39,7 @@ static bool     append_texit(struct s_task *task)
                 return false;
         }
         return true;
-}       
+}
 
 static int	check_date(struct s_task *task)
 {
@@ -110,8 +110,6 @@ static void     exec_tasks_loop(struct s_data *ctx)
 	}
 }
 
-#include <poll.h>
-
 void    daemon_loop(struct s_data *ctx)
 {
 	struct pollfd	pfds[1] = {0};
@@ -136,7 +134,7 @@ void    daemon_loop(struct s_data *ctx)
 	while (is_daemon_running()) {
 
 		handle_all_requests(ctx, pfds);
-		printf("no blocking\n");
+		// printf("no blocking\n");
 		
 		current_time = time(NULL);
 

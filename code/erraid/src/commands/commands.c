@@ -1,10 +1,12 @@
 #include "commands/commands.h"
 
-static bool handle_request(struct s_data *ctx, struct s_reply *req)
+static bool handle_request(struct s_data *ctx, struct s_request *req)
 {
+	uint16_t	raw_opcode;
 	uint16_t	opcode;
+	memcpy(&raw_opcode, req->buf, sizeof(uint16_t));
 
-	memcpy(&opcode, req->buf, sizeof(uint16_t));
+	opcode = be16toh(raw_opcode);
 
 	switch (opcode) {
 	case OPCODE_LS:
@@ -24,7 +26,7 @@ static bool handle_request(struct s_data *ctx, struct s_reply *req)
 
 void handle_all_requests(struct s_data *ctx, struct pollfd *pfds)
 {
-	struct s_reply	req = {0};
+	struct s_request req = {0};
 	int		ready = 0;
 
 	ready = poll(pfds, 1, 0);
@@ -49,7 +51,7 @@ void handle_all_requests(struct s_data *ctx, struct pollfd *pfds)
 	}
 	if (!req.buf)
 		return ;
-	printf("Received request of size %zu\n", req.buf_size);
+	// printf("Received request of size %zu\n", req.buf_size);
 	handle_request(ctx, &req);
 	return ;
 }

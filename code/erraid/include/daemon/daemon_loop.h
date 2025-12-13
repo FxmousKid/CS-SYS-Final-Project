@@ -5,6 +5,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 # include <inttypes.h>
+# include <poll.h>
 
 # include "structs.h"
 # include "utils/utils.h" // IWYU pragma: keep
@@ -14,6 +15,7 @@
 # include "utils/dir_cmd_utils.h" // IWYU pragma: keep
 # include "communication/fifo_api.h" // IWYU pragma: keep
 # include "commands/commands.h" // IWYU pragma: keep
+
 
 
 void    daemon_loop(struct s_data *ctx);

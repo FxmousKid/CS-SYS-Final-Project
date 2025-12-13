@@ -19,7 +19,7 @@ struct s_dir {
 
 };
 
-struct s_reply {
+struct s_request {
 	uint8_t	*buf;
 	size_t	buf_size;
 };
@@ -42,6 +42,14 @@ enum req_opcode {
 	/** @brief Terminate the daemon. */
 	OPCODE_TM = 0x4b49,
 };
+
+enum reply_opcode {
+	/** @brief Request executed successfully */
+	OPCODE_OK = 0x4f4b,
+	/** @brief Request didn't executed successfully */
+	OPCODE_ER = 0x4552,
+};
+
 
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
@@ -108,6 +116,8 @@ struct s_data {
 	/** @brief provided or default path to the run directory. *
 	 * '- 100' to keep space for dedicated folders like tasks/ */
 	char		run_directory[PATH_MAX + 1 - 100];
+	/** @brief provided or default path to the pipes directory */
+	char		pipes_dir[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
 	char		fifo_reply[PATH_MAX + 1];
 	/** @brief Full path for request fifo.  */
