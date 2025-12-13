@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
 	parse_cli(&ctx, argc, argv);
 
+	// Segfault if no option given
 	ctx.communication_func(&ctx);
 	
 	
