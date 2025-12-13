@@ -13,6 +13,7 @@
 # define REPLY_FIFO_NAME_LEN	18
 # define MAX_LINE_LEN           2048
 # define MAX_TIMING_LEN         512
+# define INITIAL_CMD_STR_SIZE   512
 
 
 
