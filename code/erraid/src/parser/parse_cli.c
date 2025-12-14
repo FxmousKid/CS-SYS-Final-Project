@@ -46,12 +46,15 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 static void	set_run_dir_default(struct s_data *ctx)
 {
 	char *user;
+	char buf[PATH_MAX + 1];
 
 	user = getenv("USER");
-	strcpy(ctx->run_directory, TMP_PATH);
-	if (user)
-		strcat(ctx->run_directory, user);
-	strcat(ctx->run_directory, "/erraid/");
+	if (!user)
+		return;
+	if (!build_safe_path(buf, sizeof(buf), TMP_PATH, user))
+		ERR_MSG("Failed to build /tmp/$USER path %s", buf);
+	if (!build_safe_path(ctx->run_directory, sizeof(ctx->run_directory), buf, ERRAID_PATH))
+		ERR_MSG("Failed to build run_directory %s", ctx->run_directory);
 }
 
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
