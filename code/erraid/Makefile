@@ -29,6 +29,8 @@ SRC_FILES_NAMES += daemon/daemon_loop.c
 SRC_FILES_NAMES += communication/fifo_api.c
 
 SRC_FILES_NAMES += commands/list_tasks.c
+SRC_FILES_NAMES += commands/exitcode_tasks.c
+SRC_FILES_NAMES += commands/std_tasks.c
 SRC_FILES_NAMES += commands/commands.c
 
 # Full Path to .c files
