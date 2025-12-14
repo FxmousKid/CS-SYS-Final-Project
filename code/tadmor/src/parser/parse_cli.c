@@ -88,17 +88,20 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 
 	// show exit code history of a task
 	case 'x':
-		taskid = optarg;
+		ctx->communication_func = exitcode_tasks;
+		ctx->task_id = atol(optarg);
 		break;
 	
 	// show last stdout of a task
 	case 'o':
-		taskid = optarg;
+		ctx->communication_func = stdout_tasks;
+		ctx->task_id = atol(optarg);
 		break;
 	
 	// show last stderr of a task
 	case 'e':
-		taskid = optarg;
+		ctx->communication_func = stderr_tasks;
+		ctx->task_id = atol(optarg);
 		break;
 	
 	// create a simple command
