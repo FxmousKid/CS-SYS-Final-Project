@@ -217,3 +217,18 @@ bool read_cmd_reconstruct_str(int fd, char **cmd_str)
 
 	return false;
 }
+
+
+bool	request_opt_tasks(char *fifo_request, uint16_t opcode, uint64_t opt)
+{
+	// Send OPCODE in BE
+	char	buf[10] = {0};
+
+	opcode = htobe16(opcode);
+	opt = htobe64(opt);
+	memcpy(buf, &opcode, 2);
+	memcpy(buf + 2, &opt, 8);
+	if (!writefifo(fifo_request, buf, 10))
+		return false;
+	return true;
+}
