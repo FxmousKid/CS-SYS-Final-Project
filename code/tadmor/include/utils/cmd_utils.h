@@ -16,7 +16,8 @@
  * @param fd            The file descriptor to read from.
  * @param cmd_str       Pointer to char* where the resulting string will be stored.
  */
-bool	read_cmd_reconstruct_str(int fd, char **cmd_str);
+bool	cmd_to_str(int fd, char **cmd_str);
 bool	request_opt_tasks(char *fifo_request, uint16_t opcode, uint64_t opt);
+bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parentheses);
 
 #endif
