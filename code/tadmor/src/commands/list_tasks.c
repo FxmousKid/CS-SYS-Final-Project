@@ -73,7 +73,7 @@ static bool	handle_list_tasks_reply(struct s_data *ctx)
 			goto error;
 
 		/* Read COMMANDLINE */
-		if (!read_cmd_reconstruct_str(fd_reply, &cmd_str))
+		if (!cmd_to_str(fd_reply, &cmd_str))
        			goto error;
 
 		// Convert timing to a formatted string
