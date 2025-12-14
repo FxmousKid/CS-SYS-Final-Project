@@ -48,7 +48,7 @@ static void	set_run_dir_default(struct s_data *ctx)
 	char *user;
 
 	user = getenv("USER");
-	strcpy(ctx->run_directory, "/tmp/");
+	strcpy(ctx->run_directory, TMP_PATH);
 	if (user)
 		strcat(ctx->run_directory, user);
 	strcat(ctx->run_directory, "/erraid/");
