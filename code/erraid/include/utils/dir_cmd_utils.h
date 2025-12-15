@@ -8,7 +8,7 @@
 
 # include "structs.h" // IWYU pragma: keep
 # include "utils/utils.h" // IWYU pragma: keep
-# include "commands/cmd_utils.h" // IWYU pragma: keep
+# include "utils/cmd_utils.h" // IWYU pragma: keep
 
 
 /** @brief opens a DIR *, copies path in dir->path.
@@ -29,5 +29,19 @@ bool	is_ent_sub_dir(struct dirent *ent, struct stat *st);
 /** @brief wraps over readdir(3), returns the number of
  * sub-commands (valid sub-directories) for the given path */
 int	count_sub_cmds(const char *path);
+
+/**
+ * @brief Creates the initial directories needed for the daemon to run
+ *
+ * @param run_dir the run directory path (e.g. /tmp/erraid)
+ *
+ * @return 
+ *  @retval true on success
+ *  @retval false on failure and logs error
+ */
+bool	create_initial_dirs(const char *run_dir);
+
+/** @brief performs a recursive mkdir like mkdir -p */
+bool    create_dirs_recursive(const char *path, mode_t mode);
 
 #endif

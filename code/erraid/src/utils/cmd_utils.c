@@ -1,4 +1,4 @@
-#include "commands/cmd_utils.h"
+#include "utils/cmd_utils.h"
 
 // defined in main.c
 extern bool isdle;
@@ -138,7 +138,7 @@ void	remove_last_file_from_path(char *path)
  * we are guaranteed to have a "type" file in
  * */
 enum cmd_type	get_cmd_type(const char *path_cmd_dir)
-{	
+{
 	int		type_fd;
 	char		buf[PATH_MAX + 1] = {0};
 	uint16_t	type = 0;

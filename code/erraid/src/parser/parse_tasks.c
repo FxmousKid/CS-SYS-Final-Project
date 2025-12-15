@@ -7,7 +7,7 @@ static bool	parse_sub_tasks_cmd(struct s_task *task)
 	while (task) {
 		strcpy(buf, task->path);
 		strcat(buf, CMD_DIR);
-		if (!(task->cmd = parse_cmd_tree(buf)))	
+		if (!(task->cmd = parse_cmd_tree(buf)))
 			return false;
 		task = task->next;
 		bzero(buf, sizeof(buf));
@@ -40,35 +40,35 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
  */
 static void	build_output_paths(struct s_task *task)
 {
-	if (!build_safe_path(task->stdout_path, PATH_MAX + 1, task->path, STDOUT_FILE)) 
+	if (!build_safe_path(task->stdout_path, sizeof(task->stdout_path), task->path, STDOUT_FILE))
 		ERR_MSG("Failed to build stdout path");
-	if (!build_safe_path(task->stderr_path, PATH_MAX + 1, task->path, STDERR_FILE))
+	if (!build_safe_path(task->stderr_path, sizeof(task->stderr_path), task->path, STDERR_FILE))
 		ERR_MSG("Failed to build stderr path");
-	if (!build_safe_path(task->texit_path, PATH_MAX + 1, task->path, TEXIT_FILE))
+	if (!build_safe_path(task->texit_path, sizeof(task->texit_path), task->path, TEXIT_FILE))
 		ERR_MSG("Failed to build times-exitcodes path");
 }
 
 /**
  * @brief Extract task's id from its path
  */
-static int extract_task_id(const char *task_path)
+static taskid_t extract_task_id(const char *task_path)
 {
 	char		path_copy[PATH_MAX + 1];
 	const char	*last_slash;
-	const char	*task_id_ptr;	
+	const char	*task_id_ptr;
 
 	strcpy(path_copy, task_path);
 	remove_trailing_slash(path_copy);
 	
 	last_slash = strrchr(path_copy, '/');
 	if (!last_slash)
-		return -1;
+		return 0;
 	
 	task_id_ptr = last_slash + 1;
 	if (!*task_id_ptr)
-		return -1;
+		return 0;
 
-	return atoi(task_id_ptr);
+	return (taskid_t)atol(task_id_ptr);
 }
 
 static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug)
@@ -125,10 +125,13 @@ bool	parse_tasks(struct s_data *ctx)
 	struct s_task	**task = NULL;
 	char		tasks_path[PATH_MAX + 1] = {0};
 
-	// little hack, tasks have the same criteria 
+	if (!build_safe_path(tasks_path, sizeof(tasks_path), ctx->run_directory, TASKS_DIR)) {
+		ERR_MSG("Failed to build tasks path %s", tasks_path);
+		return false;
+	}
+
+	// little hack, tasks have the same criteria
 	// to be counted as a sub-command dir
-	strcpy(tasks_path, ctx->run_directory);
-	strcat(tasks_path, TASKS_DIR);
 	subtasks_count = count_sub_cmds(tasks_path);
 	if (subtasks_count < 0)
 		return false;

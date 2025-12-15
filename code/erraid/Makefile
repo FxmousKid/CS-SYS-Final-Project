@@ -9,22 +9,29 @@ SRC_FILES_NAMES = main.c
 SRC_FILES_NAMES += parser/parse_cli.c
 SRC_FILES_NAMES += parser/parse_tasks.c
 SRC_FILES_NAMES += parser/parse_timing.c
-
-SRC_FILES_NAMES += commands/parse_cmd_tree.c
-SRC_FILES_NAMES += commands/parse_cmd_si.c
-SRC_FILES_NAMES += commands/parse_cmd_sq.c
-SRC_FILES_NAMES += commands/cmd_utils.c
-SRC_FILES_NAMES += commands/dir_cmd_utils.c
+SRC_FILES_NAMES += parser/parse_cmd_tree.c
+SRC_FILES_NAMES += parser/parse_cmd_si.c
+SRC_FILES_NAMES += parser/parse_cmd_sq.c
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
 SRC_FILES_NAMES += utils/binary_utils.c
 SRC_FILES_NAMES += utils/utils_timing.c
+SRC_FILES_NAMES += utils/cmd_utils.c
+SRC_FILES_NAMES += utils/dir_cmd_utils.c
+SRC_FILES_NAMES += utils/buffer_utils.c
 
 SRC_FILES_NAMES += exec/exec.c
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c
+
+SRC_FILES_NAMES += communication/fifo_api.c
+
+SRC_FILES_NAMES += commands/list_tasks.c
+SRC_FILES_NAMES += commands/exitcode_tasks.c
+SRC_FILES_NAMES += commands/std_tasks.c
+SRC_FILES_NAMES += commands/commands.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
@@ -39,7 +46,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 
 NAME 	:= erraid
 CC 	:= cc
-CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
+CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
 
 LOGFILE_PATH ?= $(PWD)/erraid.log
 CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
@@ -48,13 +55,13 @@ LFLAGS	?=
 
 MKDIR 	:= mkdir -p
 RM_RF	:= rm -rf
-ECHO	:= echo -e
+ECHO	:= printf '%b\n'
 
-BLUE	:= $(shell $(ECHO) "\033[34m") 
-BROWN	:= $(shell $(ECHO) "\033[33m")
-GREEN	:= $(shell $(ECHO) "\033[32m")
-RED	:= $(shell $(ECHO) "\033[31m")
-NC	:= $(shell $(ECHO) "\033[0m")
+BLUE	:= \033[34m
+BROWN	:= \033[33m
+GREEN	:= \033[32m
+RED	:= \033[31m
+NC	:= \033[0m
 
 #<><><><><><><> Recipes <><><><><><><><><><><><><><><><><><>
 

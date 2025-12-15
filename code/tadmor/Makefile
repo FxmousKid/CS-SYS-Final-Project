@@ -5,7 +5,18 @@ DOCS_DIR	= docs
 
 # source code, with root = $SRC_DIR/
 SRC_FILES_NAMES = main.c
-#SRC_FILES_NAMES += file.c
+
+SRC_FILES_NAMES += parser/parse_cli.c
+
+SRC_FILES_NAMES += utils/utils.c
+SRC_FILES_NAMES += utils/buffer_utils.c
+SRC_FILES_NAMES += utils/cmd_utils.c
+
+SRC_FILES_NAMES += commands/list_tasks.c
+SRC_FILES_NAMES += commands/exitcode_tasks.c
+SRC_FILES_NAMES += commands/std_tasks.c
+
+SRC_FILES_NAMES += communication/fifo_api.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
@@ -16,22 +27,26 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SRC_FILES))
 # .d files for dependencies
 DEP_FILES := $(OBJ_FILES:.o=.d)
 
+
 #<><><><><><><> Variables <><><><><><><><><><><><><><><><><>
 
 NAME 	:= tadmor
 CC 	:= cc
-CFLAGS	:= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP
+CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP
 LFLAGS	?=
+
+LOGFILE_PATH ?= $(PWD)/tadmor.log
+CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"
 
 MKDIR 	:= mkdir -p
 RM_RF	:= rm -rf
-ECHO	:= echo -e
+ECHO	:= printf '%b\n'
 
-BLUE	:= $(shell $(ECHO) "\033[34m") 
-BROWN	:= $(shell $(ECHO) "\033[33m")
-GREEN	:= $(shell $(ECHO) "\033[32m")
-RED	:= $(shell $(ECHO) "\033[31m")
-NC	:= $(shell $(ECHO) "\033[0m")
+BLUE	:= \033[34m
+BROWN	:= \033[33m
+GREEN	:= \033[32m
+RED	:= \033[31m
+NC	:= \033[0m
 
 #<><><><><><><> Recipes <><><><><><><><><><><><><><><><><><>
 

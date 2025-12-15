@@ -41,21 +41,14 @@ int	get_logfd(void)
 /**
  * @brief prints on stderr a custom error msg
  *
- * @param msg the custom error message
+ * @param location the macro that wraps __FILE__ and __LINE__
  *
  * @note this is internal function, and location is usually
  * a macro expanding to file and line number
  */
-void	_write_perr(const char *func, const char *location)
+void	_write_perr(const char *location)
 {
-	char	buf[256] = {0};
-	strcpy(buf, "erraid: ");
-	strcat(buf, func);
-	strcat(buf, ": ");
-	strcat(buf, strerror(errno));
-	strcat(buf, location);
-
-	write(get_logfd(), buf, sizeof(buf));
+	dprintf(get_logfd(), ": %s [%s]\n", strerror(errno), location);
 }
 
 /**
@@ -66,15 +59,10 @@ void	_write_perr(const char *func, const char *location)
  * @note this is internal function, and location is usually
  * a macro expanding to file and line number
  */
-void		_write_err(const char *msg, const char *location)
+void	_write_err(const char *location)
 {
-	char	buf[256] = {0};
-	strcpy(buf, "erraid: ");
-	strcat(buf, msg);
-	strcat(buf, ": ");
-	strcat(buf, location);
 
-	write(get_logfd(), buf, sizeof(buf));
+	dprintf(get_logfd(), "[%s]\n", location);
 }
 
 /**
@@ -165,7 +153,7 @@ void	append_int_to_buf(char *buf, int n)
 
 /**
  * @brief Removes trailing slash from a path if present
- * 
+ *
  * @param path The path to clean
  */
 void	remove_trailing_slash(char *path)
@@ -179,7 +167,7 @@ void	remove_trailing_slash(char *path)
 
 /**
  * @brief Builds a path by concatenating two parts safely
- * 
+ *
  * @param dest 		Destination buffer
  * @param dest_size 	Size of destination buffer
  * @param part1 	First part of the path
@@ -208,7 +196,7 @@ bool	build_safe_path(char *dest, size_t dest_size, const char *part1, const char
 
 /**
  * @brief Convert a relative path to an absolute path
- * 
+ *
  * @param relative_path	relative path to convert
  * @param absolute_path	buffer to write the absolute path
  * @return 		true on success, false otherwise
@@ -224,7 +212,7 @@ bool	convert_to_absolute_path(const char *relative_path, char *absolute_path)
 
 	tmp = realpath(relative_path, NULL);
 	if (!tmp) {
-		ERR_SYS("realpath");
+		ERR_SYS("realpath: path [%s]", relative_path);
 		return false;
 	}
 
