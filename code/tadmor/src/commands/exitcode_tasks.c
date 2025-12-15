@@ -48,7 +48,7 @@ static bool	handle_exitcode_reply(struct s_data *ctx)
 error:
 	if (close(fd_reply) < 0)
 		ERR_SYS("close fifo_reply");
-	write(STDOUT_FILENO, "identifiant de tâche non trouvé\n", 34);
+	//write(STDOUT_FILENO, "identifiant de tâche non trouvé\n", 34);
 	return false;
 }
 
