@@ -32,5 +32,7 @@ int main(int argc, char *argv[])
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
+	if (ctx.tasks)
+		free(ctx.tasks);
 	return EXIT_SUCCESS;
 }
