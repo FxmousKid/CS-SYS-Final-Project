@@ -39,10 +39,10 @@ error:
 		return false;
 	if (close(fd_reply) < 0)
 		ERR_SYS("close fifo_reply");
-	if (errtype == 0x4e46)
-		write(STDOUT_FILENO, "identifiant de tâche non trouvé\n", 34);
-	else if (errtype == 0x4e52)
-		write(STDOUT_FILENO, "la tâche n'a pas encore été exécutée au moins une fois\n", 59);
+	// if (errtype == 0x4e46)
+	// 	write(STDOUT_FILENO, "identifiant de tâche non trouvé\n", 34);
+	// else if (errtype == 0x4e52)
+	// 	write(STDOUT_FILENO, "la tâche n'a pas encore été exécutée au moins une fois\n", 59);
 	return false;
 }
 
