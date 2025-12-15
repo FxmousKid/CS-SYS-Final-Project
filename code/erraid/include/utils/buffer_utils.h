@@ -4,9 +4,19 @@
 # include <stdlib.h>
 # include <stdint.h>
 # include <stdbool.h>
+# include <string.h>
+# include <errno.h>
 
-# include "macros.h"
-# include "utils/utils.h"
+// basically using the compiler to check for apple vs linux 
+# if defined(__has_include) && __has_include(<endian.h>)
+#  include <endian.h>
+# elif defined(__has_include) && __has_include(<sys/endian.h>)
+#  include <sys/endian.h>
+# endif
+
+# include "macros.h" // IWYU pragma: keep
+# include "utils/utils.h" // IWYU pragma: keep
+
 
 /**
  * @brief Dynamic buffer structure used to build binary response messages.

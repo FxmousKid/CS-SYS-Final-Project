@@ -1,7 +1,4 @@
 #include "utils/buffer_utils.h"
-#include <string.h>
-#include <errno.h>
-#include <byteswap.h> // Fournit htobeXX sur Linux (lulu)
 
 /**
  * @brief Initializes the dynamic buffer structure.
