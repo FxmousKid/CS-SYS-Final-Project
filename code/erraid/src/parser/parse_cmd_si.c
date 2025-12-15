@@ -84,6 +84,8 @@ bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 {
 	int		fd;
 	char		buf[PATH_MAX + 1] = {0};
+	const char 	*exec_path_relative;
+	char 		resolved_path[PATH_MAX + 1] = {0};
 
 	strcpy(buf, path);
 	if (buf[strlen(buf) - 1] != '/')
@@ -105,8 +107,20 @@ bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 		return false;
 	}
 
-	if (find_binary_path(cmd->cmd.cmd_si.command[0], cmd->cmd.cmd_si.cmd_path) == false) {
-		ERR_MSG("binary not found");
+	exec_path_relative = cmd->cmd.cmd_si.command[0];
+
+	if (convert_to_absolute_path(exec_path_relative, resolved_path)) {
+		strlcpy(cmd->cmd.cmd_si.cmd_path, resolved_path, sizeof(cmd->cmd.cmd_si.cmd_path));
+	}
+	else if (exec_path_relative[0] != '/') {
+		if (find_binary_path(exec_path_relative, cmd->cmd.cmd_si.cmd_path) == false) {
+			ERR_MSG("binary not found in $PATH: %s", exec_path_relative);
+			close(fd);
+			return false;
+		}
+	}
+	else {
+		ERR_MSG("Failed to resolve absolute path for command %s", exec_path_relative);
 		close(fd);
 		return false;
 	}
