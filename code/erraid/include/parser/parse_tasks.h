@@ -4,7 +4,7 @@
 # include <stdbool.h>
 
 # include "structs.h"
-# include "commands/parse_cmd_tree.h" // IWYU pragma: keep
+# include "parser/parse_cmd_tree.h" // IWYU pragma: keep
 # include "parser/parse_timing.h" // IWYU pragma: keep
 
 /**

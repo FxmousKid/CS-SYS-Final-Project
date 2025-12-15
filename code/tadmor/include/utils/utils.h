@@ -9,6 +9,9 @@
 # include <stdlib.h>
 # include <limits.h>
 # include <fcntl.h>
+# include <stdbool.h>
+# include <stdarg.h>
+#include <inttypes.h> // For PRIu64
 
 # include "macros.h" // IWYU pragma: keep
 
@@ -30,18 +33,6 @@
 # define ERR_SYS(...) do { dprintf(get_logfd(), __VA_ARGS__); _write_perr(DBG); } while (0);
 # define ERR_MSG(...) do { dprintf(get_logfd(), __VA_ARGS__); _write_err(DBG); } while (0);
 
-/**
- * @brief calls read(2) and converts (if needed) data to host byte order
- *
- * @param fd file descriptor to read from
- * @param buf pointer to data buffer
- * @param nbytes number of bytes to read
- * @param is_data_le true if data is in little endian, false if in big endian
- *
- * @return the return of the read(2) call
- * */
-ssize_t		read_endian(int fd, void *buf, size_t nbytes, bool is_data_le);
-
 /** @brief prints to stdout the help message. */
 void		print_help(void);
 
@@ -51,9 +42,6 @@ void		print_darr(const char *tab_name, char **tab);
 /** @brief takes NULL-terminatd **ptr,
  * then frees all elements of darr, then frees dar itself. */
 void		free_darr(char **darr);
-
-/** @brief prints the string representation of a cmd_type enum */
-void		print_cmd_enum(enum cmd_type type, bool newline);
 
 /** @brief appends the string representation of an int to a buffer */
 void		append_int_to_buf(char *buf, int n);
@@ -67,9 +55,18 @@ bool		build_safe_path(char *dest, size_t dest_size, const char *part1, const cha
 /** @brief convert a relative path to an absolute path */
 bool		convert_to_absolute_path(const char *relative_path, char *absolute_path);
 
+/**
+ * @brief Converts binary timing fields (bitmasks) to a crontab-like string.
+ * @param timing The s_timing structure.
+ * @return A dynamically allocated string (e.g., "0,30 * 1" or "- - -"). Must be freed.
+ */
+char	*timing_to_string(const struct s_timing *timing);
+
+bool	write_task_output(uint64_t task_id, const char *timing_str, const char *cmd_str);
+
+
 int		get_logfd(void);
 void		_write_perr(const char *location);
 void		_write_err(const char *location);
-
 
 #endif

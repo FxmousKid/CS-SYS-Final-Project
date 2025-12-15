@@ -37,7 +37,7 @@ static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid
 static bool	execute_command(struct s_cmd *cmd)
 {
 	bool		success = true;
-	struct s_cmd_sq *cmd_sq = NULL;
+	struct s_cmd_sq *cmd_sq;
 
 	if (!cmd) {
 		ERR_MSG("Null command");
@@ -48,24 +48,19 @@ static bool	execute_command(struct s_cmd *cmd)
 	case CMD_SI:
 		success = exec_cmd_si(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
 		break;
-		
 	case CMD_SQ:
-		// Debug lines
-		// printf("Executing sequence of %d commands...\n", cmd->cmd.cmd_sq.nb_cmds);
 		cmd_sq = &cmd->cmd.cmd_sq;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			success &= execute_command(&cmd_sq->cmds[i]);
+			success = execute_command(&cmd_sq->cmds[i]);
 				
 		// command sequence exit code should be the last command's exit code
 		if (cmd_sq->nb_cmds > 0)
 			cmd->exit_code = cmd_sq->cmds[cmd_sq->nb_cmds - 1].exit_code;
 		break;
-		
 	default:
 		ERR_MSG("Unsupported command type");
 		return false;
 	}
-	
 	return success;
 }
 
@@ -104,13 +99,11 @@ static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 	return true;
 }
 
-
-static bool	exec_cmd_with_redir(struct s_cmd *cmd, 
-			    const char *stdout_path, 
+static bool	exec_cmd_with_redir(struct s_cmd *cmd,
+			    const char *stdout_path,
 			    const char *stderr_path)
 {
 	pid_t	pid;
-	int	status;
 	bool	success;
 
 	pid = fork();
@@ -125,8 +118,6 @@ static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 		exit(success ? cmd->exit_code : EXIT_FAILURE);
 	default:
 		cmd->pid = pid;
-		waitpid(pid, &status, 0);
-		cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
 		return true;
     	}
 }
@@ -134,6 +125,6 @@ static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 bool exec_task(struct s_task *task)
 {
 	return exec_cmd_with_redir(task->cmd,
-		 		   task->stdout_path, 
+		 		   task->stdout_path,
 		 		   task->stderr_path);
 }

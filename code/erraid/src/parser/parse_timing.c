@@ -8,13 +8,13 @@ bool	parse_timing(struct s_task *task, bool debug)
 	uint64_t	minutes_he; // Host endian
 	uint32_t	hours_he; // Host endian
 
+	if (debug)
+		printf("path task : %s\n", task->path);
+
 	if (!build_safe_path(buf, PATH_MAX + 1, task->path, TIMING_FILE)) {
 		ERR_MSG("failed to build timing file");
 		return false;
 	}
-
-	if (debug)
-		printf("path task : %s\n", buf);
 
 	fd = open(buf, O_RDONLY);
 	if (fd < 0) {
@@ -35,8 +35,6 @@ bool	parse_timing(struct s_task *task, bool debug)
 	task->timing.hours = htobe32(hours_he);
 	task->timing.days = (uint8_t)timing[12];
 	
-
-	// printf("minutes: %lx hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
 	if (debug) {
 		printf("minutes: %" PRIx64 " hours: %x days: %x\n", task->timing.minutes, task->timing.hours, task->timing.days);
 		print_timing(task->timing);

@@ -1,21 +1,65 @@
 #include "parser/parse_cli.h"
-#include "utils/utils.h"
+
+static void	set_fifos_path_default(struct s_data *ctx)
+{
+	if(!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), ctx->run_directory, PIPES_DIR)) {
+		ERR_MSG("Failed to build pipes directory path");
+		return;
+	}
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), ctx->pipes_dir, REQUEST_FIFO_NAME))
+		ERR_MSG("Failed to build request fifo path");
+	if (!build_safe_path(ctx->fifo_reply, sizeof(ctx->fifo_reply), ctx->pipes_dir, REPLY_FIFO_NAME))
+		ERR_MSG("Failed to build reply fifo path");
+}
+
+static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
+{
+	char	abs_path[PATH_MAX + 1] = {0};
+
+	if (!path || !*path) {
+		ERR_MSG("Invalid pipes dir path\n");
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+
+	if (!convert_to_absolute_path(path, abs_path)) {
+		ctx->exit_code = EXIT_FAILURE;
+		return false;
+	}
+	if (!build_safe_path(ctx->pipes_dir, sizeof(ctx->pipes_dir), "", abs_path)) {
+		ERR_MSG("Failed to build pipes directory path");
+		return false;
+	}
+	if (!build_safe_path(ctx-> fifo_reply, sizeof(ctx->fifo_reply), abs_path, REPLY_FIFO_NAME)) {
+		ERR_MSG("Failed to build fifo reply path");
+		return false;
+	}
+		
+	if (!build_safe_path(ctx->fifo_request, sizeof(ctx->fifo_request), abs_path, REQUEST_FIFO_NAME)) {
+		ERR_MSG("Failed to build fifo request path");
+		return false;
+	}
+
+	return true;
+}
 
 static void	set_run_dir_default(struct s_data *ctx)
 {
 	char *user;
+	char buf[PATH_MAX + 1];
 
 	user = getenv("USER");
-	strcpy(ctx->run_directory, "/tmp/");
-	if (user)
-		strcat(ctx->run_directory, user);
-	strcat(ctx->run_directory, "/erraid/");	
+	if (!user)
+		return;
+	if (!build_safe_path(buf, sizeof(buf), TMP_PATH, user))
+		ERR_MSG("Failed to build /tmp/$USER path %s", buf);
+	if (!build_safe_path(ctx->run_directory, sizeof(ctx->run_directory), buf, ERRAID_PATH))
+		ERR_MSG("Failed to build run_directory %s", ctx->run_directory);
 }
 
 static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 {
-	char	*ctx_rd;
-	char	abs_path[PATH_MAX + 1];
+	char	abs_path[PATH_MAX + 1] = {0};
 
 	if (!path || !*path) {
 		ERR_MSG("Invalid run directory path\n");
@@ -24,21 +68,14 @@ static bool	parse_custom_run_directory(struct s_data *ctx, const char *path)
 	}
 
 	if (!convert_to_absolute_path(path, abs_path)) {
-		ERR_MSG("Failed to convert to absolute path: %s\n");
+		ERR_MSG("Failed to convert to absolute path: %s\n", path);
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
-
-	if (strlen(abs_path) > PATH_MAX) {
-		ERR_MSG("Run directory path too long\n");
-		ctx->exit_code = EXIT_FAILURE;
+	if (!build_safe_path(ctx->run_directory, sizeof(ctx->run_directory), "", abs_path)) {
+		ERR_MSG("Failed to build run directory path");
 		return false;
 	}
-
-	ctx_rd = ctx->run_directory;
-	strcpy(ctx_rd, abs_path);
-	if (ctx_rd[strlen(ctx_rd) - 1] != '/' && strlen(ctx_rd) < PATH_MAX - 1)
-		ctx_rd[strlen(ctx_rd)] = '/';
 	return true;
 }
 
@@ -49,6 +86,12 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 	// specify dir of namedpath creation : -r PATH
 	case 'r':
 		if (!parse_custom_run_directory(ctx, optarg))
+			return false;
+		break;
+	
+	// specify dir of named pipes : -p PATH
+	case 'p':
+		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
 		break;
 
@@ -79,7 +122,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hdlr:";		
+	char		*shortopts = "hdlr:p:";
 	int		opt;
 	extern int	opterr;
 
@@ -88,6 +131,7 @@ bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 		{"debug", no_argument, NULL, 'd'},
 		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'r'},
+		{"pipes-directory", required_argument, NULL, 'p'},
 		{NULL, 0, NULL, 0}
 	};
 	opterr = 0;
@@ -100,6 +144,9 @@ bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 	// if -r not used, then used default
 	if (ctx->run_directory[0] == '\0')
 		set_run_dir_default(ctx);
+	// if -p not used, then used default
+	if (ctx->pipes_dir[0] == '\0')
+		set_fifos_path_default(ctx);
 	argc -= optind;
 	argv += optind;
 	return true;

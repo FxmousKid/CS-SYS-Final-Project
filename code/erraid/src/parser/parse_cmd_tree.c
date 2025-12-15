@@ -1,4 +1,4 @@
-#include "commands/parse_cmd_tree.h"
+#include "parser/parse_cmd_tree.h"
 
 bool	parse_sub_trees(struct s_cmd *cmd)
 {
@@ -35,11 +35,12 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 exit:
 	return false;
 }
+
 /* Main function for Parsing the cmd/ folder
  *
  * takes the path to the initial cmd/ under TASK_ID/
- * 
- * */
+ *
+ */
 struct s_cmd	*parse_cmd_tree(const char *path_cmd_dir)
 {
 	struct s_cmd	*cmd;
