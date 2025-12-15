@@ -99,7 +99,6 @@ static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 	return true;
 }
 
-
 static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 			    const char *stdout_path,
 			    const char *stderr_path)

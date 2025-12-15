@@ -76,9 +76,9 @@ bool	_fparse_cmd_si(int fd, struct s_cmd_si *cmd, int isdle)
  * @param path the path of the dir where the argv lives
  * @param cmd struct to parse argv in the right union member
  *
- * @return 
- *  @retval true on success
- *  @retval false on failure
+ * @return
+ * @retval true on success
+ * @retval false on failure
  */
 bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 {
@@ -87,7 +87,7 @@ bool	parse_cmd_si(const char path[PATH_MAX + 1], struct s_cmd *cmd)
 
 	strcpy(buf, path);
 	if (buf[strlen(buf) - 1] != '/')
-		buf[strlen(buf)] = '/'; 
+		buf[strlen(buf)] = '/';
 
 	if (strlen(buf) + 4 > PATH_MAX) {
 		ERR_MSG("path too big");

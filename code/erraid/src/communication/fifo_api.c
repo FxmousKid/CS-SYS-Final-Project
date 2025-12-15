@@ -50,9 +50,9 @@ static int	openfifo(const char *fifo_path, bool to_read)
  * @param buf the payload
  * @param len the length of the payload
  *
- * @return 
- *  @retval true on success
- *  @retval false on failure, logs the error
+ * @return
+ * @retval true on success
+ * @retval false on failure, logs the error
  */
 bool	writefifo(const char *path, const void *buf, size_t len)
 {
