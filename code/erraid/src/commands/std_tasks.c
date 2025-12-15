@@ -6,7 +6,7 @@ static char	serialize_std_tasks(struct s_data *ctx, struct s_buffer *buf, uint64
 	char		path[PATH_MAX] = {0};
 	char		read_buf[1] = {0};
 	int		read_size;
-	uint32_t	nbchar;
+	uint32_t	nbchar = 0;
 	struct stat	st;
 	int		file;
 
@@ -32,7 +32,6 @@ static char	serialize_std_tasks(struct s_data *ctx, struct s_buffer *buf, uint64
 
 	nbchar = htobe32(nbchar);
 	memcpy(buf->data + 2, &nbchar, 4);
-
 	close(file);
 	return 'S';
 }

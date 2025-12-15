@@ -67,7 +67,7 @@ void handle_all_requests(struct s_data *ctx, struct pollfd *pfds)
 	}
 	if (!req.buf)
 		return ;
-	printf("Received request of size %zu %s\n", req.buf_size, ctx->run_directory);
+	//printf("Received request of size %zu %s\n", req.buf_size, ctx->run_directory);
 	handle_request(ctx, &req);
 	return ;
 }
