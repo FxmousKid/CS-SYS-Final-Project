@@ -1,4 +1,3 @@
-
 #include "commands/std_tasks.h"
 
 static char	serialize_std_tasks(struct s_data *ctx, struct s_buffer *buf, uint64_t taskid, char *std)
@@ -10,7 +9,7 @@ static char	serialize_std_tasks(struct s_data *ctx, struct s_buffer *buf, uint64
 	struct stat	st;
 	int		file;
 
-	read_size = snprintf(path, PATH_MAX, "%s/tasks/%lu/", ctx->run_directory, taskid);
+	read_size = snprintf(path, PATH_MAX, "%s/tasks/%" PRId64 "/", ctx->run_directory, taskid);
 	//printf("path : %s\n", path);
 	if (!(stat(path, &st) == 0 && S_ISDIR(st.st_mode)))
 		return 'F';

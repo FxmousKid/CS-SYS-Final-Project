@@ -1,4 +1,3 @@
-
 #include "commands/exitcode_tasks.h"
 
 static bool	serialize_exitcode_tasks(struct s_data *ctx, struct s_buffer *buf, uint64_t taskid)
@@ -11,7 +10,7 @@ static bool	serialize_exitcode_tasks(struct s_data *ctx, struct s_buffer *buf, u
 	uint64_t	time = 0;
 	int		file;
 
-	snprintf(path, PATH_MAX, "%s/tasks/%lu/times-exitcodes", ctx->run_directory, taskid);
+	snprintf(path, PATH_MAX, "%s/tasks/%" PRId64 "/times-exitcodes", ctx->run_directory, taskid);
 	if ((file = open(path, O_RDONLY)) < 0) {
 		return false;
 	}

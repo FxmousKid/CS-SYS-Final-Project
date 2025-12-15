@@ -5,9 +5,15 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <byteswap.h>
 
-#include "utils/utils.h"
+// basically using the compiler to check for apple vs linux 
+# if defined(__has_include) && __has_include(<endian.h>)
+#  include <endian.h>
+# elif defined(__has_include) && __has_include(<sys/endian.h>)
+#  include <sys/endian.h>
+# endif
+
+#include "utils/utils.h" // IWYU pragma: keep
 
 /** @brief Reads an exact number of bytes from a file descriptor. */
 
