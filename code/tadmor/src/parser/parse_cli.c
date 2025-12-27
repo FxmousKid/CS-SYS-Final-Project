@@ -82,7 +82,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		break;
 
 	// remove a task
-	case 'r':
+	case 'R':
 		ctx->task_id = atol(optarg);
 		break;
 
@@ -136,7 +136,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		break;
 	
 	// the directory for storing named pipes
-	case 'p':
+	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
 		break;
@@ -170,7 +170,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 {
 	int		opt;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:lcsm:H:d:np:qbh";
+	const char	*shortopts = "x:o:e:r:R:lcsm:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -188,7 +188,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		{"no-time", no_argument, NULL, 'n'},
 
 		// General options
-		{"pipes-directory", required_argument, NULL, 'p'},
+		{"pipes-directory", required_argument, NULL, 'P'},
 		{"stop-daemon", no_argument, NULL, 'q'},
 		{"debug", no_argument, NULL, 'b'},
 		{"help", no_argument, NULL, 'h'},

@@ -27,7 +27,7 @@ Options to create tasks :\n\
 \n\
 Miscellenaeous options :\n\
  -q, --stop-daemon\n\
- -p, --pipes-directory=PATH\n\
+ -P, --pipes-directory=PATH\n\
  -b, --debug\n\
  -h, --help\n\
 \n\
