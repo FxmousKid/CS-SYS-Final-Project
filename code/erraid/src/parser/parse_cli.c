@@ -89,6 +89,11 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 			return false;
 		break;
 	
+	// to execute on foreground or to daemonize
+	case 'F':
+		ctx->foreground = true;
+		break;
+	
 	// specify dir of named pipes : -p PATH
 	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
@@ -112,7 +117,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 	// Unknown option
 	case '?':
-		printf("Check usage with -h, --help\n");
+		// printf("Check usage with -h, --help\n");
 		ctx->exit_code = EXIT_FAILURE;
 		return false;
 	}
@@ -122,7 +127,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hdlR:P:";
+	char		*shortopts = "hdlR:P:F";
 	int		opt;
 	extern int	opterr;
 
@@ -132,9 +137,10 @@ bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 		{"little-endian", no_argument, NULL, 'l'},
 		{"run-directory", required_argument, NULL, 'R'},
 		{"pipes-directory", required_argument, NULL, 'P'},
+		{"foreground", no_argument, NULL, 'F'},
 		{NULL, 0, NULL, 0}
 	};
-	opterr = 0;
+	// opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, 0)) != -1) {
 		// if opts_handle() returns false, no need to parse anymore
 		if (!opts_handle(ctx, opt)) {

@@ -114,6 +114,8 @@ struct s_data {
 	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
 	uint8_t		exit_code;
+	/** @brief to execute in foreground (no daemonization). */
+	bool		foreground;
 	/** @brief provided or default path to the run directory. *
 	 * '- 100' to keep space for dedicated folders like tasks/ */
 	char		run_directory[PATH_MAX + 1 - 100];
