@@ -11,7 +11,8 @@ Spawns a deamon that receives tasks to perform at specific times.\n\
 \n\
 Options Valid for the deamon :\n\
 \n\
- -r, --run-directory=PATH\n\
+ -P, --pipes-directory=PATH\n\
+ -R, --run-directory=PATH\n\
  -h, --help\n\
  -l, --little-endian\n\
  -d, --debug\n\

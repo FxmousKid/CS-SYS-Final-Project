@@ -84,13 +84,13 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 	switch (opt) {
 	
 	// specify dir of namedpath creation : -r PATH
-	case 'r':
+	case 'R':
 		if (!parse_custom_run_directory(ctx, optarg))
 			return false;
 		break;
 	
 	// specify dir of named pipes : -p PATH
-	case 'p':
+	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
 		break;
@@ -122,7 +122,7 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hdlr:p:";
+	char		*shortopts = "hdlR:P:";
 	int		opt;
 	extern int	opterr;
 
@@ -130,8 +130,8 @@ bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 		{"help", no_argument, NULL, 'h'},
 		{"debug", no_argument, NULL, 'd'},
 		{"little-endian", no_argument, NULL, 'l'},
-		{"run-directory", required_argument, NULL, 'r'},
-		{"pipes-directory", required_argument, NULL, 'p'},
+		{"run-directory", required_argument, NULL, 'R'},
+		{"pipes-directory", required_argument, NULL, 'P'},
 		{NULL, 0, NULL, 0}
 	};
 	opterr = 0;
