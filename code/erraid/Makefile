@@ -12,6 +12,7 @@ SRC_FILES_NAMES += parser/parse_timing.c
 SRC_FILES_NAMES += parser/parse_cmd_tree.c
 SRC_FILES_NAMES += parser/parse_cmd_si.c
 SRC_FILES_NAMES += parser/parse_cmd_sq.c
+SRC_FILES_NAMES += parser/parse_cmd_pl.c
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c

@@ -3,6 +3,7 @@
 bool	parse_sub_trees(struct s_cmd *cmd)
 {
 	struct s_cmd_sq	*cmd_sq = NULL;
+	struct s_cmd_pl	*cmd_pl = NULL;
 	bool		ret_flag = true;
 
 	if (!(cmd->cmd_type = get_cmd_type(cmd->path)))
@@ -28,12 +29,21 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		break;
 
 	case CMD_PL:
-		ERR_MSG("Parsing Pipeline !")
+		cmd_pl = &cmd->cmd.cmd_pl;
+		if ((cmd_pl->nb_cmds = count_sub_cmds(cmd->path)) < 0)
+			goto exit;
+		if (!alloc_and_fill_pl_sub_dirs(cmd_pl, cmd->path))
+			goto exit;
+		for (int i = 0; i < cmd_pl->nb_cmds; i++)
+			ret_flag &= parse_sub_trees(&cmd_pl->cmds[i]);
 		break;
 
 	default:
 		return false;
 	}
+
+	if (cmd->cmd_type == CMD_PL)
+		printf("cmd = %p\n", cmd->cmd.cmd_pl.cmds[0].path);
 	return ret_flag;
 
 exit:
@@ -57,5 +67,6 @@ struct s_cmd	*parse_cmd_tree(const char *path_cmd_dir)
 		free_command_rec(cmd);
 		return NULL;
 	}
+	print_cmd_tree(cmd);
 	return cmd;
 }

@@ -71,10 +71,7 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 	printf("%s%s ", prefix, is_last ? "└──" : "├──");
 	print_cmd_enum(cmd->cmd_type, true);
 
-	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
-		return;
-
-	if (cmd->cmd_type != CMD_PL || !cmd->cmd.cmd_pl.cmds)
+	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;
 
 	if (snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix,
@@ -143,9 +140,7 @@ void	print_cmd_tree(struct s_cmd *cmd)
 		return;
 	}
 	print_cmd_enum(cmd->cmd_type, true);
-	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
-		return;
-	if (cmd->cmd_type != CMD_PL || !cmd->cmd.cmd_pl.cmds)
+	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;
 
 	if (cmd->cmd_type == CMD_SQ)
