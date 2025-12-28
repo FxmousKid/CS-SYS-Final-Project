@@ -78,6 +78,14 @@ union u_cmd {
 		/** @brief number of commands (number of semi-colons + 1). */
 		int		nb_cmds;
 	} cmd_sq;
+
+	/** @brief struct representing a pipeline of commands. */
+	struct s_cmd_pl {
+		/** @brief cmd 0 | ... | cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief number of commands (number of pipes + 1). */
+		int		nb_cmds;
+	} cmd_pl;
 };
 
 /** @brief struct representing a abstract command via a tagged union*/

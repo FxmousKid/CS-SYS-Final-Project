@@ -40,6 +40,17 @@ static void	free_cmd_node(struct s_cmd *cmd, bool free_self)
 			cmd->cmd.cmd_sq.nb_cmds = 0;
 		}
 		break;
+
+	case CMD_PL:
+		if (cmd->cmd.cmd_pl.cmds) {
+			for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+				free_cmd_node(&cmd->cmd.cmd_pl.cmds[i], false);
+			free(cmd->cmd.cmd_pl.cmds);
+			cmd->cmd.cmd_pl.cmds = NULL;
+			cmd->cmd.cmd_pl.nb_cmds = 0;
+		}
+		break;
+
 	default:
 		break;
 	}
@@ -63,13 +74,26 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
 		return;
 
+	if (cmd->cmd_type != CMD_PL || !cmd->cmd.cmd_pl.cmds)
+		return;
+
 	if (snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix,
 		    is_last ? "    " : "│   ") < 0)
 		next_prefix[0] = '\0';
-	child_count = cmd->cmd.cmd_sq.nb_cmds;
-	for (int i = 0; i < child_count; ++i)
-		print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], next_prefix,
-				   i == child_count - 1);
+
+	if (cmd->cmd_type == CMD_SQ) {
+		child_count = cmd->cmd.cmd_sq.nb_cmds;
+		for (int i = 0; i < child_count; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], next_prefix,
+					   i == child_count - 1);
+	}
+
+	if (cmd->cmd_type == CMD_PL) {
+		child_count = cmd->cmd.cmd_pl.nb_cmds;
+		for (int i = 0; i < child_count; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_pl.cmds[i], next_prefix,
+					   i == child_count - 1);
+	}
 }
 
 static void	closedir_cmd_rec(struct s_cmd *cmd)
@@ -84,6 +108,12 @@ static void	closedir_cmd_rec(struct s_cmd *cmd)
 		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
 			closedir_cmd_rec(&cmd->cmd.cmd_sq.cmds[i]);
 		break;
+
+	case CMD_PL:
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			closedir_cmd_rec(&cmd->cmd.cmd_pl.cmds[i]);
+		break;
+
 	
 	default:
 		return ;
@@ -115,9 +145,17 @@ void	print_cmd_tree(struct s_cmd *cmd)
 	print_cmd_enum(cmd->cmd_type, true);
 	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
 		return;
-	for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
-		print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], "",
-				   i == cmd->cmd.cmd_sq.nb_cmds - 1);
+	if (cmd->cmd_type != CMD_PL || !cmd->cmd.cmd_pl.cmds)
+		return;
+
+	if (cmd->cmd_type == CMD_SQ)
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], "",
+					   i == cmd->cmd.cmd_sq.nb_cmds - 1);
+	if (cmd->cmd_type == CMD_PL)
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_pl.cmds[i], "",
+					   i == cmd->cmd.cmd_pl.nb_cmds - 1);
 }
 
 /**
