@@ -27,6 +27,10 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 			ret_flag &= parse_sub_trees(&cmd_sq->cmds[i]);
 		break;
 
+	case CMD_PL:
+		ERR_MSG("Parsing Pipeline !")
+		break;
+
 	default:
 		return false;
 	}

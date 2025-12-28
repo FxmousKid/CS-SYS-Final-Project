@@ -54,11 +54,11 @@ enum reply_opcode {
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
 	CMD_SI = 0x5349,
-	/** @brief Sequence of commands "cmd1 ; cmd2 ; cmd3". */
+	/** @brief Sequence of commands "cmd_1 ; ... ; cmd_n". */
 	CMD_SQ = 0x5351,
+	/** @brief Pipeline "cmd_1 | ... | cmd_n". */
+	CMD_PL = 0x504c,
 	CMD_IF,
-	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
-	CMD_PL,
 };
 
 /** @brief union used to abstract the command type */

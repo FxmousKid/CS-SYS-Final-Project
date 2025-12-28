@@ -168,10 +168,12 @@ enum cmd_type	get_cmd_type(const char *path_cmd_dir)
 	close(type_fd);
 
 	switch(type) {
-	case 0x5349: 
+	case CMD_SI:
 		return CMD_SI;
-	case 0x5351: 
+	case CMD_SQ:
 		return CMD_SQ;
+	case CMD_PL:
+		return CMD_PL;
 	default:
 		ERR_MSG("Unknown command type");
 	}
