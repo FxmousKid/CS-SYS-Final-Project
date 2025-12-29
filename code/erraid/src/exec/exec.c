@@ -2,9 +2,13 @@
 
 extern char **environ;
 
-static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid)
+static bool	exec_cmd_si(struct s_cmd *cmd)
 {
 	int	status;
+
+	pid_t		pid = cmd->pid;
+	uint16_t	*exit_code = &cmd->exit_code;
+	struct s_cmd_si	*cmd_si = &cmd->cmd.cmd_si;
 
 	if (!cmd_si || !cmd_si->command || !cmd_si->command[0]) {
 		ERR_MSG("Invalid simple command");
@@ -18,8 +22,8 @@ static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid
 	}
 	
 	status = 0;
-	*pid = fork();
-	switch((*pid)){
+	pid = fork();
+	switch((pid)){
 	case -1:
 		ERR_SYS("fork");
 		return false;
@@ -28,7 +32,7 @@ static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid
 		ERR_SYS("execve");
 		exit(EXIT_FAILURE);
 	default:
-		waitpid(*pid, &status, 0);
+		waitpid(pid, &status, 0);
 		*exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
 		return true;
 	}
@@ -46,7 +50,7 @@ static bool	execute_command(struct s_cmd *cmd)
 	
 	switch (cmd->cmd_type) {
 	case CMD_SI:
-		success = exec_cmd_si(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
+		success = exec_cmd_si(cmd);
 		break;
 
 	case CMD_SQ:
@@ -132,7 +136,12 @@ static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 
 bool exec_task(struct s_task *task)
 {
+	struct s_cmd	*cmd = cmd;
+
+
+
 	return exec_cmd_with_redir(task->cmd,
 		 		   task->stdout_path,
 		 		   task->stderr_path);
+
 }
