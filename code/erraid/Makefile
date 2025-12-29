@@ -23,6 +23,7 @@ SRC_FILES_NAMES += utils/dir_cmd_utils.c
 SRC_FILES_NAMES += utils/buffer_utils.c
 
 SRC_FILES_NAMES += exec/exec.c
+SRC_FILES_NAMES += exec/exec_pl.c
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c
@@ -47,7 +48,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 
 NAME 	:= erraid
 CC 	:= cc
-CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
+CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3 -trigraphs -Wno-trigraphs
 
 LOGFILE_PATH ?= $(PWD)/erraid.log
 CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"

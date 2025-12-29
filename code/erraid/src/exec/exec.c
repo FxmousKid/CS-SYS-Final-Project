@@ -36,8 +36,8 @@ static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid
 
 static bool	execute_command(struct s_cmd *cmd)
 {
-	bool		success = true;
-	struct s_cmd_sq *cmd_sq;
+	bool			success = true;
+	struct s_cmd_sq 	*cmd_sq = NULL;
 
 	if (!cmd) {
 		ERR_MSG("Null command");
@@ -48,6 +48,7 @@ static bool	execute_command(struct s_cmd *cmd)
 	case CMD_SI:
 		success = exec_cmd_si(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
 		break;
+
 	case CMD_SQ:
 		cmd_sq = &cmd->cmd.cmd_sq;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
@@ -57,6 +58,10 @@ static bool	execute_command(struct s_cmd *cmd)
 		if (cmd_sq->nb_cmds > 0)
 			cmd->exit_code = cmd_sq->cmds[cmd_sq->nb_cmds - 1].exit_code;
 		break;
+
+	case CMD_PL:
+		break;
+	
 	default:
 		ERR_MSG("Unsupported command type");
 		return false;
@@ -100,8 +105,8 @@ static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
 }
 
 static bool	exec_cmd_with_redir(struct s_cmd *cmd,
-			    const char *stdout_path,
-			    const char *stderr_path)
+				    const char *stdout_path,
+				    const char *stderr_path)
 {
 	pid_t	pid;
 	bool	success;
@@ -111,11 +116,14 @@ static bool	exec_cmd_with_redir(struct s_cmd *cmd,
 	case -1:
 		ERR_SYS("fork");
 		return false;
+
 	case 0:
-		if (!setup_output_redir(stdout_path, stderr_path))
+		if (NEED_REDIR_BEFORE_FIRST_CMD(cmd) && \
+		    !setup_output_redir(stdout_path, stderr_path))
 			exit(EXIT_FAILURE);
 		success = execute_command(cmd);
 		exit(success ? cmd->exit_code : EXIT_FAILURE);
+
 	default:
 		cmd->pid = pid;
 		return true;

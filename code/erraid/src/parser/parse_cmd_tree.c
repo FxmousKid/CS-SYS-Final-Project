@@ -65,6 +65,5 @@ struct s_cmd	*parse_cmd_tree(const char *path_cmd_dir)
 		free_command_rec(cmd);
 		return NULL;
 	}
-	print_cmd_tree(cmd);
 	return cmd;
 }
