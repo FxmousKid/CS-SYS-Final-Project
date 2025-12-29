@@ -1,6 +1,6 @@
 #include "parser/parse_cmd_tree.h"
 
-bool	parse_sub_trees(struct s_cmd *cmd)
+static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 {
 	struct s_cmd_sq	*cmd_sq = NULL;
 	struct s_cmd_pl	*cmd_pl = NULL;
@@ -15,6 +15,8 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 
 	switch (cmd->cmd_type) {
 	case CMD_SI:
+		cmd->cmd_id = *cmd_count;
+		*cmd_count = *cmd_count + 1;
 		ret_flag = parse_cmd_si(cmd->path, cmd);
 		break;
 
@@ -25,7 +27,7 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		if (!alloc_and_fill_sq_sub_dirs(cmd_sq, cmd->path))
 			goto exit;
 		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			ret_flag &= parse_sub_trees(&cmd_sq->cmds[i]);
+			ret_flag &= parse_sub_trees(&cmd_sq->cmds[i], cmd_count);
 		break;
 
 	case CMD_PL:
@@ -35,7 +37,7 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		if (!alloc_and_fill_pl_sub_dirs(cmd_pl, cmd->path))
 			goto exit;
 		for (int i = 0; i < cmd_pl->nb_cmds; i++)
-			ret_flag &= parse_sub_trees(&cmd_pl->cmds[i]);
+			ret_flag &= parse_sub_trees(&cmd_pl->cmds[i], cmd_count);
 		break;
 
 	default:
@@ -56,12 +58,13 @@ exit:
 struct s_cmd	*parse_cmd_tree(const char *path_cmd_dir)
 {
 	struct s_cmd	*cmd;
+	int		cmd_id = 0;
 
 	if (!(cmd = get_cmd_struct()))
 		return NULL;
 
 	strcpy(cmd->path, path_cmd_dir);
-	if (!parse_sub_trees(cmd)) {
+	if (!parse_sub_trees(cmd, &cmd_id)) {
 		free_command_rec(cmd);
 		return NULL;
 	}

@@ -88,8 +88,18 @@ union u_cmd {
 	} cmd_pl;
 };
 
+
+struct s_timing {
+	uint64_t	minutes;
+	uint32_t	hours;
+	uint8_t		days;
+};
+
 /** @brief struct representing a abstract command via a tagged union*/
 struct s_cmd {
+	/** @brief The "index" of the command (0 or 1 indexed doesn't matter
+	*   what matters is the fact that the order remains. */
+	int		cmd_id;
 	DIR		*cmd_dir;
 	char		path[PATH_MAX + 1];
 	enum cmd_type	cmd_type;
@@ -98,13 +108,9 @@ struct s_cmd {
 	uint16_t	exit_code;
 };
 
-struct s_timing {
-	uint64_t	minutes;
-	uint32_t	hours;
-	uint8_t		days;
-};
-
 struct s_task {
+	/** @brief The number of sub commands. */
+	int		sub_cmds_count;
 	char		path[PATH_MAX + 1];
 	char		stdout_path[PATH_MAX + 1];
 	char		stderr_path[PATH_MAX + 1];

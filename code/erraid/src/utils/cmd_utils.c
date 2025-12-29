@@ -69,7 +69,8 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 		return;
 
 	printf("%s%s ", prefix, is_last ? "└──" : "├──");
-	print_cmd_enum(cmd->cmd_type, true);
+	print_cmd_enum(cmd->cmd_type, false);
+	printf(" - [%d]\n", cmd->cmd_id);
 
 	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;

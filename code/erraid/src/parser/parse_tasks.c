@@ -1,5 +1,29 @@
 #include "parser/parse_tasks.h"
 
+static void	count_sub_cmds_entries(struct s_cmd *cmd, int *count)
+{
+	switch (cmd->cmd_type) {
+	case CMD_SI:
+		*count = *count + 1;
+		break;
+	case CMD_SQ:
+		*count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++)
+			count_sub_cmds_entries(cmd->cmd.cmd_sq.cmds + i, count);
+		break;
+	case CMD_PL:
+		*count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++)
+			count_sub_cmds_entries(cmd->cmd.cmd_pl.cmds + i, count);
+		break;
+
+	case CMD_IF:
+	default:
+		return;
+	}
+
+}
+
 static bool	parse_sub_tasks_cmd(struct s_task *task)
 {
 	char	buf[PATH_MAX + 1] = {0};
@@ -148,6 +172,7 @@ bool	parse_tasks(struct s_data *ctx)
 	if (!parse_sub_tasks_cmd(*task))
 		return false;
 
+	count_sub_cmds_entries((*task)->cmd, &(*task)->sub_cmds_count);
 	return true;
 }
 
