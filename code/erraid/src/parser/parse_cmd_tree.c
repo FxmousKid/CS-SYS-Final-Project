@@ -42,8 +42,6 @@ bool	parse_sub_trees(struct s_cmd *cmd)
 		return false;
 	}
 
-	if (cmd->cmd_type == CMD_PL)
-		printf("cmd = %p\n", cmd->cmd.cmd_pl.cmds[0].path);
 	return ret_flag;
 
 exit:

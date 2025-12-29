@@ -25,6 +25,8 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
+	print_timing_human(ctx.tasks->timing);
+
 	if (!ctx.foreground && !daemonize(ctx.debug_mode)) {
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;
