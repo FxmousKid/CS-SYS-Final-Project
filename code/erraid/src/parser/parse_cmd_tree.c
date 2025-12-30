@@ -36,6 +36,8 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 			goto exit;
 		if (!alloc_and_fill_pl_sub_dirs(cmd_pl, cmd->path))
 			goto exit;
+		if (!alloc_pipe_fds(cmd_pl))
+			goto exit;
 		for (int i = 0; i < cmd_pl->nb_cmds; i++)
 			ret_flag &= parse_sub_trees(&cmd_pl->cmds[i], cmd_count);
 		break;

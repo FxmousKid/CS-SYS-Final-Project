@@ -15,5 +15,6 @@
 
 
 bool	alloc_and_fill_pl_sub_dirs(struct s_cmd_pl *cmd_pl, const char *path);
+bool	alloc_pipe_fds(struct s_cmd_pl *cmd_pl);
 
 #endif

@@ -1,5 +1,14 @@
 #include "parser/parse_cmd_pl.h"
 
+bool	alloc_pipe_fds(struct s_cmd_pl *cmd_pl)
+{
+	if (!(cmd_pl->fds = calloc(cmd_pl->nb_cmds - 1, sizeof(*cmd_pl->fds)))) {
+		ERR_SYS("calloc");
+		return false;
+	}
+	return true;
+}
+
 bool	alloc_and_fill_pl_sub_dirs(struct s_cmd_pl *cmd_pl, const char *path)
 {
 	int	idx = 0;
