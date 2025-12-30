@@ -4,7 +4,7 @@
 extern bool isdle;
 
 // static bool	_read_and_alloc_sub_cmds(struct s_cmd_si cmd, int fd,
-bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
+static bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
 					bool isdle, uint32_t argc)
 {
 	ssize_t		n;
@@ -41,7 +41,7 @@ bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
 }
 
 // static bool	_fparse_cmd_si(struct s_data *ctx, int fd, struct s_cmd_si *cmd)
-bool	_fparse_cmd_si(int fd, struct s_cmd_si *cmd, int isdle)
+static bool	_fparse_cmd_si(int fd, struct s_cmd_si *cmd, int isdle)
 {
 	uint32_t	argc = 0;
 	ssize_t		n;

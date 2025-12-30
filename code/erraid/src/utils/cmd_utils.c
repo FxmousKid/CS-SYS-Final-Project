@@ -46,6 +46,7 @@ static void	free_cmd_node(struct s_cmd *cmd, bool free_self)
 			for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
 				free_cmd_node(&cmd->cmd.cmd_pl.cmds[i], false);
 			free(cmd->cmd.cmd_pl.cmds);
+			free(cmd->cmd.cmd_pl.fds);
 			cmd->cmd.cmd_pl.cmds = NULL;
 			cmd->cmd.cmd_pl.nb_cmds = 0;
 		}
@@ -70,7 +71,13 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 
 	printf("%s%s ", prefix, is_last ? "└──" : "├──");
 	print_cmd_enum(cmd->cmd_type, false);
-	printf(" - [%d]\n", cmd->cmd_id);
+	printf(" - [%d]", cmd->cmd_id);
+	if (cmd->cmd_type == CMD_SI && cmd->cmd.cmd_si.stdout_path)
+		printf(" -- [out : %s]", cmd->cmd.cmd_si.stdout_path);
+	if (cmd->cmd_type == CMD_SI && cmd->cmd.cmd_si.stderr_path)
+		printf(" -- [err : %s]", cmd->cmd.cmd_si.stderr_path);
+	printf("\n");
+	
 
 	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;
