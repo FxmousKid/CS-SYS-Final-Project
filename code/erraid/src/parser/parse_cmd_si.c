@@ -26,10 +26,6 @@ static bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
 			return (false);
 		}
 
-		// if we have a command alone, e.g. `cat`
-		if (arg_len == 0)
-			break;
-
 		// do not use read_endian here
 		n = read(fd, cmd->command[i], arg_len);
 		if (n < 0) {
