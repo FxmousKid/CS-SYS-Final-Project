@@ -42,14 +42,16 @@ static void	free_cmd_node(struct s_cmd *cmd, bool free_self)
 		break;
 
 	case CMD_PL:
-		if (cmd->cmd.cmd_pl.cmds) {
-			for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
-				free_cmd_node(&cmd->cmd.cmd_pl.cmds[i], false);
-			free(cmd->cmd.cmd_pl.cmds);
-			free(cmd->cmd.cmd_pl.fds);
-			cmd->cmd.cmd_pl.cmds = NULL;
-			cmd->cmd.cmd_pl.nb_cmds = 0;
-		}
+		if (!cmd->cmd.cmd_pl.cmds)
+			break;
+
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			free_cmd_node(&cmd->cmd.cmd_pl.cmds[i], false);
+		cmd->cmd.cmd_pl.nb_cmds = 0;
+		free(cmd->cmd.cmd_pl.fds);
+		cmd->cmd.cmd_pl.fds = NULL;
+		free(cmd->cmd.cmd_pl.cmds);
+		cmd->cmd.cmd_pl.cmds = NULL;
 		break;
 
 	default:
@@ -72,11 +74,13 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 	printf("%s%s ", prefix, is_last ? "└──" : "├──");
 	print_cmd_enum(cmd->cmd_type, false);
 	printf(" - [%d]", cmd->cmd_id);
-	if (cmd->cmd_type == CMD_SI && cmd->cmd.cmd_si.stdout_path)
+	if (cmd->cmd_type == CMD_SI) {
 		printf(" -- [out : %s]", cmd->cmd.cmd_si.stdout_path);
-	if (cmd->cmd_type == CMD_SI && cmd->cmd.cmd_si.stderr_path)
-		printf(" -- [err : %s]", cmd->cmd.cmd_si.stderr_path);
-	printf("\n");
+		printf(" -- [err : %s] -- cmd = ", cmd->cmd.cmd_si.stderr_path);
+		print_darr("", cmd->cmd.cmd_si.command);
+	}
+	else 
+		printf("\n");
 	
 
 	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
