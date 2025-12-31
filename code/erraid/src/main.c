@@ -25,9 +25,6 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
-# include "exec/exec_pl.h"
-
-
 	if (!ctx.foreground && !daemonize(ctx.debug_mode)) <%
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;
