@@ -3,7 +3,7 @@
   <p><strong>A task scheduling daemon-client system for automated command execution.</strong></p>
 
   <p>
-    <a href="https://en.wikipedia.org/wiki/C_(programming_language)"><img src="https://img.shields.io/badge/C-17-00599C?style=flat-square&logo=c&logoColor=white" alt="C"/></a>
+    <a href="https://en.wikipedia.org/wiki/C_(programming_language)"><img src="https://img.shields.io/badge/Language-C-00599C?style=flat-square&logo=c&logoColor=white" alt="C"/></a>
     <a href="https://pubs.opengroup.org/onlinepubs/9699919799/"><img src="https://img.shields.io/badge/POSIX-Compliant-4EAA25?style=flat-square" alt="POSIX"/></a>
     <a href="https://www.gnu.org/software/make/"><img src="https://img.shields.io/badge/Make-Build%20System-427819?style=flat-square&logo=gnu&logoColor=white" alt="Make"/></a>
     <a href="https://git-scm.com/"><img src="https://img.shields.io/badge/Git-Version%20Control-F05032?style=flat-square&logo=git&logoColor=white" alt="Git"/></a>
@@ -25,7 +25,7 @@
 
 ## 🛠 Tech Stack
 
-- **Language**: [C17](https://en.wikipedia.org/wiki/C17_(C_standard_revision))
+- **Language**: [C](https://en.wikipedia.org/wiki/C_(programming_language))
 - **System Calls**: `fork()`, `execve()`, `pipe()`, `dup2()`, `waitpid()`, `open()`, `read()`, `write()`
 - **IPC**: Named pipes (FIFOs) for client-daemon communication
 - **Build System**: [GNU Make](https://www.gnu.org/software/make/)
