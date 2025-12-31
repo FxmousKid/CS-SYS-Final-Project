@@ -2,6 +2,40 @@
 
 extern char **environ;
 
+/* Closes all pipes in the pipe_fds array of the passed pipeline */
+bool	close_all_pipes(struct s_cmd_pl *cmd_pl)
+{
+	for (int i = 0; i < cmd_pl->nb_cmds - 1; i++) {
+		if (cmd_pl->fds[i][0] >= 0 && close(cmd_pl->fds[i][0]) < 0)
+			ERR_SYS("close fd = %d", cmd_pl->fds[i][0]);
+		cmd_pl->fds[i][0] = -1;
+		if (cmd_pl->fds[i][1] >= 0 && close(cmd_pl->fds[i][1]) < 0)
+			ERR_SYS("close fd = %d", cmd_pl->fds[i][1]);
+		cmd_pl->fds[i][1] = -1;
+	}
+	return true;
+}
+
+/* Like close_all_pipes() execpt we ignore keep_fd1 and keep_fd2 */
+bool	close_pipes_except(struct s_cmd_pl *cmd_pl, int keep_fd1, int keep_fd2)
+{
+	int	fd;
+
+	for (int i = 0; i < cmd_pl->nb_cmds - 1; i++) {
+		fd = cmd_pl->fds[i][0];
+		if (fd >= 0 && fd != keep_fd1 && fd != keep_fd2) {
+			if (close(fd) < 0)
+				ERR_SYS("close fd = %d", fd);
+		}
+		fd = cmd_pl->fds[i][1];
+		if (fd >= 0 && fd != keep_fd1 && fd != keep_fd2) {
+			if (close(fd) < 0)
+				ERR_SYS("close fd = %d", fd);
+		}
+	}
+	return true;
+}
+
 void	print_pipe_array(int fds[][2], int nb_pipes)
 {
 	printf("pipes: {");
@@ -110,12 +144,14 @@ bool	setup_output_last_cmd(const char *stdout_file, const char *stderr_file)
  * @param cmd the the command to execute
  * @param fd_in input fd, or NO_REDIRECT
  * @param fd_out output fd, or NO_REDIRECT
+ * @param parent_pl parent pipeline (to close inherited fds), or NULL
  *
  * @return
  *  @retval true on success
  *  @retval false on failure
  */
-bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
+bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
+		  struct s_cmd_pl *parent_pl)
 {
 	struct s_cmd_si	*cmd_si = &cmd->cmd.cmd_si;
 
@@ -137,6 +173,10 @@ bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
 		return false;
 
 	case 0:
+		// close inherited pipeline fds we don't need
+		if (parent_pl)
+			close_pipes_except(parent_pl, fd_in, fd_out);
+
 		if (cmd_si->stdout_path && \
 		    !setup_output_last_cmd(cmd_si->stdout_path, cmd_si->stderr_path)) {
 			ERR_MSG("setup_output_last_cmd failed in cmd id %d", cmd->cmd_id);
@@ -174,7 +214,7 @@ bool	run_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
 {
 	int	status = 0;
 
-	if (!spawn_cmd(cmd, fd_in, fd_out))
+	if (!spawn_cmd(cmd, fd_in, fd_out, NULL))
 		return false;
 
 	waitpid(cmd->pid, &status, 0);
