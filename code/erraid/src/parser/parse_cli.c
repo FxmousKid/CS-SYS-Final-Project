@@ -83,6 +83,10 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 {
 	switch (opt) {
 	
+	case 'I':
+		ctx->exec_instant = true;
+		break;
+	
 	// specify dir of namedpath creation : -r PATH
 	case 'R':
 		if (!parse_custom_run_directory(ctx, optarg))
@@ -127,11 +131,12 @@ static bool	opts_handle(struct s_data *ctx, int opt)
 
 bool	parser_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	char		*shortopts = "hdlR:P:F";
+	char		*shortopts = "hdlR:P:FI";
 	int		opt;
 	extern int	opterr;
 
 	struct option longopts[] = {
+		{"exec-instant", no_argument, NULL, 'I'},
 		{"help", no_argument, NULL, 'h'},
 		{"debug", no_argument, NULL, 'd'},
 		{"little-endian", no_argument, NULL, 'l'},
