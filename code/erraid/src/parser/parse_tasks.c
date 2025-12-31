@@ -27,13 +27,15 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 					      int last_cmd_id,
 					      const char *stdout_path,
 					      const char *stderr_path,
-					      enum cmd_type parent_type)
+					      bool is_inside_pipeline)
 {
-	if (cmd->cmd_id == last_cmd_id) {
+	// only the last CMD_SI in the entire tree gets stdout/stderr paths
+	if (cmd->cmd_type == CMD_SI && cmd->cmd_id == last_cmd_id) {
 		cmd->cmd.cmd_si.stdout_path = stdout_path;
 		cmd->cmd.cmd_si.stderr_path = stderr_path;
 		return;
 	}
+
 	switch (cmd->cmd_type) {
 	case CMD_PL:
 		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++)
@@ -41,7 +43,7 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 						      last_cmd_id, 
 						      stdout_path, 
 						      stderr_path,
-						      CMD_PL);
+						      true);
 		break;
 
 	case CMD_SQ:
@@ -50,18 +52,15 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 						      last_cmd_id, 
 						      stdout_path, 
 						      stderr_path,
-						      CMD_SQ);
+						      is_inside_pipeline);
 		break;
 
 	case CMD_SI:
-		if (parent_type == CMD_SQ) {
-			cmd->cmd.cmd_si.stdout_path = stdout_path;
-			cmd->cmd.cmd_si.stderr_path = stderr_path;
-		}
-		else {
-			cmd->cmd.cmd_si.stdout_path = NULL;
-			cmd->cmd.cmd_si.stderr_path = NULL;
-		}
+		// not the last command, clear paths
+		cmd->cmd.cmd_si.stdout_path = NULL;
+		cmd->cmd.cmd_si.stderr_path = NULL;
+		break;
+
 	case CMD_IF:
 	default:
 		return;
@@ -192,7 +191,7 @@ static bool	set_task_dependencies(struct s_task *tasks)
 					      tasks->sub_cmds_count - 1,
 					      tasks->stdout_path,
 					      tasks->stderr_path,
-					      0);
+					      false);
 		tasks = tasks->next;
 	}
 	return true;
