@@ -131,6 +131,9 @@ struct s_task {
 
 /* @brief struct representing the daemon data */
 struct s_data {
+	/** @brief wether to wait for the right timing or to execute
+	*   all tasks instantly. */
+	bool		exec_instant;
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
