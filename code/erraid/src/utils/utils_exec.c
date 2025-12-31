@@ -24,7 +24,7 @@ bool	setup_pipe(int fds[2])
 
 bool	setup_input_fd(int fd)
 {
-	if (fd <= 0)
+	if (fd == NO_REDIRECT)
 		return true;
 
 	if (dup2(fd, STDIN_FILENO) < 0) {
@@ -40,7 +40,7 @@ bool	setup_input_fd(int fd)
 
 bool	setup_output_fd(int fd)
 {	
-	if (fd <= 0)
+	if (fd == NO_REDIRECT)
 		return true;
 
 	if (dup2(fd, STDOUT_FILENO) < 0) {
@@ -62,8 +62,6 @@ bool	wait_for_pipeline(struct s_cmd_pl *cmd_pl)
 		if (cmd_pl->cmds[i].pid <= 0)
 			continue;
 		waitpid(cmd_pl->cmds[i].pid, &status, 0);
-		printf("Successfully waited for command %d!\n", i);
-		fflush(stdout);
 		if (WIFEXITED(status))
 			cmd_pl->cmds[i].exit_code = WEXITSTATUS(status);
 	}
@@ -110,8 +108,8 @@ bool	setup_output_last_cmd(const char *stdout_file, const char *stderr_file)
  * @brief forks and execve the command
  *
  * @param cmd the the command to execute
- * @param fd_in the fd to use as stdin, ignores if <= 0
- * @param fd_out the fd to use as stdout, ignores if <= 0
+ * @param fd_in input fd, or NO_REDIRECT
+ * @param fd_out output fd, or NO_REDIRECT
  *
  * @return
  *  @retval true on success
@@ -133,7 +131,7 @@ bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
 	}
 	
 	cmd->pid = fork();
-	switch((cmd->pid)){
+	switch ((cmd->pid)) {
 	case -1:
 		ERR_SYS("fork");
 		return false;
@@ -144,11 +142,11 @@ bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
 			ERR_MSG("setup_output_last_cmd failed in cmd id %d", cmd->cmd_id);
 			exit(EXIT_FAILURE);
 		}
-		else if (fd_out && !setup_output_fd(fd_out)) {
+		else if (fd_out != NO_REDIRECT && !setup_output_fd(fd_out)) {
 			ERR_MSG("setup_output_fd failed in cmd id %d", cmd->cmd_id);
 			exit(EXIT_FAILURE);
 		}
-		if (fd_in && !setup_input_fd(fd_in)) {
+		if (fd_in != NO_REDIRECT && !setup_input_fd(fd_in)) {
 			ERR_MSG("setup_input_fd failed in cmd id %d", cmd->cmd_id);
 			exit(EXIT_FAILURE);
 		}
@@ -165,8 +163,8 @@ bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out)
  * @brief calls spawn_cmd but also waitpids it
  *
  * @param cmd the command
- * @param fd_in the fd to use as stdin, ignores if <= 0
- * @param fd_out the fd to use as stdout, ignores if <= 0
+ * @param fd_in the fd to use as stdin, NO_REDIRECT (-1) for no redirect
+ * @param fd_out the fd to use as stdout, NO_REDIRECT (-1) for no redirect
  *
  * @return
  *  @retval true on success
