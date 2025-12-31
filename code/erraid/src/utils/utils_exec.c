@@ -2,6 +2,17 @@
 
 extern char **environ;
 
+void	print_pipe_array(int fds[][2], int nb_pipes)
+{
+	printf("pipes: {");
+	for (int i = 0; i < nb_pipes; i++) {
+		printf(" [%d, %d]", fds[i][0], fds[i][1]);
+		if (i < nb_pipes - 1)
+			printf(",");
+	}
+	printf("}\n");
+}
+
 bool	setup_pipe(int fds[2])
 {
 	if (pipe(fds) < 0) {

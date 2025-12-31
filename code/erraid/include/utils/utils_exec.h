@@ -9,6 +9,7 @@
 # include "utils/binary_utils.h" // IWYU pragma: keep
 
 
+void	print_pipe_array(int fds[][2], int nb_pipes);
 bool	setup_pipe(int fds[2]);
 bool	setup_input_fd(int fd);
 bool	setup_output_fd(int fd);
