@@ -3,7 +3,7 @@
 // doesn't need to be included in any headers
 // but is called by functions in this TU
 bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
-	       enum cmd_type parent_type, struct s_cmd_pl *parent_pl);
+	         enum cmd_type parent_type, struct s_cmd_pl *parent_pl);
 
 /* calls pipe(2) on all int[2] in the cmd_pl->fds array 
  * not the most correct, since we *will* eventually run out
@@ -26,40 +26,6 @@ bool	create_all_pipes(struct s_cmd_pl *cmd_pl)
 	for (int i = 0; i < cmd_pl->nb_cmds - 1; i++) {
 		if (!setup_pipe(cmd_pl->fds[i]))
 			return false;
-	}
-	return true;
-}
-
-/* Closes all pipes in the pipe_fds array of the passed pipeline */
-bool	close_all_pipes(struct s_cmd_pl *cmd_pl)
-{
-	for (int i = 0; i < cmd_pl->nb_cmds - 1; i++) {
-		if (cmd_pl->fds[i][0] >= 0 && close(cmd_pl->fds[i][0]) < 0)
-			ERR_SYS("close fd = %d", cmd_pl->fds[i][0]);
-		cmd_pl->fds[i][0] = -1;
-		if (cmd_pl->fds[i][1] >= 0 && close(cmd_pl->fds[i][1]) < 0)
-			ERR_SYS("close fd = %d", cmd_pl->fds[i][1]);
-		cmd_pl->fds[i][1] = -1;
-	}
-	return true;
-}
-
-/* Like close_all_pipes() execpt we ignore keep_fd1 and keep_fd2 */
-bool	close_pipes_except(struct s_cmd_pl *cmd_pl, int keep_fd1, int keep_fd2)
-{
-	int	fd;
-
-	for (int i = 0; i < cmd_pl->nb_cmds - 1; i++) {
-		fd = cmd_pl->fds[i][0];
-		if (fd >= 0 && fd != keep_fd1 && fd != keep_fd2) {
-			if (close(fd) < 0)
-				ERR_SYS("close fd = %d", fd);
-		}
-		fd = cmd_pl->fds[i][1];
-		if (fd >= 0 && fd != keep_fd1 && fd != keep_fd2) {
-			if (close(fd) < 0)
-				ERR_SYS("close fd = %d", fd);
-		}
 	}
 	return true;
 }
