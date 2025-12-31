@@ -26,7 +26,8 @@ static void	count_individual_cmds(struct s_cmd *cmd, int *count)
 static void	set_output_paths_last_command(struct s_cmd *cmd,
 					      int last_cmd_id,
 					      const char *stdout_path,
-					      const char *stderr_path)
+					      const char *stderr_path,
+					      enum cmd_type parent_type)
 {
 	if (cmd->cmd_id == last_cmd_id) {
 		cmd->cmd.cmd_si.stdout_path = stdout_path;
@@ -39,7 +40,8 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 			set_output_paths_last_command(cmd->cmd.cmd_pl.cmds + i, 
 						      last_cmd_id, 
 						      stdout_path, 
-						      stderr_path);
+						      stderr_path,
+						      CMD_PL);
 		break;
 
 	case CMD_SQ:
@@ -47,10 +49,19 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 			set_output_paths_last_command(cmd->cmd.cmd_sq.cmds + i, 
 						      last_cmd_id, 
 						      stdout_path, 
-						      stderr_path);
+						      stderr_path,
+						      CMD_SQ);
 		break;
 
 	case CMD_SI:
+		if (parent_type == CMD_SQ) {
+			cmd->cmd.cmd_si.stdout_path = stdout_path;
+			cmd->cmd.cmd_si.stderr_path = stderr_path;
+		}
+		else {
+			cmd->cmd.cmd_si.stdout_path = NULL;
+			cmd->cmd.cmd_si.stderr_path = NULL;
+		}
 	case CMD_IF:
 	default:
 		return;
@@ -180,7 +191,8 @@ static bool	set_task_dependencies(struct s_task *tasks)
 		set_output_paths_last_command(tasks->cmd,
 					      tasks->sub_cmds_count - 1,
 					      tasks->stdout_path,
-					      tasks->stderr_path);
+					      tasks->stderr_path,
+					      0);
 		tasks = tasks->next;
 	}
 	return true;

@@ -3,7 +3,6 @@
 // defined in main.c
 extern bool isdle;
 
-// static bool	_read_and_alloc_sub_cmds(struct s_cmd_si cmd, int fd,
 static bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
 					bool isdle, uint32_t argc)
 {
@@ -25,6 +24,7 @@ static bool	_read_and_alloc_sub_cmds(struct s_cmd_si *cmd, int fd,
 			ERR_SYS("calloc");
 			return (false);
 		}
+
 
 		// do not use read_endian here
 		n = read(fd, cmd->command[i], arg_len);
