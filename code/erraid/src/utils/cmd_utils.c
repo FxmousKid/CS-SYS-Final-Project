@@ -76,7 +76,7 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 	printf(" - [%d]", cmd->cmd_id);
 	if (cmd->cmd_type == CMD_SI) {
 		printf(" -- [out : %s]", cmd->cmd.cmd_si.stdout_path);
-		printf(" -- [err : %s] -- cmd = ", cmd->cmd.cmd_si.stderr_path);
+		printf(" -- [err : %s] -- cmd", cmd->cmd.cmd_si.stderr_path);
 		print_darr("", cmd->cmd.cmd_si.command);
 	}
 	else 
