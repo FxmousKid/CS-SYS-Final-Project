@@ -3,6 +3,7 @@
 
 # include <stdio.h>
 # include <unistd.h>
+# include <sys/wait.h>
 
 # include "utils.h" // IWYU pragma: keep
 # include "macros.h" // IWYU pragma: keep
