@@ -1,5 +1,72 @@
 #include "parser/parse_tasks.h"
 
+static void	count_individual_cmds(struct s_cmd *cmd, int *count)
+{
+	switch (cmd->cmd_type) {
+	case CMD_SI:
+		*count = *count + 1;
+		break;
+	case CMD_SQ:
+		// *count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++)
+			count_individual_cmds(cmd->cmd.cmd_sq.cmds + i, count);
+		break;
+	case CMD_PL:
+		// *count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++)
+			count_individual_cmds(cmd->cmd.cmd_pl.cmds + i, count);
+		break;
+
+	case CMD_IF:
+	default:
+		return;
+	}
+}
+
+static void	set_output_paths_last_command(struct s_cmd *cmd,
+					      int last_cmd_id,
+					      const char *stdout_path,
+					      const char *stderr_path,
+					      bool is_inside_pipeline)
+{
+	// only the last CMD_SI in the entire tree gets stdout/stderr paths
+	if (cmd->cmd_type == CMD_SI && cmd->cmd_id == last_cmd_id) {
+		cmd->cmd.cmd_si.stdout_path = stdout_path;
+		cmd->cmd.cmd_si.stderr_path = stderr_path;
+		return;
+	}
+
+	switch (cmd->cmd_type) {
+	case CMD_PL:
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++)
+			set_output_paths_last_command(cmd->cmd.cmd_pl.cmds + i, 
+						      last_cmd_id, 
+						      stdout_path, 
+						      stderr_path,
+						      true);
+		break;
+
+	case CMD_SQ:
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++)
+			set_output_paths_last_command(cmd->cmd.cmd_sq.cmds + i, 
+						      last_cmd_id, 
+						      stdout_path, 
+						      stderr_path,
+						      is_inside_pipeline);
+		break;
+
+	case CMD_SI:
+		// not the last command, clear paths
+		cmd->cmd.cmd_si.stdout_path = NULL;
+		cmd->cmd.cmd_si.stderr_path = NULL;
+		break;
+
+	case CMD_IF:
+	default:
+		return;
+	}
+}
+
 static bool	parse_sub_tasks_cmd(struct s_task *task)
 {
 	char	buf[PATH_MAX + 1] = {0};
@@ -116,6 +183,20 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool deb
 	return true;
 }
 
+static bool	set_task_dependencies(struct s_task *tasks)
+{
+	while (tasks) {
+		count_individual_cmds(tasks->cmd, &tasks->sub_cmds_count);
+		set_output_paths_last_command(tasks->cmd,
+					      tasks->sub_cmds_count - 1,
+					      tasks->stdout_path,
+					      tasks->stderr_path,
+					      false);
+		tasks = tasks->next;
+	}
+	return true;
+}
+
 /* This is the main function that will start the parsing starting from the 
  * root of the given directory.
  * */
@@ -148,6 +229,9 @@ bool	parse_tasks(struct s_data *ctx)
 	if (!parse_sub_tasks_cmd(*task))
 		return false;
 
+	if (!set_task_dependencies(*task))
+		return false;
+	
 	return true;
 }
 

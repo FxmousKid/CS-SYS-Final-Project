@@ -63,7 +63,7 @@ void	_write_perr(const char *location)
 void	_write_err(const char *location)
 {
 
-	dprintf(get_logfd(), "[%s]\n", location);
+	dprintf(get_logfd(), " [%s]\n", location);
 }
 
 /**

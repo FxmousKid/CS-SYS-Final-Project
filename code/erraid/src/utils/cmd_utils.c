@@ -40,6 +40,20 @@ static void	free_cmd_node(struct s_cmd *cmd, bool free_self)
 			cmd->cmd.cmd_sq.nb_cmds = 0;
 		}
 		break;
+
+	case CMD_PL:
+		if (!cmd->cmd.cmd_pl.cmds)
+			break;
+
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			free_cmd_node(&cmd->cmd.cmd_pl.cmds[i], false);
+		cmd->cmd.cmd_pl.nb_cmds = 0;
+		free(cmd->cmd.cmd_pl.fds);
+		cmd->cmd.cmd_pl.fds = NULL;
+		free(cmd->cmd.cmd_pl.cmds);
+		cmd->cmd.cmd_pl.cmds = NULL;
+		break;
+
 	default:
 		break;
 	}
@@ -58,18 +72,37 @@ static void	print_cmd_tree_rec(const struct s_cmd *cmd, const char *prefix,
 		return;
 
 	printf("%s%s ", prefix, is_last ? "└──" : "├──");
-	print_cmd_enum(cmd->cmd_type, true);
+	print_cmd_enum(cmd->cmd_type, false);
+	printf(" - [%d]", cmd->cmd_id);
+	if (cmd->cmd_type == CMD_SI) {
+		printf(" -- [out : %s]", cmd->cmd.cmd_si.stdout_path);
+		printf(" -- [err : %s] -- cmd", cmd->cmd.cmd_si.stderr_path);
+		print_darr("", cmd->cmd.cmd_si.command);
+	}
+	else 
+		printf("\n");
+	
 
-	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
+	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;
 
 	if (snprintf(next_prefix, sizeof(next_prefix), "%s%s", prefix,
 		    is_last ? "    " : "│   ") < 0)
 		next_prefix[0] = '\0';
-	child_count = cmd->cmd.cmd_sq.nb_cmds;
-	for (int i = 0; i < child_count; ++i)
-		print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], next_prefix,
-				   i == child_count - 1);
+
+	if (cmd->cmd_type == CMD_SQ) {
+		child_count = cmd->cmd.cmd_sq.nb_cmds;
+		for (int i = 0; i < child_count; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], next_prefix,
+					   i == child_count - 1);
+	}
+
+	if (cmd->cmd_type == CMD_PL) {
+		child_count = cmd->cmd.cmd_pl.nb_cmds;
+		for (int i = 0; i < child_count; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_pl.cmds[i], next_prefix,
+					   i == child_count - 1);
+	}
 }
 
 static void	closedir_cmd_rec(struct s_cmd *cmd)
@@ -84,6 +117,12 @@ static void	closedir_cmd_rec(struct s_cmd *cmd)
 		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
 			closedir_cmd_rec(&cmd->cmd.cmd_sq.cmds[i]);
 		break;
+
+	case CMD_PL:
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			closedir_cmd_rec(&cmd->cmd.cmd_pl.cmds[i]);
+		break;
+
 	
 	default:
 		return ;
@@ -113,11 +152,17 @@ void	print_cmd_tree(struct s_cmd *cmd)
 		return;
 	}
 	print_cmd_enum(cmd->cmd_type, true);
-	if (cmd->cmd_type != CMD_SQ || !cmd->cmd.cmd_sq.cmds)
+	if (cmd->cmd_type != CMD_SQ && cmd->cmd_type != CMD_PL)
 		return;
-	for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
-		print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], "",
-				   i == cmd->cmd.cmd_sq.nb_cmds - 1);
+
+	if (cmd->cmd_type == CMD_SQ)
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_sq.cmds[i], "",
+					   i == cmd->cmd.cmd_sq.nb_cmds - 1);
+	if (cmd->cmd_type == CMD_PL)
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; ++i)
+			print_cmd_tree_rec(&cmd->cmd.cmd_pl.cmds[i], "",
+					   i == cmd->cmd.cmd_pl.nb_cmds - 1);
 }
 
 /**
@@ -168,10 +213,12 @@ enum cmd_type	get_cmd_type(const char *path_cmd_dir)
 	close(type_fd);
 
 	switch(type) {
-	case 0x5349: 
+	case CMD_SI:
 		return CMD_SI;
-	case 0x5351: 
+	case CMD_SQ:
 		return CMD_SQ;
+	case CMD_PL:
+		return CMD_PL;
 	default:
 		ERR_MSG("Unknown command type");
 	}
