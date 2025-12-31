@@ -8,6 +8,7 @@
 
 # include "structs.h"
 # include "exec/exec_pl.h" // IWYU pragma: keep
+# include "exec/exec_sq.h" // IWYU pragma: keep
 # include "utils/utils.h" // IWYU pragma: keep
 # include "utils/utils_exec.h" // IWYU pragma: keep
 # include "utils/binary_utils.h" // IWYU pragma: keep

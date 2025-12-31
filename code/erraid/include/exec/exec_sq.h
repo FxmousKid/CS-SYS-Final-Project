@@ -12,6 +12,8 @@
 # include "utils/binary_utils.h" // IWYU pragma: keep
 
 
-
+bool	exec_sq(struct s_cmd *cmd, int fd_in, int fd_out);
+bool	exec_sq_if_parent_pl(struct s_cmd *cmd, struct s_cmd_pl *parent_pl,
+			     int fd_in, int fd_out);
 
 #endif
