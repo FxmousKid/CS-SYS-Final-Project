@@ -12,8 +12,6 @@
 # define DEV_NULL_DIR   	"/dev/null"
 # define TIMING_FILE    	"timing"
 # define TIMING_SIZE    	13
-
-
 # define REQUEST_FIFO_NAME	"erraid-request-pipe"
 # define REQUEST_FIFO_NAME_LEN	20
 # define REPLY_FIFO_NAME	"erraid-reply-pipe"
