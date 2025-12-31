@@ -96,3 +96,65 @@ bool	exec_last_command(struct s_cmd_pl *cmd_pl, int fd_out)
 	// or another pipeline...
 	return exec_cmd(last_cmd, last_fds[0], fd_out, CMD_PL, cmd_pl);
 }
+
+/**
+ * @brief executes a pipeline
+ *
+ * @param cmd the CMD_PL command to execute
+ * @param fd_in input fd for first command, or NO_REDIRECT
+ * @param fd_out output fd for last command, or NO_REDIRECT
+ *
+ * @return
+ *  @retval true on success
+ *  @retval false on failure
+ */
+bool	exec_pl(struct s_cmd *cmd, int fd_in, int fd_out)
+{
+	struct s_cmd_pl	*cmd_pl = &cmd->cmd.cmd_pl;
+
+	// create all pipes beforehand
+	if (!create_all_pipes(cmd_pl))
+		return false;
+
+	// execute the pipeline 1; 1->n-1; n
+	exec_first_command(cmd_pl, fd_in);
+	exec_middle_commands(cmd_pl);
+	exec_last_command(cmd_pl, fd_out);
+
+	// closing all fds, much much easier that way
+	close_all_pipes(cmd_pl);
+
+	// wait for all commands that were launched parallely
+	wait_for_pipeline(cmd_pl);
+	cmd->exit_code = cmd_pl->cmds[cmd_pl->nb_cmds - 1].exit_code;
+
+	return true;
+}
+
+bool	exec_pl_if_parent_pl(struct s_cmd *cmd,
+			     struct s_cmd_pl *parent_pl,
+			     int fd_in, int fd_out)
+{
+	int pid = 0;
+
+	pid = fork();
+	switch ((pid)) {
+	case -1:
+		ERR_SYS("fork");
+		return false;
+
+	case 0:
+		if (parent_pl)
+			close_pipes_except(parent_pl, fd_in, fd_out);
+		if (fd_in != NO_REDIRECT && !setup_input_fd(fd_in))
+			exit(EXIT_FAILURE);
+		if (fd_out != NO_REDIRECT && !setup_output_fd(fd_out))
+			exit(EXIT_FAILURE);
+		exec_pl(cmd, NO_REDIRECT, NO_REDIRECT);
+		exit(cmd->exit_code);
+
+	default:
+		cmd->pid = pid;
+	}
+	return true;
+}
