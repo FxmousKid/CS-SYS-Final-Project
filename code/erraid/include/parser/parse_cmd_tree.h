@@ -12,6 +12,7 @@
 # include "utils/utils.h" // IWYU pragma: keep
 # include "parser/parse_cmd_si.h" // IWYU pragma: keep
 # include "parser/parse_cmd_sq.h" // IWYU pragma: keep
+# include "parser/parse_cmd_pl.h" // IWYU pragma: keep
 # include "utils/dir_cmd_utils.h" // IWYU pragma: keep
 
 

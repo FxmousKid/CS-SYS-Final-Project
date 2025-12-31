@@ -168,7 +168,7 @@ void    daemon_loop(struct s_data *ctx)
 
 		current_time = time(NULL);
 		// Check every minute if a task can be executed
-		if (current_time >= next_execution) {
+		if (ctx->exec_instant || current_time >= next_execution) {
 			ctx->debug_mode ? exec_tasks_loop_debug(ctx) : exec_tasks_loop(ctx);
 			next_execution = ((current_time/60) + 1) * 60;
 		}

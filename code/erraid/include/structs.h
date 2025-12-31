@@ -8,7 +8,7 @@
 # include <stdbool.h>
 # include <dirent.h>
 
-# include "macros.h"
+# include "macros.h" // IWYU pragma: keep
 
 typedef uint64_t	taskid_t;
 
@@ -54,21 +54,26 @@ enum reply_opcode {
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
 	CMD_SI = 0x5349,
-	/** @brief Sequence of commands "cmd1 ; cmd2 ; cmd3". */
+	/** @brief Sequence of commands "cmd_1 ; ... ; cmd_n". */
 	CMD_SQ = 0x5351,
+	/** @brief Pipeline "cmd_1 | ... | cmd_n". */
+	CMD_PL = 0x504c,
 	CMD_IF,
-	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
-	CMD_PL,
 };
 
 /** @brief union used to abstract the command type */
 union u_cmd {
 	/** @brief struct representing a simple command */
 	struct s_cmd_si {
+		int		fd_in;
+		int		fd_out;
+		int		fd_err;
+		const char	*stdout_path;
+		const char	*stderr_path;
 		/** @brief absolute cmd path : "/usr/bin/echo" */
-		char	cmd_path[PATH_MAX + 1];
+		char		cmd_path[PATH_MAX + 1];
 		/** @brief execve compliant char ** : {"echo", "lol", NULL}. */
-		char	**command;
+		char		**command;
 	} cmd_si;
 
 	/** @brief struct representing a sequence of commands */
@@ -78,10 +83,30 @@ union u_cmd {
 		/** @brief number of commands (number of semi-colons + 1). */
 		int		nb_cmds;
 	} cmd_sq;
+
+	/** @brief struct representing a pipeline of commands. */
+	struct s_cmd_pl {
+		/** @brief cmd 0 | ... | cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief allocated space of nb_cmds - 1 pairs of int, to store the pipes. */
+		int		(*fds)[2];
+		/** @brief number of commands (number of pipes + 1). */
+		int		nb_cmds;
+	} cmd_pl;
+};
+
+
+struct s_timing {
+	uint64_t	minutes;
+	uint32_t	hours;
+	uint8_t		days;
 };
 
 /** @brief struct representing a abstract command via a tagged union*/
 struct s_cmd {
+	/** @brief The "index" of the command (0 or 1 indexed doesn't matter
+	*   what matters is the fact that the order remains. */
+	int		cmd_id;
 	DIR		*cmd_dir;
 	char		path[PATH_MAX + 1];
 	enum cmd_type	cmd_type;
@@ -90,13 +115,9 @@ struct s_cmd {
 	uint16_t	exit_code;
 };
 
-struct s_timing {
-	uint64_t	minutes;
-	uint32_t	hours;
-	uint8_t		days;
-};
-
 struct s_task {
+	/** @brief The number of sub commands. */
+	int		sub_cmds_count;
 	char		path[PATH_MAX + 1];
 	char		stdout_path[PATH_MAX + 1];
 	char		stderr_path[PATH_MAX + 1];
@@ -110,6 +131,9 @@ struct s_task {
 
 /* @brief struct representing the daemon data */
 struct s_data {
+	/** @brief wether to wait for the right timing or to execute
+	*   all tasks instantly. */
+	bool		exec_instant;
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
 	/** @brief exit code of the daemon. */
