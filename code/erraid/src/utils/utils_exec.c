@@ -4,7 +4,6 @@ extern char **environ;
 
 bool	setup_pipe(int fds[2])
 {
-	ERR_MSG("XXXX")
 	if (pipe(fds) < 0) {
 		ERR_SYS("pipe");
 		return false;
