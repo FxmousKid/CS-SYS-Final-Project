@@ -4,6 +4,7 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 {
 	struct s_cmd_sq	*cmd_sq = NULL;
 	struct s_cmd_pl	*cmd_pl = NULL;
+	struct s_cmd_if	*cmd_if = NULL;
 	bool		ret_flag = true;
 
 	if (!(cmd->cmd_type = get_cmd_type(cmd->path)))
@@ -43,9 +44,8 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 		break;
 	
 	case CMD_IF:
-		printf("Parsing Command IF\n");
-			fflush(stdout);
-		exit(12);
+		cmd_if = &cmd->cmd.cmd_if;
+		(void)cmd_if;
 		break;
 
 
