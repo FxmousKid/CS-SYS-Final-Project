@@ -41,8 +41,16 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 		for (int i = 0; i < cmd_pl->nb_cmds; i++)
 			ret_flag &= parse_sub_trees(&cmd_pl->cmds[i], cmd_count);
 		break;
+	
+	case CMD_IF:
+		printf("Parsing Command IF\n");
+			fflush(stdout);
+		exit(12);
+		break;
+
 
 	default:
+		ERR_MSG("Unknown command type at parsing")
 		return false;
 	}
 
