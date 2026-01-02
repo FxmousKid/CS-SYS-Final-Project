@@ -34,6 +34,11 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 		break;
 
 	case CMD_IF:
+		if (parent_type == CMD_PL)
+			retval = exec_if_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_if(cmd, fd_in, fd_out);
+		break;
 
 		break;
 

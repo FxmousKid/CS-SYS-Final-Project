@@ -81,7 +81,10 @@ bool	exec_si_and_wait(struct s_cmd *cmd, int fd_in, int fd_out)
 	if (!exec_si(cmd, fd_in, fd_out, NULL))
 		return false;
 
-	waitpid(cmd->pid, &status, 0);
+	if (waitpid(cmd->pid, &status, 0) < 0) {
+		ERR_SYS("waitpid")
+		return false;
+	}
 	cmd->exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
 	return true;
 }

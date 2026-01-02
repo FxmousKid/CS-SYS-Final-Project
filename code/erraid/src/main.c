@@ -31,7 +31,6 @@ int main(int argc, char *argv[])
 	%>
 
 print_cmd_tree(ctx.tasks->cmd);
-exit(12);
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
