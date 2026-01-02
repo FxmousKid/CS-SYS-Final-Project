@@ -1,10 +1,5 @@
 #include "exec/exec_pl.h"
 
-// doesn't need to be included in any headers
-// but is called by functions in this TU
-bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
-	         enum cmd_type parent_type, struct s_cmd_pl *parent_pl);
-
 /* calls pipe(2) on all int[2] in the cmd_pl->fds array 
  * not the most correct, since we *will* eventually run out
  * of FDs, i.e. a pipeline with 10k commands, but at that points

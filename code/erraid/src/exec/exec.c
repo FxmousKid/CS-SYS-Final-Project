@@ -10,12 +10,12 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 	switch (cmd->cmd_type) {
 	case CMD_SI:
 		if (parent_type == CMD_PL) {
-			retval = spawn_cmd(cmd, fd_in, fd_out, parent_pl);
-			if (!retval) ERR_MSG("spawn_cmd(cmd, %d, %d)", fd_in, fd_out);
+			retval = exec_si(cmd, fd_in, fd_out, parent_pl);
+			if (!retval) ERR_MSG("exec_si(cmd, %d, %d)", fd_in, fd_out);
 		}
 		else {
-			retval = run_cmd(cmd, fd_in, fd_out);
-			if (!retval) ERR_MSG("run_cmd(cmd, %d, %d)", fd_in, fd_out);
+			retval = exec_si_and_wait(cmd, fd_in, fd_out);
+			if (!retval) ERR_MSG("exec_si_and_wait(cmd, %d, %d)", fd_in, fd_out);
 		}
 		break;
 
@@ -33,7 +33,16 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 			retval = exec_pl(cmd, fd_in, fd_out);
 		break;
 
+	case CMD_IF:
+		if (parent_type == CMD_PL)
+			retval = exec_if_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_if(cmd, fd_in, fd_out);
+		break;
+
+
 	default:
+		ERR_MSG("Unknown cmd_type: %d", cmd->cmd_type);
 		return false;
 	}
 

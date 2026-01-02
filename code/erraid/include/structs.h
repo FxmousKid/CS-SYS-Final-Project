@@ -58,7 +58,8 @@ enum	cmd_type {
 	CMD_SQ = 0x5351,
 	/** @brief Pipeline "cmd_1 | ... | cmd_n". */
 	CMD_PL = 0x504c,
-	CMD_IF,
+	/** @brief Conditional "if cmd_1 then cmd_2 (optional ->) else cmd_3 . */
+	CMD_IF = 0x4946,
 };
 
 /** @brief union used to abstract the command type */
@@ -93,6 +94,18 @@ union u_cmd {
 		/** @brief number of commands (number of pipes + 1). */
 		int		nb_cmds;
 	} cmd_pl;
+
+	/** @brief struct representing a conditional (if - then - else). */
+	struct s_cmd_if {
+		/** @brief command whose exit code will be the conditional :
+		 * if (conditional->exit_code == 0) 
+		 * then exec(cmd_if_true) else exec(cmd_if_false)*/
+		struct s_cmd	*conditional;
+		/** @brief command to execute on true condition. */
+		struct s_cmd	*cmd_if_true;
+		/** @brief command to execute on false condition. */
+		struct s_cmd	*cmd_if_false;
+	} cmd_if;
 };
 
 
