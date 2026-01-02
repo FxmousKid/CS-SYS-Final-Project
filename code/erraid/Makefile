@@ -27,6 +27,7 @@ SRC_FILES_NAMES += utils/buffer_utils.c
 SRC_FILES_NAMES += exec/exec.c
 SRC_FILES_NAMES += exec/exec_pl.c
 SRC_FILES_NAMES += exec/exec_sq.c
+SRC_FILES_NAMES += exec/exec_if.c
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c
