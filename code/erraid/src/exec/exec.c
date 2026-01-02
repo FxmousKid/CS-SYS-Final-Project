@@ -33,7 +33,13 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 			retval = exec_pl(cmd, fd_in, fd_out);
 		break;
 
+	case CMD_IF:
+
+		break;
+
+
 	default:
+		ERR_MSG("Unknown cmd_type: %d", cmd->cmd_type);
 		return false;
 	}
 

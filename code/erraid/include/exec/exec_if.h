@@ -12,6 +12,11 @@
 # include "utils/binary_utils.h" // IWYU pragma: keep
 
 
+bool	exec_if(struct s_cmd *cmd, struct s_cmd *parent_pl,
+	        int fd_in, int fd_out);
+bool	exec_if_if_parent_pl(struct s_cmd *cmd, struct s_cmd *parent_pl,
+			     int fd_in, int fd_out);
 
+# include "exec/exec.h" // IWYU pragma: keep
 
 #endif
