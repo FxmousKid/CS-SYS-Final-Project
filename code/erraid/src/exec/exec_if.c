@@ -9,6 +9,7 @@ bool	exec_if(struct s_cmd *cmd, int fd_in, int fd_out)
 	cmd_if = &cmd->cmd.cmd_if;
 
 	ret = exec_cmd(cmd_if->conditional, NO_REDIRECT, NO_REDIRECT, CMD_IF, NULL);
+	conditional_is_true = (cmd_if->conditional->exit_code == 0);
 	if (ret < 0) {
 		ERR_MSG("Failed to exec_cmd()")
 		return false;
