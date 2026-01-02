@@ -53,6 +53,13 @@ static void	free_cmd_node(struct s_cmd *cmd, bool free_self)
 		free(cmd->cmd.cmd_pl.cmds);
 		cmd->cmd.cmd_pl.cmds = NULL;
 		break;
+	
+	case CMD_IF:
+		free_cmd_node(cmd->cmd.cmd_if.conditional, false);
+		free_cmd_node(cmd->cmd.cmd_if.cmd_if_true, false);
+		if (cmd->cmd.cmd_if.cmd_if_false)
+			free_cmd_node(cmd->cmd.cmd_if.cmd_if_false, false);
+		break;
 
 	default:
 		break;

@@ -30,6 +30,9 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	%>
 
+print_cmd_tree(ctx.tasks->cmd);
+exit(12);
+
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
 	if (ctx.tasks)
