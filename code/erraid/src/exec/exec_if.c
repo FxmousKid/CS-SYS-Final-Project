@@ -4,31 +4,36 @@ bool	exec_if(struct s_cmd *cmd, int fd_in, int fd_out)
 {
 	struct s_cmd_if *cmd_if = NULL;
 	bool		conditional_is_true = false;
-	int		ret = 0;
+	bool		ret = 0;
 
 	cmd_if = &cmd->cmd.cmd_if;
 
 	ret = exec_cmd(cmd_if->conditional, NO_REDIRECT, NO_REDIRECT, CMD_IF, NULL);
 	conditional_is_true = (cmd_if->conditional->exit_code == 0);
-	if (ret < 0) {
+	if (!ret) {
 		ERR_MSG("Failed to exec_cmd()")
 		return false;
 	}
 
 	if (conditional_is_true) {
 		ret = exec_cmd(cmd_if->cmd_if_true, fd_in, fd_out, CMD_IF, NULL);
-		if (ret < 0) {
+		if (!ret) {
 			ERR_MSG("Failed to exec_cmd()")
 			return false;
 		}
+		cmd->exit_code = cmd_if->cmd_if_true->exit_code;
 	}
 
 	else if (cmd_if->cmd_if_false) {
 		ret = exec_cmd(cmd_if->cmd_if_false, fd_in, fd_out, CMD_IF, NULL);
-		if (ret < 0) {
+		if (!ret) {
 			ERR_MSG("Failed to exec_cmd()")
 			return false;
 		}
+		cmd->exit_code = cmd_if->cmd_if_false->exit_code;
+	}
+	else {
+		cmd->exit_code = cmd_if->conditional->exit_code;
 	}
 
 	return ret;
@@ -38,8 +43,8 @@ bool	exec_if_if_parent_pl(struct s_cmd *cmd, struct s_cmd_pl *parent_pl, int fd_
 {
 	pid_t	pid = 0;
 
-	cmd->pid = fork();
-	switch (cmd->pid) {
+	pid = fork();
+	switch (pid) {
 	case -1:
 		ERR_SYS("fork")
 		return false;
@@ -58,6 +63,4 @@ bool	exec_if_if_parent_pl(struct s_cmd *cmd, struct s_cmd_pl *parent_pl, int fd_
 		cmd->pid = pid;
 		return true;
 	}
-
-	return true;
 }
