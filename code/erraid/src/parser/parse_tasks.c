@@ -18,6 +18,11 @@ static void	count_individual_cmds(struct s_cmd *cmd, int *count)
 		break;
 
 	case CMD_IF:
+		count_individual_cmds(cmd->cmd.cmd_if.conditional, count);
+		count_individual_cmds(cmd->cmd.cmd_if.cmd_if_true, count);
+		if (!cmd->cmd.cmd_if.cmd_if_false)
+			return
+		count_individual_cmds(cmd->cmd.cmd_if.cmd_if_false, count);
 	default:
 		return;
 	}
@@ -29,6 +34,8 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 					      const char *stderr_path,
 					      bool is_inside_pipeline)
 {
+	bool	has_else = false;
+
 	// only the last CMD_SI in the entire tree gets stdout/stderr paths
 	if (cmd->cmd_type == CMD_SI && cmd->cmd_id == last_cmd_id) {
 		cmd->cmd.cmd_si.stdout_path = stdout_path;
@@ -62,6 +69,26 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 		break;
 
 	case CMD_IF:
+		has_else = (cmd->cmd.cmd_if.cmd_if_false != NULL);
+		set_output_paths_last_command(cmd->cmd.cmd_if.conditional,
+	       				      last_cmd_id,
+					      stdout_path,
+					      stderr_path,
+					      is_inside_pipeline);
+		set_output_paths_last_command(cmd->cmd.cmd_if.cmd_if_true,
+	       				      last_cmd_id, 
+					      stdout_path,
+					      stderr_path,
+					      is_inside_pipeline);
+		if (!has_else)
+			return;
+		set_output_paths_last_command(cmd->cmd.cmd_if.cmd_if_false,
+	       				      last_cmd_id + has_else,
+					      stdout_path,
+					      stderr_path,
+					      is_inside_pipeline);
+		break;
+
 	default:
 		return;
 	}

@@ -1,5 +1,5 @@
-#ifndef EXEC_PL_H
-# define EXEC_PL_H
+#ifndef EXEC_IF_H
+# define EXEC_IF_H
 
 # include <stdbool.h>
 # include <sys/wait.h>
@@ -12,15 +12,10 @@
 # include "utils/binary_utils.h" // IWYU pragma: keep
 
 
-bool	exec_pl(struct s_cmd *cmd, int fd_in, int fd_out);
-bool	exec_pl_if_parent_pl(struct s_cmd *cmd,
-			     struct s_cmd_pl *parent_pl,
+bool	exec_if(struct s_cmd *cmd, int fd_in, int fd_out);
+bool	exec_if_if_parent_pl(struct s_cmd *cmd, struct s_cmd_pl *parent_pl,
 			     int fd_in, int fd_out);
 
-
-// includes are here to avoid circular depedency
-// but if we have to resort to that, maybe here
-// is not the best place to put...
 # include "exec/exec.h" // IWYU pragma: keep
 
 #endif

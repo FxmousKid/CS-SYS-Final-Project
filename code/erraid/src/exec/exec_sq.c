@@ -1,8 +1,5 @@
 #include "exec/exec_sq.h"
 
-bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
-	         enum cmd_type parent_type, struct s_cmd_pl *parent_pl);
-
 bool	exec_sq(struct s_cmd *cmd, int fd_in, int fd_out)
 {
 	struct s_cmd_sq 	*cmd_sq = NULL;

@@ -22,6 +22,7 @@ erraid/tasks/
 sujet/
 rundir/
 rundir_pipes/
+rundir_ifs/
 test_git/
 
 vgcore*

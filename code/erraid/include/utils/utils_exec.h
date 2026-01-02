@@ -18,8 +18,5 @@ bool	setup_input_fd(int fd);
 bool	setup_output_fd(int fd);
 bool	wait_for_pipeline(struct s_cmd_pl *cmd_pl);
 bool	setup_output_last_cmd(const char *stdout_file, const char *stderr_file);
-bool	spawn_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
-		  struct s_cmd_pl *parent_pl);
-bool	run_cmd(struct s_cmd *cmd, int fd_in, int fd_out);
 
 #endif
