@@ -14,5 +14,6 @@
 # include "structs.h"
 
 
+bool	alloc_and_fill_if_sub_dirs(struct s_cmd_if *cmd_if, const char *path);
 
 #endif

@@ -45,7 +45,9 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 	
 	case CMD_IF:
 		cmd_if = &cmd->cmd.cmd_if;
-		(void)cmd_if;
+		if (!alloc_and_fill_if_sub_dirs(cmd_if, cmd->path))
+			goto exit;
+		exit(12);
 		break;
 
 
