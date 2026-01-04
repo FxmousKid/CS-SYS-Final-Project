@@ -136,12 +136,13 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
 		free_argv(argv);
 		return *cmd_str != NULL;
 		
-	} else if (type == CMD_SQ) {
+	}
+	// TYPE = 'SQ' or 'PL'
+	else if (type == CMD_SQ || type == CMD_PL){
 		// Read NBCMDS <uint32>
 		if (!read_uint32(fd, &nb_cmds))
 			return false;
-		
-		return assemble_seq_string(fd, nb_cmds, cmd_str, parentheses);
+		return assemble_seq_string(fd, type, nb_cmds, cmd_str, parentheses);
 	}
 
 	return false;
@@ -156,7 +157,7 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
  * @param cmd_str   Pointer to a char* where the resulting string will be stored.
  * @return true on success, false on read/allocation failure.
  */
-bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parentheses)
+bool assemble_seq_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
 {
 	char		*str;
 	char		*tmp;
@@ -204,11 +205,17 @@ bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parenthe
 			str = tmp;
 		}
 
-		// Add ';' if it's not the first command
+		// Add ';' or '|' if it's not the first command
 		if (i > 0) {
-			str[len++] = ' ';
-			str[len++] = ';';
-			str[len++] = ' ';
+			if (type == CMD_SQ) {
+				str[len++] = ' ';
+				str[len++] = ';';
+				str[len++] = ' ';
+			} else if (type == CMD_PL) {
+				str[len++] = ' ';
+				str[len++] = '|';
+				str[len++] = ' ';
+			}
 		}
 
 		memcpy(str + len, sub_cmd_str, sub_len);
