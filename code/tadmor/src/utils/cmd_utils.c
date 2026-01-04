@@ -142,22 +142,94 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
 		// Read NBCMDS <uint32>
 		if (!read_uint32(fd, &nb_cmds))
 			return false;
-		return assemble_seq_string(fd, type, nb_cmds, cmd_str, parentheses);
+		return assemble_sq_pl_string(fd, type, nb_cmds, cmd_str, parentheses);
+	}
+	else if (type == CMD_IF) {
+		return assemble_if_string(fd, cmd_str, parentheses);
 	}
 
 	return false;
 }
 
+bool assemble_if_string(int fd, char **cmd_str, bool parentheses)
+{
+	char *cond = NULL;
+	char *t_cmd = NULL;
+	char *e_cmd = NULL;
+	char *res = NULL;
+	uint8_t has_else;
+
+	// Deserialize each bloc
+	if (!cmd_to_str_internal(fd, &cond, false))
+		goto error;
+	if (!cmd_to_str_internal(fd, &t_cmd, false))
+		goto error;
+	// Read the boolean flag indicating whether a else cmd exists or not
+	if (!read_exact(fd, &has_else, sizeof(uint8_t)))
+		goto error;
+
+	if (has_else && !cmd_to_str_internal(fd, &e_cmd, false))
+		goto error;
+
+	
+	// if + then + (else) + fi + spaces + parentheses etc
+	size_t size = strlen(cond) + strlen(t_cmd) + (e_cmd ? strlen(e_cmd) : 0) + 32;
+	res = calloc(size, sizeof(char));
+	if (!res)
+		goto error;
+
+	// Build string
+	if (parentheses)
+		strcat(res, "( ");
+	strcat(res, "if ");
+	strcat(res, cond);
+	// Add ';' if cond cmd doesn't finish with ')'
+	if (cond[strlen(cond) - 1] != ')')
+		strcat(res, " ;");
+
+	strcat(res, " then ");
+	strcat(res, t_cmd);
+	// Add ';' if then cmd doesn't finish with ')'
+	if (t_cmd[strlen(t_cmd) - 1] != ')')
+		strcat(res, " ;");
+
+	if (has_else) {
+		strcat(res, " else ");
+		strcat(res, e_cmd);
+		if (e_cmd[strlen(e_cmd) - 1] != ')')
+			strcat(res, " ;");
+	}
+
+	strcat(res, " fi");
+	if (parentheses)
+		strcat(res, " )");
+
+	*cmd_str = res;
+	free(cond);
+	free(t_cmd);
+	if (e_cmd)
+		free(e_cmd);
+	return true;
+
+error:
+	free(cond);
+	free(t_cmd);
+	if (e_cmd)
+		free(e_cmd);
+	return false;
+}
+
 /**
- * @brief Recursively reads a CMD_SQ from the FIFO and reconstructs the command string.
- * Format: ( [sub_cmd_1] ; [sub_cmd_2] ; ... )
+ * @brief Recursively reads a CMD_SQ or CMD_PL from the FIFO and reconstructs the command string.
+ * Format: ( [sub_cmd_1] ; [sub_cmd_2] ; ... ) or ( [sub_cmd_1] | [sub_cmd_2] | ... )
  *
  * @param fd        The file descriptor to read from.
+ * @param type	    The command type.
  * @param nb_cmds   The number of sub-commands in the sequence.
  * @param cmd_str   Pointer to a char* where the resulting string will be stored.
  * @return true on success, false on read/allocation failure.
  */
-bool assemble_seq_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
+bool assemble_sq_pl_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
 {
 	char		*str;
 	char		*tmp;
