@@ -61,7 +61,7 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 	return true;
 }
 
-static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
+static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 {
 	char	*taskid = NULL;
 	char	*minutes = NULL;
@@ -107,6 +107,8 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	
 	// create a simple command
 	case 'c':
+		ctx->communication_func = create_tasks;
+		(*current)++;
 		break;
 
 	// creates a sequence command
@@ -116,20 +118,32 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	// set the minutes of a task
 	case 'm':
 		minutes = optarg;
+		ctx->cmd.timing.minutes = parse_minutes(minutes);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
 	// set the hours of a task
 	case 'H':
 		hours = optarg;
+		ctx->cmd.timing.hours = parse_hours(hours);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
 	// set up the days of the week of a task
 	case 'd':
 		daysofweek = optarg;
+		ctx->cmd.timing.days = parse_days(daysofweek);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 
 	// sets up a task that has no specified time to run at
 	case 'n':
+		ctx->cmd.timing.days = 0;
+		ctx->cmd.timing.hours = 0;
+		ctx->cmd.timing.minutes = 0;
 		break;
 		
 	// stop the daemon
@@ -140,6 +154,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
+		*current += 2;
 		break;
 
 	// if launched in debug mode
@@ -170,6 +185,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 {
 	int		opt;
+	int		current = 0;
 	extern int	opterr;
 	const char	*shortopts = "x:o:e:r:R:lcsm:H:d:nP:qbh";
 	struct option	longopts[] = {
@@ -198,14 +214,19 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
-		if (!opts_handle(ctx, opt, argv)) {
+		if (!opts_handle(ctx, opt, argv, &current)) {
 			exit(ctx->exit_code);
 		}
 	}
+	ctx->argv = argv;
+	ctx->current = current + 1;
 }
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 {
+	ctx->cmd.timing.days = 0xFF;
+	ctx->cmd.timing.hours = 0xFFFFFFFF;
+	ctx->cmd.timing.minutes = 0xFFFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
 	argc -= optind;
 	argv += optind;

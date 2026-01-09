@@ -34,6 +34,7 @@ print_cmd_tree(ctx.tasks->cmd);
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
+	free_new_tasks(ctx.tasks[ctx.nb_base_tasks - 1].next);
 	if (ctx.tasks)
 		free(ctx.tasks);
 	return EXIT_SUCCESS;

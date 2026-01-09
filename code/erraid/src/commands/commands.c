@@ -29,6 +29,7 @@ static bool handle_request(struct s_data *ctx, struct s_request *req)
 		std_tasks(ctx, taskid, "stderr");
 		break;
 	case OPCODE_CR:
+		create_tasks(ctx, req);
 		break;
 	case OPCODE_RM:
 		memcpy(&taskid, req->buf + 2, sizeof(uint64_t));
