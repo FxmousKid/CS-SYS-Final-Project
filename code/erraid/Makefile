@@ -41,6 +41,7 @@ SRC_FILES_NAMES += commands/std_tasks.c
 SRC_FILES_NAMES += commands/commands.c
 SRC_FILES_NAMES += commands/create_tasks.c
 SRC_FILES_NAMES += commands/remove_task.c
+SRC_FILES_NAMES += commands/terminate.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))

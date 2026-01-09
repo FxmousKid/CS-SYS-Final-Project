@@ -36,6 +36,10 @@ static bool handle_request(struct s_data *ctx, struct s_request *req)
 		taskid = htobe64(taskid);
 		remove_task(ctx, taskid);
 		break;
+	case OPCODE_TM:
+		printf("Ici\n");
+		terminate(ctx);
+		break;
 	default:
 		break;
 	}
