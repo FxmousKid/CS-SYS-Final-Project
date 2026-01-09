@@ -31,6 +31,9 @@ static bool handle_request(struct s_data *ctx, struct s_request *req)
 	case OPCODE_CR:
 		break;
 	case OPCODE_RM:
+		memcpy(&taskid, req->buf + 2, sizeof(uint64_t));
+		taskid = htobe64(taskid);
+		remove_task(ctx, taskid);
 		break;
 	default:
 		break;
