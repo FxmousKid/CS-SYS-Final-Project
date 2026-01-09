@@ -11,6 +11,7 @@
 # include "commands/exitcode_tasks.h"
 # include "commands/std_tasks.h"
 # include "commands/remove_task.h"
+# include "commands/terminate.h"
 # include "macros.h"
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[]);

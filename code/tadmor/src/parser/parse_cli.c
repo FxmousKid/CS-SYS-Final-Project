@@ -134,6 +134,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		
 	// stop the daemon
 	case 'q':
+		ctx -> communication_func = terminate;
 		break;
 	
 	// the directory for storing named pipes

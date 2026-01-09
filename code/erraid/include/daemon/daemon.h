@@ -14,5 +14,6 @@
 bool    daemonize(bool debug_mode);
 bool 	is_daemon_running();
 void 	setup_sig_handlers();
+void    stop_daemon();
 
 #endif
