@@ -15,6 +15,7 @@ SRC_FILES_NAMES += utils/cmd_utils.c
 SRC_FILES_NAMES += commands/list_tasks.c
 SRC_FILES_NAMES += commands/exitcode_tasks.c
 SRC_FILES_NAMES += commands/std_tasks.c
+SRC_FILES_NAMES += commands/remove_task.c
 
 SRC_FILES_NAMES += communication/fifo_api.c
 

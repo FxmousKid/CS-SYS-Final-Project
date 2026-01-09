@@ -50,6 +50,13 @@ enum reply_opcode {
 	OPCODE_ER = 0x4552,
 };
 
+enum reply_errcode {
+	/** @brief Task id not found */
+	OPCODE_NF = 0x4e46,
+	/** @brief Task has not been executed yet */
+	OPCODE_NR = 0x4e52,
+};
+
 
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */

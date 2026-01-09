@@ -82,7 +82,8 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		break;
 
 	// remove a task
-	case 'R':
+	case 'r':
+		ctx->communication_func = remove_task;
 		ctx->task_id = atol(optarg);
 		break;
 
