@@ -132,7 +132,7 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 /**
  * @brief Builds complete paths to stdout and stderr files of a given task
  */
-static void	build_output_paths(struct s_task *task)
+void	build_output_paths(struct s_task *task)
 {
 	if (!build_safe_path(task->stdout_path, sizeof(task->stdout_path), task->path, STDOUT_FILE))
 		ERR_MSG("Failed to build stdout path");
@@ -245,6 +245,7 @@ bool	parse_tasks(struct s_data *ctx)
 		return false;
 
 	task = &ctx->tasks;
+	ctx->nb_base_tasks = subtasks_count;
 	if (!alloc_ll_sub_tasks(task, subtasks_count))
 		return false;
 
@@ -269,4 +270,12 @@ void	free_tasks(struct s_task *tasks)
 		return;
 	free_command_rec(tasks->cmd);
 	free_tasks(tasks->next);
+}
+
+void	free_new_tasks(struct s_task *tasks)
+{
+	if (!tasks)
+		return;
+	free_tasks(tasks->next);
+	free(tasks);
 }

@@ -173,6 +173,7 @@ struct s_data {
 	bool		is_data_le;
 	/** @brief flag to indicate if debug mode is enabled. */
 	bool		debug_mode;
+	int		nb_base_tasks;
 };
 
 #endif

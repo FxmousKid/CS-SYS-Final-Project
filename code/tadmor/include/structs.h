@@ -70,6 +70,7 @@ struct s_cmd {
 
 
 struct s_data {
+	char		**argv;
 	/** @brief provided or default path to the pipes directory */
 	char		pipes_dir[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
@@ -86,6 +87,7 @@ struct s_data {
 	uint64_t		task_id;
 	/** @brief flag to indicate if debug mode is enabled. */
 	bool			debug_mode;
+	int		current;
 };
 
 struct s_reply {
