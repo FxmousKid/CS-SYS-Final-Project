@@ -92,6 +92,7 @@ bool	create_tasks(struct s_data *ctx, struct s_request *req)
 	parse_cmd_si(task->cmd->path, task->cmd);
 	task->cmd->cmd.cmd_si.stdout_path = task->stdout_path;
 	task->cmd->cmd.cmd_si.stderr_path = task->stderr_path;
+	task->new_task = true;
 	task->next = NULL;
 	if (ctx->tasks)
 		add_tasks(ctx->tasks, task);
