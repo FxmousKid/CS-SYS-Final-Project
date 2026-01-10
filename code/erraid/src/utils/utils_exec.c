@@ -107,7 +107,7 @@ bool	setup_output_last_cmd(const char *stdout_file, const char *stderr_file)
 	int	stderr_fd;
 
 	if (stdout_file) {
-		stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_APPEND, 0666);
 		if (stdout_fd == -1) {
 			ERR_SYS("open stdout");
 			return false;
@@ -121,7 +121,7 @@ bool	setup_output_last_cmd(const char *stdout_file, const char *stderr_file)
 	}
     
 	if (stderr_file) {
-		stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_APPEND, 0666);
 		if (stderr_fd == -1) {
 			ERR_SYS("open stderr");
 			return false;

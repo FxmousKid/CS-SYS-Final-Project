@@ -24,19 +24,20 @@ int main(int argc, char *argv[])
 
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
+
+	// print_cmd_tree(ctx.tasks->next->cmd);
+
 	if (!ctx.foreground && !daemonize(ctx.debug_mode)) <%
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;
 	%>
 
-	if (ctx.tasks)
-		print_cmd_tree(ctx.tasks->cmd);
-
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
-	if (ctx.tasks && ctx.nb_base_tasks > 0)
+	if (ctx.tasks && ctx.nb_base_tasks > 0) {
 		free_new_tasks(ctx.tasks[ctx.nb_base_tasks - 1].next);
-	if (ctx.tasks)
 		free(ctx.tasks);
+	}
+
 	return EXIT_SUCCESS;
 %>
