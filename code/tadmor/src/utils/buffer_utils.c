@@ -216,11 +216,8 @@ bool	buffer_append_string(struct s_buffer *buf, const char *str)
 
 bool	buffer_append_argument(struct s_buffer *buf, char **arg)
 {
-	uint32_t len = 0;
+	uint32_t len = get_arg_len(arg);
 
-	while (arg[len]) {
-		len++;
-	}
 	if (len <= 0)
 		return false;
 	
@@ -234,4 +231,33 @@ bool	buffer_append_argument(struct s_buffer *buf, char **arg)
 			return false;
 	}
 	return true;
+}
+
+bool	buffer_append_taskids(struct s_buffer *buf, char **arg)
+{
+	uint32_t len = get_arg_len(arg);
+
+	if (len <= 0)
+		return false;
+	
+	// Write the length (uint32_t)
+	if (!buffer_append_uint32(buf, len))
+		return false;
+
+	for (uint32_t i = 0; i < len; i++) {
+	// Write string in buffer
+		if (!buffer_append_uint64(buf, atol(arg[i])))
+			return false;
+	}
+	return true;
+}
+
+uint32_t	get_arg_len(char **arg)
+{
+	uint32_t len = 0;
+
+	while (arg[len]) {
+		len++;
+	}
+	return len;
 }

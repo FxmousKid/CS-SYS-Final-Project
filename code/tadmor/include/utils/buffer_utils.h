@@ -70,5 +70,8 @@ bool	buffer_append_string(struct s_buffer *buf, const char *str);
 /** @brief Appends a protocol-compliant arg: ARGC <uint32>, ARGV[0] <string>, ..., ARGV[ARGC-1] <string>. */
 bool	buffer_append_argument(struct s_buffer *buf, char **arg);
 
+bool	buffer_append_taskids(struct s_buffer *buf, char **arg);
+
+uint32_t	get_arg_len(char **arg);
 
 #endif

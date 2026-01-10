@@ -1,5 +1,5 @@
-#ifndef CREATE_TASKS_H
-# define CREATE_TASKS_H
+#ifndef TASK_CREATE_UTILS_H
+# define TASK_CREATE_UTILS_H
 
 # include <stdbool.h>
 # include <inttypes.h>
@@ -16,12 +16,15 @@
 # include "communication/fifo_api.h" // IWYU pragma: keep
 # include "utils/buffer_utils.h" // IWYU pragma: keep
 # include "utils/cmd_utils.h" // IWYU pragma: keep
-# include "utils/task_create_utils.h"
+# include "utils/combine_utils.h"
 # include "macros.h" // IWYU pragma: keep
 # include "parser/parse_tasks.h"
 # include "parser/parse_cmd_si.h"
 
 
-bool	create_tasks(struct s_data *ctx, struct s_request *req);
+void		add_tasks(struct s_task *tasks, struct s_task *new);
+bool		create_timing(struct s_task *task, uint8_t *req);
+taskid_t	get_taskid(struct s_data *ctx);
+void		create_directory(struct s_task *task);
 
 #endif

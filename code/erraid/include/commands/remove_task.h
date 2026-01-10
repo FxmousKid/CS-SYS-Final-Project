@@ -14,5 +14,6 @@
 
 
 bool    remove_task(struct s_data *ctx, uint64_t taskid);
+bool	del_task_node(struct s_data *ctx, uint64_t taskid);
 
 #endif
