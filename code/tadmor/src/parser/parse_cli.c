@@ -162,6 +162,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		ctx->cmd.timing.days = 0;
 		ctx->cmd.timing.hours = 0;
 		ctx->cmd.timing.minutes = 0;
+		(*current)++;
 		break;
 		
 	// stop the daemon
