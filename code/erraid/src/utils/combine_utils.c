@@ -7,7 +7,7 @@ static bool	check_taskid_exist(struct s_data *ctx, taskid_t taskid)
 	char		taskid_string[44] = {0};
 	char		path[PATH_MAX] = {0};
 
-	snprintf(taskid_string, 44, "tasks/%lu", taskid);
+	snprintf(taskid_string, 44, "tasks/%" PRId64, taskid);
 	build_safe_path(path, PATH_MAX, ctx->run_directory, taskid_string);
 	printf("check : %s\n", path);
 	return (stat(path, &st) != -1 && S_ISDIR(st.st_mode));
@@ -86,7 +86,7 @@ bool	move_all_cmd(struct s_data *ctx, struct s_task *task, uint8_t *req)
 		memcpy(&taskid, req + len, 8);
 		taskid = htobe64(taskid);
 		if (!check_taskid_exist(ctx, taskid)) {
-			printf("existe pas : %lu\n", taskid);
+			printf("existe pas : %" PRId64 "\n", taskid);
 			return false;
 		}
 		taskid = 0;
@@ -97,7 +97,7 @@ bool	move_all_cmd(struct s_data *ctx, struct s_task *task, uint8_t *req)
 	for (uint32_t current = 0; current < nb_arg; current++) {
 		memcpy(&taskid, req + len, 8);
 		taskid = htobe64(taskid);
-		snprintf(taskid_string, 44, "tasks/%lu", taskid);
+		snprintf(taskid_string, 44, "tasks/%" PRId64, taskid);
 		build_safe_path(oldpath, PATH_MAX, ctx->run_directory, taskid_string);
 
 		memset(taskid_string, 0, 44);

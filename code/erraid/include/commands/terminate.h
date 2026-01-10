@@ -8,6 +8,6 @@
 # include "daemon/daemon.h"
 # include "communication/fifo_api.h"
 
-bool    terminate();
+bool            terminate(struct s_data *ctx);
 
 #endif

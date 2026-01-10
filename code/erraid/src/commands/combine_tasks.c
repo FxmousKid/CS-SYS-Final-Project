@@ -60,7 +60,7 @@ bool	combine_tasks(struct s_data *ctx, uint8_t *req)
 
 	task->task_id = id;
 	task->sub_cmds_count = 0;
-	if (!snprintf(task->path, sizeof(task->path), "%s/%lu", tasks_path, id)) {
+	if (!snprintf(task->path, sizeof(task->path), "%s/%" PRId64, tasks_path, id)) {
 		ERR_MSG("Failed to build tasks path %s", tasks_path);
 		return false;
 	}
