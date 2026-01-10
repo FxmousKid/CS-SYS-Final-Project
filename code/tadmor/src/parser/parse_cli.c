@@ -107,6 +107,10 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
+		char c = '*';
+		ctx->cmd.timing.minutes = parse_minutes(&c);
+		ctx->cmd.timing.hours = parse_hours(&c);
+		ctx->cmd.timing.days = parse_days(&c);
 		ctx->communication_func = create_tasks;
 		(*current)++;
 		break;
