@@ -13,6 +13,8 @@ bool	create_timing(struct s_task *task, uint8_t *req)
 {
 	char		path_timing[PATH_MAX + 1] = {0};
 	int		fd;
+	uint64_t	minutes_be;
+	uint32_t	hours_be;
 
 	if (build_safe_path(path_timing, PATH_MAX, task->path, "timing"))
 		ERR_MSG("Failed to build stdout path");
@@ -20,16 +22,18 @@ bool	create_timing(struct s_task *task, uint8_t *req)
 		ERR_SYS("open");
 		return false;
 	}
-	memcpy(&task->timing.minutes, req, 8);
-	memcpy(&task->timing.hours, req + 8, 4);
-	// task->timing.minutes = htobe64(task->timing.minutes);
-	// task->timing.hours = htobe64(task->timing.minutes);
+
+	// Data from client is in Big Endian, convert to host endian for in-memory use
+	memcpy(&minutes_be, req, 8);
+	memcpy(&hours_be, req + 8, 4);
+	task->timing.minutes = be64toh(minutes_be);
+	task->timing.hours = be32toh(hours_be);
 	task->timing.days = (uint8_t)req[12];
 
+	// Write the raw BE data to disk
 	write(fd, req, 13);
 	close(fd);
 
-	// print_timing(task->timing);
 	return true;
 }
 

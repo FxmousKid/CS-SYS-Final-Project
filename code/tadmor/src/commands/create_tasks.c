@@ -7,8 +7,13 @@ static bool	request_create_tasks(struct s_data *ctx)
 
 	buffer_init(&buf, INITIAL_BUF_CAPACITY);
 	buffer_append_uint16(&buf, OPCODE_CR);
-	buffer_append_uint64(&buf, htobe64(ctx->cmd.timing.minutes));
-	buffer_append_uint32(&buf, htobe32(ctx->cmd.timing.hours));
+<<<<<<< HEAD
+	// buffer_append_uint* already converts to big-endian
+=======
+	// buffer_append_uint already converts to big-endian
+>>>>>>> eb8fe82 (cancelled the combine changes, but fixed the endianness for timing)
+	buffer_append_uint64(&buf, ctx->cmd.timing.minutes);
+	buffer_append_uint32(&buf, ctx->cmd.timing.hours);
 	buffer_append(&buf, &ctx->cmd.timing.days, 1);
 	buffer_append_argument(&buf, ctx->argv + ctx->current);
 	if (!writefifo(ctx->fifo_request, buf.data, buf.size)) {

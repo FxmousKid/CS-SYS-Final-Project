@@ -31,8 +31,9 @@ bool	parse_timing(struct s_task *task, bool debug)
 	memcpy(&minutes_he, timing, 8);
 	memcpy(&hours_he, timing + 8, 4);
 
-	task->timing.minutes = htobe64(minutes_he);
-	task->timing.hours = htobe32(hours_he);
+	// Data is stored in Big Endian, convert to host endian
+	task->timing.minutes = be64toh(minutes_he);
+	task->timing.hours = be32toh(hours_he);
 	task->timing.days = (uint8_t)timing[12];
 	
 	if (debug) {
