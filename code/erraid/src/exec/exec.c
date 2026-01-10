@@ -51,5 +51,7 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 
 bool	exec_task(struct s_task *task)
 {
+	printf("Executing task: %s\n", task->path);
 	return exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL);
+	printf("Finished task: %s\n", task->path);
 }

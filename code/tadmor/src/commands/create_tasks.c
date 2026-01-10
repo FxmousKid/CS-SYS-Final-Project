@@ -37,7 +37,7 @@ static bool	handle_create_reply(struct s_data *ctx)
 	if (ans == OPCODE_ER)
 		return false;
 	read_uint64(fd_reply, &id);
-	len = snprintf(buf, 21, "%lu\n", id);
+	len = snprintf(buf, 21, "%" PRId64 "\n", id);
 	write(STDOUT_FILENO, buf, len);
 	return true;
 }
