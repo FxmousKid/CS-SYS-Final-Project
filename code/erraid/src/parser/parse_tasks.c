@@ -246,8 +246,13 @@ bool	parse_tasks(struct s_data *ctx)
 	if (subtasks_count < 0)
 		return false;
 
-	task = &ctx->tasks;
 	ctx->nb_base_tasks = subtasks_count;
+
+	// No tasks to parse, return early with success
+	if (subtasks_count == 0)
+		return true;
+
+	task = &ctx->tasks;
 	if (!alloc_ll_sub_tasks(task, subtasks_count))
 		return false;
 

@@ -93,7 +93,10 @@ bool	create_tasks(struct s_data *ctx, struct s_request *req)
 	task->cmd->cmd.cmd_si.stdout_path = task->stdout_path;
 	task->cmd->cmd.cmd_si.stderr_path = task->stderr_path;
 	task->next = NULL;
-	add_tasks(ctx->tasks, task);
+	if (ctx->tasks)
+		add_tasks(ctx->tasks, task);
+	else
+		ctx->tasks = task;
 	reply_to_client_create(ctx, id);
 	return true;
 }
