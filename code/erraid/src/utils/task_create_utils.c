@@ -30,7 +30,7 @@ bool	create_timing(struct s_task *task, uint8_t *req)
 	task->timing.hours = be32toh(hours_be);
 	task->timing.days = (uint8_t)req[12];
 
-	// Write the raw BE data to disk (as received)
+	// Write the raw BE data to disk
 	write(fd, req, 13);
 	close(fd);
 

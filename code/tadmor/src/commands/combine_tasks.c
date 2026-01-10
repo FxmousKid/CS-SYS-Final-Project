@@ -7,7 +7,7 @@ static bool	request_combine_tasks(struct s_data *ctx, enum cmd_type type)
 
 	buffer_init(&buf, INITIAL_BUF_CAPACITY);
 	buffer_append_uint16(&buf, OPCODE_CB);
-	// buffer_append_uint* already converts to big-endian
+	// buffer_append_uint already converts to big-endian
 	buffer_append_uint64(&buf, ctx->cmd.timing.minutes);
 	buffer_append_uint32(&buf, ctx->cmd.timing.hours);
 	buffer_append(&buf, &ctx->cmd.timing.days, 1);
