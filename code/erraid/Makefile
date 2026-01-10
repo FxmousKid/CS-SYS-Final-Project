@@ -23,6 +23,9 @@ SRC_FILES_NAMES += utils/cmd_utils.c
 SRC_FILES_NAMES += utils/utils_exec.c
 SRC_FILES_NAMES += utils/dir_cmd_utils.c
 SRC_FILES_NAMES += utils/buffer_utils.c
+SRC_FILES_NAMES += utils/task_create_utils.c
+SRC_FILES_NAMES += utils/combine_utils.c
+
 
 SRC_FILES_NAMES += exec/exec.c
 SRC_FILES_NAMES += exec/exec_si.c
@@ -41,6 +44,7 @@ SRC_FILES_NAMES += commands/std_tasks.c
 SRC_FILES_NAMES += commands/commands.c
 SRC_FILES_NAMES += commands/create_tasks.c
 SRC_FILES_NAMES += commands/remove_task.c
+SRC_FILES_NAMES += commands/combine_tasks.c
 SRC_FILES_NAMES += commands/terminate.c
 
 # Full Path to .c files

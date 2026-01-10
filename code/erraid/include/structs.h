@@ -156,6 +156,8 @@ struct s_data {
 	bool		exec_instant;
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
+	/** @brief max number of taskid -> not create a taskid that already exist*/
+	taskid_t	max_taskid;
 	/** @brief exit code of the daemon. */
 	uint8_t		exit_code;
 	/** @brief to execute in foreground (no daemonization). */

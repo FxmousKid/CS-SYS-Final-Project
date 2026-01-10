@@ -1,7 +1,7 @@
 
 #include "commands/create_tasks.h"
 
-bool	request_create_tasks(struct s_data *ctx)
+static bool	request_create_tasks(struct s_data *ctx)
 {
 	struct s_buffer	buf;
 
@@ -18,9 +18,9 @@ bool	request_create_tasks(struct s_data *ctx)
 	return true;
 }
 
-bool	handle_create_reply(struct s_data *ctx)
+static bool	handle_create_reply(struct s_data *ctx)
 {
-	char		buf[20];
+	char		buf[21];
 	int		fd_reply;
 	int		len;
 	uint16_t	ans = 0;

@@ -165,7 +165,7 @@ static taskid_t extract_task_id(const char *task_path)
 	return (taskid_t)atol(task_id_ptr);
 }
 
-static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug)
+static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug, taskid_t *max_taskid)
 {
 	struct dirent	*ent = NULL;
 	struct stat	st = {0};
@@ -198,6 +198,8 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool deb
 		strcat(task->path, "/");
 
 		task->task_id = extract_task_id(dir.path);
+		if (task->task_id > *max_taskid)
+			*max_taskid = task->task_id;
 		build_output_paths(task);
 		remove_last_file_from_path(dir.path);
 		if (!parse_timing(task, debug)) {
@@ -251,7 +253,8 @@ bool	parse_tasks(struct s_data *ctx)
 
 	// parsing actual sub commands by reading through the dir
 	task = &ctx->tasks;
-	if (!parse_sub_tasks_path(*task, tasks_path, ctx->debug_mode))
+	ctx->max_taskid = 0;
+	if (!parse_sub_tasks_path(*task, tasks_path, ctx->debug_mode, &ctx->max_taskid))
 		return false;
 
 	if (!parse_sub_tasks_cmd(*task))

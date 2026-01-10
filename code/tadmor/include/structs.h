@@ -44,9 +44,9 @@ enum	cmd_type {
 	CMD_SI = 0x5349,
 	/** @brief Sequence of commands "cmd1 ; cmd2 ; cmd3". */
 	CMD_SQ = 0x5351,
-	CMD_IF,
+	CMD_IF = 0x4946,
 	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
-	CMD_PL,
+	CMD_PL = 0x504C,
 };
 
 struct s_timing {

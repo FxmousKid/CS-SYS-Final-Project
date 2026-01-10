@@ -113,6 +113,20 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 
 	// creates a sequence command
 	case 's':
+		ctx->communication_func = sequence_tasks;
+		(*current)++;
+		break;
+
+	// creates a if command
+	case 'i':
+		ctx->communication_func = if_tasks;
+		(*current)++;
+		break;
+
+	// creates a pipeline command
+	case 'p':
+		ctx->communication_func = pipeline_tasks;
+		(*current)++;
 		break;
 	
 	// set the minutes of a task
@@ -200,6 +214,8 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		// Option to create task
 		{"create-simple-command", no_argument, NULL, 'c'},
 		{"create-sequence-command", no_argument, NULL, 's'},
+		{"create-pipeline-command", no_argument, NULL, 'p'},
+		{"create-if-command", no_argument, NULL, 'i'},
 		{"minutes", required_argument, NULL, 'm'},
 		{"hours", required_argument, NULL, 'H'},
 		{"daysofweek", required_argument, NULL, 'd'},
