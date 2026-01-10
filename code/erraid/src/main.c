@@ -34,8 +34,6 @@ int main(int argc, char *argv[])
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
-	if (ctx.tasks && ctx.nb_base_tasks > 0)
-		free_new_tasks(ctx.tasks[ctx.nb_base_tasks - 1].next);
 	if (ctx.tasks)
 		free(ctx.tasks);
 	return EXIT_SUCCESS;

@@ -103,6 +103,7 @@ static bool	parse_sub_tasks_cmd(struct s_task *task)
 		strcat(buf, CMD_DIR);
 		if (!(task->cmd = parse_cmd_tree(buf)))
 			return false;
+		task->new_task = false;
 		task = task->next;
 		bzero(buf, sizeof(buf));
 	}
@@ -278,12 +279,6 @@ void	free_tasks(struct s_task *tasks)
 		return;
 	free_command_rec(tasks->cmd);
 	free_tasks(tasks->next);
-}
-
-void	free_new_tasks(struct s_task *tasks)
-{
-	if (!tasks)
-		return;
-	free_tasks(tasks->next);
-	free(tasks);
+	if (tasks->new_task)
+		free(tasks);
 }

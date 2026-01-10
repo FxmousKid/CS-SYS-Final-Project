@@ -147,6 +147,7 @@ struct s_task {
 	struct s_task	*next;
 	taskid_t	task_id;
 	int64_t		launch_time;
+	bool		new_task;
 };
 
 /* @brief struct representing the daemon data */

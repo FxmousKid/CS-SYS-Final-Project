@@ -16,7 +16,6 @@ static bool	create_cmd_dir_and_type(struct s_task *task, uint8_t *req)
 		return false;
 	}
 	memcpy(&type, req, 2);
-	type = htobe16(type);
 	write(fd, &type, 2);
 	close(fd);
 	return true;
@@ -92,7 +91,7 @@ bool	combine_tasks(struct s_data *ctx, uint8_t *req)
 		free(task);
 		return false;
 	}
-
+	task->new_task = true;
 	task->next = NULL;
 	if (ctx->tasks)
 		add_tasks(ctx->tasks, task);

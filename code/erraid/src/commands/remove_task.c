@@ -38,6 +38,8 @@ bool	del_task_node(struct s_data *ctx, uint64_t taskid)
 		if (task->task_id == taskid) {
 			*indirect = task->next;
 			free_command_rec(task->cmd);
+			if (task->new_task)
+				free(task);
 			return true;
 		}
 		indirect = &task->next;
