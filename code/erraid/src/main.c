@@ -36,7 +36,6 @@ int main(int argc, char *argv[])
 	free_tasks(ctx.tasks);
 	if (ctx.tasks)
 		free(ctx.tasks);
-	}
 
 	return EXIT_SUCCESS;
 %>

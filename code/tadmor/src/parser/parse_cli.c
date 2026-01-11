@@ -63,17 +63,12 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 
 static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 {
-	char	*taskid = NULL;
 	char	*minutes = NULL;
 	char	*hours = NULL;
 	char	*daysofweek = NULL;
+	char	c = 0;
 
 	// for -Werror...
-	(void)taskid;
-	(void)minutes;
-	(void)hours;
-	(void)daysofweek;
-
 	switch(opt) {
 	
 	// list tasks
@@ -107,7 +102,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
-		char c = '*';
+		c = '*';
 		ctx->cmd.timing.minutes = parse_minutes(&c);
 		ctx->cmd.timing.hours = parse_hours(&c);
 		ctx->cmd.timing.days = parse_days(&c);
