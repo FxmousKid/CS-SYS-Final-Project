@@ -91,6 +91,15 @@ bool	combine_tasks(struct s_data *ctx, uint8_t *req)
 		free(task);
 		return false;
 	}
+
+	// Set up stdout/stderr paths for the last command in the tree
+	count_individual_cmds(task->cmd, &task->sub_cmds_count);
+	set_output_paths_last_command(task->cmd,
+				      task->sub_cmds_count - 1,
+				      task->stdout_path,
+				      task->stderr_path,
+				      false);
+
 	task->new_task = true;
 	task->next = NULL;
 	if (ctx->tasks)
