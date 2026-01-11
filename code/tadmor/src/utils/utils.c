@@ -88,6 +88,10 @@ void	_write_err(const char *location)
  */
 void	print_darr(const char *tab_name, char **tab)
 {
+	if (!tab || !*tab) {
+		printf("%s = NULL\n", tab_name);
+		return ;
+	}
 	printf("%s = {", tab_name);
 	while (*tab) {
 		printf("\"%s\", ", *tab);

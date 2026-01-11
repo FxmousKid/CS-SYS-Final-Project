@@ -62,6 +62,41 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 }
 
 
+static void	parse_timing_opt(struct s_data *ctx, char *argv[])
+{
+	const char *arg_cur = argv[optind];
+
+	printf("parsing timing options starting at arg '%s'\n", arg_cur);
+	if (strcmp(arg_cur, "-n") == 0) {
+		ctx->cmd.timing.days = 0;
+		ctx->cmd.timing.hours = 0;
+		ctx->cmd.timing.minutes = 0;
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-m") == 0) {
+		optind++;
+		ctx->cmd.timing.minutes = parse_minutes(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-H") == 0) {
+		optind++;
+		ctx->cmd.timing.hours = parse_hours(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-d") == 0) {
+		optind++;
+		ctx->cmd.timing.days = parse_days(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+}
+
 
 /**
  * @brief handles parsing of variadic options, -i, -p, ..., then moves
@@ -70,16 +105,20 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
  * @param ctx 
  * @param argv 
  */
-static void	parse_variadic_opt(struct s_data *ctx, char *argv[])
+int	parse_variadic_opt(struct s_data *ctx, char *argv[])
 {
-	const char *arg_cur = argv[optind];
+	const char	*arg_cur = NULL;
+	int		count = 0;
+
 
 	(void)ctx;
+	arg_cur = argv[optind];
 	while (arg_cur && arg_cur[0] != '-') {
-		printf("current argument = %s\n", arg_cur);
+		count++;
 		optind++;
 		arg_cur = argv[optind];
 	}
+	return count;
 }
 
 static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
@@ -87,7 +126,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	char	*minutes = NULL;
 	char	*hours = NULL;
 	char	*daysofweek = NULL;
-	char	c = 0;
+	// char	c = 0;
 
 	// for -Werror...
 	switch(opt) {
@@ -123,35 +162,38 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
-
-		printf("parsing -c : \n");
-		parse_variadic_opt(ctx, argv);
-		c = '*';
-		ctx->cmd.timing.minutes = parse_minutes(&c);
-		ctx->cmd.timing.hours = parse_hours(&c);
-		ctx->cmd.timing.days = parse_days(&c);
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = create_tasks;
-		(*current)++;
 		break;
 
 	// creates a sequence command
 	case 's':
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = sequence_tasks;
-		(*current)++;
 		break;
 
 	// creates a if command
 	case 'i':
-		printf("parsing -i : \n");
-		parse_variadic_opt(ctx, argv);
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = if_tasks;
-		(*current)++;
 		break;
 
 	// creates a pipeline command
 	case 'p':
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = pipeline_tasks;
-		(*current)++;
 		break;
 	
 	// set the minutes of a task
@@ -178,12 +220,13 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 
+	// NEVER SUPPOSED TO REACH IT HERE
 	// sets up a task that has no specified time to run at
 	case 'n':
 		ctx->cmd.timing.days = 0;
 		ctx->cmd.timing.hours = 0;
 		ctx->cmd.timing.minutes = 0;
-		(*current)++;
+		
 		break;
 		
 	// stop the daemon
@@ -262,7 +305,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		}
 	}
 	ctx->argv = argv;
-	ctx->current = current + 1;
+	//FUCK THIS LINE : ctx->current = current + 1;
 }
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
@@ -271,11 +314,13 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	ctx->cmd.timing.hours = 0x00FFFFFF;
 	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
-	exit(1);
+
 	argc -= optind;
 	argv += optind;
 	if (ctx->pipes_dir[0] == '\0')
 		set_fifos_path_default(ctx);
+
+	print_darr("variadic args", ctx->argv + ctx->current);
 
 	// add cmd and tasks parsing
 	// parse_arguments(ctx, argc, argv);
