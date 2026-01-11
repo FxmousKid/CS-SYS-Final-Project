@@ -4,18 +4,20 @@ bool	exec_nd(struct s_cmd *cmd, int fd_in, int fd_out)
 {
 	struct s_cmd_nd 	*cmd_nd = NULL;
 	bool			retval;
+	int			last_executed = 0;
 
 	cmd_nd = &cmd->cmd.cmd_nd;
 	for (int i = 0; i < cmd_nd->nb_cmds; i++) {
 		retval = exec_cmd(&cmd_nd->cmds[i], fd_in, fd_out, CMD_ND, NULL);
-                if (retval != 0)
-                        break;
-        }
+		last_executed = i;
+		// For &&: stop if the command failed (exit_code != 0)
+		if (cmd_nd->cmds[i].exit_code != 0)
+			break;
+	}
 
-	// command and exit code should be the last command's exit code
-        // since commands after are not executed
+	// command and exit code should be the last executed command's exit code
 	if (cmd_nd->nb_cmds > 0)
-		cmd->exit_code = cmd_nd->cmds[cmd_nd->nb_cmds - 1].exit_code;
+		cmd->exit_code = cmd_nd->cmds[last_executed].exit_code;
 
 	return retval;
 }

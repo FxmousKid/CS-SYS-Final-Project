@@ -4,18 +4,20 @@ bool	exec_or(struct s_cmd *cmd, int fd_in, int fd_out)
 {
 	struct s_cmd_or 	*cmd_or = NULL;
 	bool			retval;
+	int			last_executed = 0;
 
 	cmd_or = &cmd->cmd.cmd_or;
 	for (int i = 0; i < cmd_or->nb_cmds; i++) {
 		retval = exec_cmd(&cmd_or->cmds[i], fd_in, fd_out, CMD_OR, NULL);
-                if (retval == 0)
-                        break;
-        }
+		last_executed = i;
+		// For ||: stop if the command succeeded (exit_code == 0)
+		if (cmd_or->cmds[i].exit_code == 0)
+			break;
+	}
 
-	// command or exit code should be the last command's exit code
-        // since commands after are not executed
+	// command or exit code should be the last executed command's exit code
 	if (cmd_or->nb_cmds > 0)
-		cmd->exit_code = cmd_or->cmds[cmd_or->nb_cmds - 1].exit_code;
+		cmd->exit_code = cmd_or->cmds[last_executed].exit_code;
 
 	return retval;
 }
