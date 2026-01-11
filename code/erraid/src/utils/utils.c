@@ -82,6 +82,10 @@ void	print_cmd_enum(enum cmd_type type, bool newline)
 		printf("CMD_IF");
 	else if (type == CMD_PL)
 		printf("CMD_PL");
+	else if (type == CMD_ND)
+		printf("CMD_ND");
+	else if (type == CMD_OR)
+		printf("CMD_OR");
 	else
 		printf("UNKNOWN_CMD_TYPE");
 	if (newline)
