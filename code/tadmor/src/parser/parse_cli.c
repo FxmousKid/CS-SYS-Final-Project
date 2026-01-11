@@ -120,7 +120,7 @@ int	parse_variadic_opt(struct s_data *ctx, char *argv[])
 	return count;
 }
 
-static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
+static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 {
 	char	*minutes = NULL;
 	char	*hours = NULL;
@@ -196,25 +196,13 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		break;
 	case 'A':
 		ctx->communication_func = and_tasks;
-		(*current)++;
 		break;
 	case 'O':
 		ctx->communication_func = or_tasks;
-		(*current)++;
 		break;
-	case 'A':
-		ctx->communication_func = and_tasks;
-		(*current)++;
-		break;
-	case 'O':
-		ctx->communication_func = or_tasks;
-		(*current)++;
-		break;
-	// set the minutes of a task
 	case 'm':
 		minutes = optarg;
 		ctx->cmd.timing.minutes = parse_minutes(minutes);
-		*current += 2;
 		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
@@ -222,7 +210,6 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	case 'H':
 		hours = optarg;
 		ctx->cmd.timing.hours = parse_hours(hours);
-		*current += 2;
 		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
@@ -230,7 +217,6 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	case 'd':
 		daysofweek = optarg;
 		ctx->cmd.timing.days = parse_days(daysofweek);
-		*current += 2;
 		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 
@@ -252,7 +238,6 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
-		*current += 2;
 		break;
 
 	// if launched in debug mode
@@ -283,7 +268,6 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 {
 	int		opt;
-	int		current = 0;
 	extern int	opterr;
 	const char	*shortopts = "+x:o:e:r:R:lcspim:H:d:nP:qbh";
 	struct option	longopts[] = {
@@ -316,7 +300,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
-		if (!opts_handle(ctx, opt, argv, &current)) {
+		if (!opts_handle(ctx, opt, argv)) {
 			exit(ctx->exit_code);
 		}
 	}
