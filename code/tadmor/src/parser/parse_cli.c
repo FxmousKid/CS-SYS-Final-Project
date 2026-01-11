@@ -61,6 +61,27 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 	return true;
 }
 
+
+
+/**
+ * @brief handles parsing of variadic options, -i, -p, ..., then moves
+ * optind onto the next option
+ *
+ * @param ctx 
+ * @param argv 
+ */
+static void	parse_variadic_opt(struct s_data *ctx, char *argv[])
+{
+	const char *arg_cur = argv[optind];
+
+	(void)ctx;
+	while (arg_cur && arg_cur[0] != '-') {
+		printf("current argument = %s\n", arg_cur);
+		optind++;
+		arg_cur = argv[optind];
+	}
+}
+
 static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 {
 	char	*minutes = NULL;
@@ -102,6 +123,9 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
+
+		printf("parsing -c : \n");
+		parse_variadic_opt(ctx, argv);
 		c = '*';
 		ctx->cmd.timing.minutes = parse_minutes(&c);
 		ctx->cmd.timing.hours = parse_hours(&c);
@@ -118,6 +142,8 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 
 	// creates a if command
 	case 'i':
+		printf("parsing -i : \n");
+		parse_variadic_opt(ctx, argv);
 		ctx->communication_func = if_tasks;
 		(*current)++;
 		break;
@@ -202,7 +228,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 	int		opt;
 	int		current = 0;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:R:lcspim:H:d:nP:qbh";
+	const char	*shortopts = "+x:o:e:r:R:lcspim:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -245,6 +271,7 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	ctx->cmd.timing.hours = 0x00FFFFFF;
 	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
+	exit(1);
 	argc -= optind;
 	argv += optind;
 	if (ctx->pipes_dir[0] == '\0')
