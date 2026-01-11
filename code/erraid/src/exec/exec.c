@@ -49,7 +49,38 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 	return retval;
 }
 
+// bool	exec_task(struct s_task *task)
+// {
+// 	return exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL);
+// }
+
 bool	exec_task(struct s_task *task)
 {
-	return exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL);
+	pid_t	pid = 0;
+
+	pid = fork();
+	switch (pid) {
+	case -1:
+		ERR_SYS("fork");
+		return false;
+
+	case 0:
+		// Child : execute the task and wait
+		if (task->stdout_path[0] != '\0') {
+			int fd = open(task->stdout_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			if (fd >= 0) close(fd);
+		}
+		if (task->stderr_path[0] != '\0') {
+			int fd = open(task->stderr_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			if (fd >= 0) close(fd);
+		}
+		if (!exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL))
+			exit(EXIT_FAILURE);
+		exit(task->cmd->exit_code);
+
+	default:
+		// Parent : store the child pid and return
+		task->cmd->pid = pid;
+		return true;
+	}
 }

@@ -26,4 +26,6 @@ bool	parse_tasks(struct s_data *ctx);
  */
 void	free_tasks(struct s_task *tasks);
 
+void	build_output_paths(struct s_task *task);
+
 #endif 

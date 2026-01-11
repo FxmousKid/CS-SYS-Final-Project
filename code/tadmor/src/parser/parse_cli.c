@@ -61,7 +61,7 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 	return true;
 }
 
-static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
+static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 {
 	char	*taskid = NULL;
 	char	*minutes = NULL;
@@ -82,7 +82,8 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		break;
 
 	// remove a task
-	case 'R':
+	case 'r':
+		ctx->communication_func = remove_task;
 		ctx->task_id = atol(optarg);
 		break;
 
@@ -106,39 +107,74 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	
 	// create a simple command
 	case 'c':
+		char c = '*';
+		ctx->cmd.timing.minutes = parse_minutes(&c);
+		ctx->cmd.timing.hours = parse_hours(&c);
+		ctx->cmd.timing.days = parse_days(&c);
+		ctx->communication_func = create_tasks;
+		(*current)++;
 		break;
 
 	// creates a sequence command
 	case 's':
+		ctx->communication_func = sequence_tasks;
+		(*current)++;
+		break;
+
+	// creates a if command
+	case 'i':
+		ctx->communication_func = if_tasks;
+		(*current)++;
+		break;
+
+	// creates a pipeline command
+	case 'p':
+		ctx->communication_func = pipeline_tasks;
+		(*current)++;
 		break;
 	
 	// set the minutes of a task
 	case 'm':
 		minutes = optarg;
+		ctx->cmd.timing.minutes = parse_minutes(minutes);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
 	// set the hours of a task
 	case 'H':
 		hours = optarg;
+		ctx->cmd.timing.hours = parse_hours(hours);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 	
 	// set up the days of the week of a task
 	case 'd':
 		daysofweek = optarg;
+		ctx->cmd.timing.days = parse_days(daysofweek);
+		*current += 2;
+		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 
 	// sets up a task that has no specified time to run at
 	case 'n':
+		ctx->cmd.timing.days = 0;
+		ctx->cmd.timing.hours = 0;
+		ctx->cmd.timing.minutes = 0;
+		(*current)++;
 		break;
 		
 	// stop the daemon
 	case 'q':
+		ctx -> communication_func = terminate;
 		break;
 	
 	// the directory for storing named pipes
 	case 'P':
 		if (!parse_custom_fifo_dir(ctx, optarg))
 			return false;
+		*current += 2;
 		break;
 
 	// if launched in debug mode
@@ -169,8 +205,9 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 {
 	int		opt;
+	int		current = 0;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:R:lcsm:H:d:nP:qbh";
+	const char	*shortopts = "x:o:e:r:R:lcspim:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -181,7 +218,9 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 		// Option to create task
 		{"create-simple-command", no_argument, NULL, 'c'},
-		{"create-sequence-command", no_argument, NULL, 's'},
+		{"combine-sequence-command", no_argument, NULL, 's'},
+		{"combine-pipeline-command", no_argument, NULL, 'p'},
+		{"combine-if-command", no_argument, NULL, 'i'},
 		{"minutes", required_argument, NULL, 'm'},
 		{"hours", required_argument, NULL, 'H'},
 		{"daysofweek", required_argument, NULL, 'd'},
@@ -197,14 +236,19 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 	opterr = 0;
 	while ((opt = getopt_long(argc, argv, shortopts, longopts, NULL)) != -1) {
-		if (!opts_handle(ctx, opt, argv)) {
+		if (!opts_handle(ctx, opt, argv, &current)) {
 			exit(ctx->exit_code);
 		}
 	}
+	ctx->argv = argv;
+	ctx->current = current + 1;
 }
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 {
+	ctx->cmd.timing.days = 0x7F;
+	ctx->cmd.timing.hours = 0x00FFFFFF;
+	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
 	argc -= optind;
 	argv += optind;

@@ -50,6 +50,13 @@ enum reply_opcode {
 	OPCODE_ER = 0x4552,
 };
 
+enum reply_errcode {
+	/** @brief Task id not found */
+	OPCODE_NF = 0x4e46,
+	/** @brief Task has not been executed yet */
+	OPCODE_NR = 0x4e52,
+};
+
 
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
@@ -140,6 +147,7 @@ struct s_task {
 	struct s_task	*next;
 	taskid_t	task_id;
 	int64_t		launch_time;
+	bool		new_task;
 };
 
 /* @brief struct representing the daemon data */
@@ -149,6 +157,8 @@ struct s_data {
 	bool		exec_instant;
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
+	/** @brief max number of taskid -> not create a taskid that already exist*/
+	taskid_t	max_taskid;
 	/** @brief exit code of the daemon. */
 	uint8_t		exit_code;
 	/** @brief to execute in foreground (no daemonization). */
@@ -166,6 +176,7 @@ struct s_data {
 	bool		is_data_le;
 	/** @brief flag to indicate if debug mode is enabled. */
 	bool		debug_mode;
+	int		nb_base_tasks;
 };
 
 #endif

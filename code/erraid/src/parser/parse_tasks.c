@@ -36,10 +36,14 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 {
 	bool	has_else = false;
 
-	// only the last CMD_SI in the entire tree gets stdout/stderr paths
-	if (cmd->cmd_type == CMD_SI && cmd->cmd_id == last_cmd_id) {
-		cmd->cmd.cmd_si.stdout_path = stdout_path;
-		cmd->cmd.cmd_si.stderr_path = stderr_path;
+	if (cmd->cmd_type == CMD_SI) {
+		if (cmd->cmd_id == last_cmd_id || !is_inside_pipeline) {
+			cmd->cmd.cmd_si.stdout_path = stdout_path;
+			cmd->cmd.cmd_si.stderr_path = stderr_path;
+		} else {
+			cmd->cmd.cmd_si.stdout_path = NULL;
+			cmd->cmd.cmd_si.stderr_path = NULL;
+		}
 		return;
 	}
 
@@ -103,6 +107,7 @@ static bool	parse_sub_tasks_cmd(struct s_task *task)
 		strcat(buf, CMD_DIR);
 		if (!(task->cmd = parse_cmd_tree(buf)))
 			return false;
+		task->new_task = false;
 		task = task->next;
 		bzero(buf, sizeof(buf));
 	}
@@ -132,7 +137,7 @@ static bool	alloc_ll_sub_tasks(struct s_task **task, int subtasks_count)
 /**
  * @brief Builds complete paths to stdout and stderr files of a given task
  */
-static void	build_output_paths(struct s_task *task)
+void	build_output_paths(struct s_task *task)
 {
 	if (!build_safe_path(task->stdout_path, sizeof(task->stdout_path), task->path, STDOUT_FILE))
 		ERR_MSG("Failed to build stdout path");
@@ -165,7 +170,7 @@ static taskid_t extract_task_id(const char *task_path)
 	return (taskid_t)atol(task_id_ptr);
 }
 
-static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug)
+static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool debug, taskid_t *max_taskid)
 {
 	struct dirent	*ent = NULL;
 	struct stat	st = {0};
@@ -198,6 +203,8 @@ static bool	parse_sub_tasks_path(struct s_task *task, const char *path, bool deb
 		strcat(task->path, "/");
 
 		task->task_id = extract_task_id(dir.path);
+		if (task->task_id > *max_taskid)
+			*max_taskid = task->task_id;
 		build_output_paths(task);
 		remove_last_file_from_path(dir.path);
 		if (!parse_timing(task, debug)) {
@@ -244,13 +251,20 @@ bool	parse_tasks(struct s_data *ctx)
 	if (subtasks_count < 0)
 		return false;
 
+	ctx->nb_base_tasks = subtasks_count;
+
+	// No tasks to parse, return early with success
+	if (subtasks_count == 0)
+		return true;
+
 	task = &ctx->tasks;
 	if (!alloc_ll_sub_tasks(task, subtasks_count))
 		return false;
 
 	// parsing actual sub commands by reading through the dir
 	task = &ctx->tasks;
-	if (!parse_sub_tasks_path(*task, tasks_path, ctx->debug_mode))
+	ctx->max_taskid = 0;
+	if (!parse_sub_tasks_path(*task, tasks_path, ctx->debug_mode, &ctx->max_taskid))
 		return false;
 
 	if (!parse_sub_tasks_cmd(*task))
@@ -269,4 +283,6 @@ void	free_tasks(struct s_task *tasks)
 		return;
 	free_command_rec(tasks->cmd);
 	free_tasks(tasks->next);
+	if (tasks->new_task)
+		free(tasks);
 }
