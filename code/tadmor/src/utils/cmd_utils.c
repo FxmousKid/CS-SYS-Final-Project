@@ -209,16 +209,16 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 		if (i > 0) {
 			switch(type){
 			case CMD_SQ:
-				len += sprintf(strl + len, " ; ");
+				len += sprintf(str + len, " ; ");
 				break;
 			case CMD_PL:
-				len += sprintf(strl + len, " | ");
+				len += sprintf(str + len, " | ");
 				break;
 			case CMD_ND:
-				len += sprintf(strl + len, " && ");
+				len += sprintf(str + len, " && ");
 				break;
 			case CMD_OR:
-				len += sprintf(strl + len, " || ");
+				len += sprintf(str + len, " || ");
 				break;
 			default:
 				break;
