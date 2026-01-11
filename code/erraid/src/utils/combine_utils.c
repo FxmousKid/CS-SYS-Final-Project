@@ -9,7 +9,7 @@ static bool	check_taskid_exist(struct s_data *ctx, taskid_t taskid)
 
 	snprintf(taskid_string, 44, "tasks/%" PRId64, taskid);
 	build_safe_path(path, PATH_MAX, ctx->run_directory, taskid_string);
-	printf("check : %s\n", path);
+	//printf("check : %s\n", path);
 	return (stat(path, &st) != -1 && S_ISDIR(st.st_mode));
 }
 
@@ -25,7 +25,8 @@ static bool	move_cmd(char *oldpath, char *newpath)
 	bool 		success = true;
 
 	dir = opendir(oldpath);
-	mkdir(newpath, 0755);
+	if (stat(newpath, &statbuf) == -1)
+		mkdir(newpath, 0755);
 
 	old_path_len = strlen(oldpath);
 	new_path_len = strlen(newpath);
@@ -41,14 +42,17 @@ static bool	move_cmd(char *oldpath, char *newpath)
 		if (oldbuf && newbuf) {
 			sprintf(oldbuf, "%s/%s", oldpath, p->d_name);
 			sprintf(newbuf, "%s/%s", newpath, p->d_name);
-			printf("\noldbuf : %s\nnewbuf : %s\n", oldbuf, newbuf);
+			//printf("\noldbuf : %s\nnewbuf : %s\n", oldbuf, newbuf);
 			if (!stat(oldbuf, &statbuf)) {
 				if (S_ISDIR(statbuf.st_mode)) {
 					// Need to delete entries recursively from this dir
-					success = move_cmd(oldbuf, newbuf);
+					if (!strcmp(p->d_name, "cmd"))
+						success = move_cmd(oldbuf, newpath);
+					else
+						success = move_cmd(oldbuf, newbuf);
 				} else {
 					if (!strcmp(p->d_name, "argv") || !strcmp(p->d_name, "type")) {
-						printf("move %s\n", p->d_name);
+						//printf("move %s\n", p->d_name);
 						rename(oldbuf, newbuf);
 					}
 					unlink(oldbuf);
@@ -80,7 +84,7 @@ bool	move_all_cmd(struct s_data *ctx, struct s_task *task, uint8_t *req)
 
 	memcpy(&nb_arg, req, 4);
 	nb_arg = htobe32(nb_arg);
-	printf("nbarg : %u\n", nb_arg);
+	//printf("nbarg : %u\n", nb_arg);
 
 	for (uint32_t current = 0; current < nb_arg; current++) {
 		memcpy(&taskid, req + len, 8);
@@ -101,10 +105,10 @@ bool	move_all_cmd(struct s_data *ctx, struct s_task *task, uint8_t *req)
 		build_safe_path(oldpath, PATH_MAX, ctx->run_directory, taskid_string);
 
 		memset(taskid_string, 0, 44);
-		snprintf(taskid_string, 44, "%u", current);
-		build_safe_path(newpath, PATH_MAX, task->cmd->path, taskid_string);
+		snprintf(taskid_string, 44, "cmd/%u", current);
+		build_safe_path(newpath, PATH_MAX, task->path, taskid_string);
 
-		printf("oldpath : %s\nnewpath : %s\n", oldpath, newpath);
+		//printf("oldpath : %s\nnewpath : %s\n", oldpath, newpath);
 		move_cmd(oldpath, newpath);
 		
 		del_task_node(ctx, taskid);

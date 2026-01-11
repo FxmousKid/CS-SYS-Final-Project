@@ -25,7 +25,6 @@ bool	parse_tasks(struct s_data *ctx);
  * @param tasks the head of the linked list of tasks
  */
 void	free_tasks(struct s_task *tasks);
-void	free_new_tasks(struct s_task *tasks);
 
 void	build_output_paths(struct s_task *task);
 

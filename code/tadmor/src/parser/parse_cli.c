@@ -107,6 +107,10 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
+		char c = '*';
+		ctx->cmd.timing.minutes = parse_minutes(&c);
+		ctx->cmd.timing.hours = parse_hours(&c);
+		ctx->cmd.timing.days = parse_days(&c);
 		ctx->communication_func = create_tasks;
 		(*current)++;
 		break;
@@ -158,6 +162,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		ctx->cmd.timing.days = 0;
 		ctx->cmd.timing.hours = 0;
 		ctx->cmd.timing.minutes = 0;
+		(*current)++;
 		break;
 		
 	// stop the daemon
@@ -202,7 +207,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 	int		opt;
 	int		current = 0;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:R:lcsm:H:d:nP:qbh";
+	const char	*shortopts = "x:o:e:r:R:lcspim:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -213,9 +218,9 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 		// Option to create task
 		{"create-simple-command", no_argument, NULL, 'c'},
-		{"create-sequence-command", no_argument, NULL, 's'},
-		{"create-pipeline-command", no_argument, NULL, 'p'},
-		{"create-if-command", no_argument, NULL, 'i'},
+		{"combine-sequence-command", no_argument, NULL, 's'},
+		{"combine-pipeline-command", no_argument, NULL, 'p'},
+		{"combine-if-command", no_argument, NULL, 'i'},
 		{"minutes", required_argument, NULL, 'm'},
 		{"hours", required_argument, NULL, 'H'},
 		{"daysofweek", required_argument, NULL, 'd'},
@@ -241,9 +246,9 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 {
-	ctx->cmd.timing.days = 0xFF;
-	ctx->cmd.timing.hours = 0xFFFFFFFF;
-	ctx->cmd.timing.minutes = 0xFFFFFFFFFFFFFFFF;
+	ctx->cmd.timing.days = 0x7F;
+	ctx->cmd.timing.hours = 0x00FFFFFF;
+	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
 	argc -= optind;
 	argv += optind;

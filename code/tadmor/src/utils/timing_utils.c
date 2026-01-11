@@ -46,15 +46,21 @@ uint64_t	parse_timing(char *arg)
 
 minutes_t	parse_minutes(char *arg)
 {
+	if (arg[0] == '*')
+		return 0x0FFFFFFFFFFFFFFFULL;
 	return parse_timing(arg);
 }
 
 hours_t		parse_hours(char *arg)
 {
+	if (arg[0] == '*')
+		return 0x00FFFFFF;
 	return parse_timing(arg);
 }
 
 dasyofweek_t	parse_days(char *arg)
 {
+	if (arg[0] == '*')
+		return 0x7F;
 	return parse_timing(arg);
 }
