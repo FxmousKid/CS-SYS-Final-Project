@@ -178,7 +178,6 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 	if (parentheses) {
 		// Start with '('
 		str[len++] = '(';
-		str[len++] = ' ';
 	}
 
 	// For every sub commands
@@ -230,7 +229,11 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 				len += sprintf(str + len, "if ");
 				break;
 			case 1:
-				len  += sprintf(str + len, " ; then ");
+				if (str[len-1] != ')')
+					len  += sprintf(str + len, " ; then ");
+				else
+					len  += sprintf(str + len, " then ");
+
 				break;
 			case 2:
 				len += sprintf(str + len, " else ");
@@ -246,12 +249,15 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 		free(sub_cmd_str);
 	}
 
-	if (type == CMD_IF)
-		len += sprintf(str + len, " ; fi");
+	if (type == CMD_IF) {
+		if (str[len-1] != ')')
+			len += sprintf(str + len, " ; fi");
+		else
+			len += sprintf(str + len, " fi");
+	}
 
 	if (parentheses) {
 		// Add ')' at the end
-		str[len++] = ' ';
 		str[len++] = ')';
 	}
 	str[len] = '\0';
