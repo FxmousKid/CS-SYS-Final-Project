@@ -1,6 +1,6 @@
 #include "parser/parse_tasks.h"
 
-static void	count_individual_cmds(struct s_cmd *cmd, int *count)
+void	count_individual_cmds(struct s_cmd *cmd, int *count)
 {
 	switch (cmd->cmd_type) {
 	case CMD_SI:
@@ -28,7 +28,7 @@ static void	count_individual_cmds(struct s_cmd *cmd, int *count)
 	}
 }
 
-static void	set_output_paths_last_command(struct s_cmd *cmd,
+void	set_output_paths_last_command(struct s_cmd *cmd,
 					      int last_cmd_id,
 					      const char *stdout_path,
 					      const char *stderr_path,

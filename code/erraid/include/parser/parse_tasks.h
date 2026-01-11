@@ -28,4 +28,12 @@ void	free_tasks(struct s_task *tasks);
 
 void	build_output_paths(struct s_task *task);
 
+void	count_individual_cmds(struct s_cmd *cmd, int *count);
+
+void	set_output_paths_last_command(struct s_cmd *cmd,
+				      int last_cmd_id,
+				      const char *stdout_path,
+				      const char *stderr_path,
+				      bool is_inside_pipeline);
+
 #endif 

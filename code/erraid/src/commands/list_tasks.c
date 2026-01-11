@@ -64,6 +64,19 @@ static bool serialize_command(struct s_buffer *buf, const struct s_cmd *cmd)
 		}
 		return true;
 	}
+	else if(cmd->cmd_type == CMD_PL) {
+		// NBCMDS <uint32>
+		if (!buffer_append_uint32(buf, cmd->cmd.cmd_pl.nb_cmds))
+			return false;
+
+		// CMD[0] <command>, ..., CMD[N-1] <command>
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++) {
+			// Recursive call for the sub-command
+			if (!serialize_command(buf, &(cmd->cmd.cmd_pl.cmds[i])))
+				return false;
+		}
+		return true;
+	}
 	
 	return true;
 }
