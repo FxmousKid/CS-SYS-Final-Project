@@ -193,8 +193,7 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 
 		size_t sub_len = strlen(sub_cmd_str);
 
-		// Make sure to have enough space + 3 for ';' / ',' / ')' space and '\0'
-		while (len + sub_len + 3 > size) {
+		while (len + sub_len + 15 > size) {
 			size *= 2;
 			tmp = realloc(str, size);
 			if (!tmp) {
