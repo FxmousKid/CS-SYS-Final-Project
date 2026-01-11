@@ -202,6 +202,14 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		ctx->communication_func = or_tasks;
 		(*current)++;
 		break;
+	case 'A':
+		ctx->communication_func = and_tasks;
+		(*current)++;
+		break;
+	case 'O':
+		ctx->communication_func = or_tasks;
+		(*current)++;
+		break;
 	// set the minutes of a task
 	case 'm':
 		minutes = optarg;

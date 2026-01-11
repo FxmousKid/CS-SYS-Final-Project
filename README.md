@@ -14,7 +14,7 @@
 
 **erraid & tadmor** is a Unix-style task scheduler system similar to `cron`, allowing users to automate the execution of complex commands (simple commands, sequences, pipelines, and conditionals) at specified times. The system consists of a daemon (`erraid`) that executes tasks and a client (`tadmor`) that manages them.
 
-## 🚀 Features
+## Features
 
 - **Complex Command Support**: Execute simple commands, sequences (`;`), pipelines (`|`), and conditionals (`if-then-else`)
 - **Flexible Scheduling**: Cron-like scheduling with minute, hour, and day-of-week specifications
@@ -23,7 +23,7 @@
 - **Execution History**: Track exit codes and capture stdout/stderr for each task execution
 - **Named Pipe Communication**: Client-daemon communication via FIFOs for reliable IPC
 
-## 🛠 Tech Stack
+## Tech Stack
 
 - **Language**: [C](https://en.wikipedia.org/wiki/C_(programming_language))
 - **System Calls**: `fork()`, `execve()`, `pipe()`, `dup2()`, `waitpid()`, `open()`, `read()`, `write()`
@@ -31,7 +31,7 @@
 - **Build System**: [GNU Make](https://www.gnu.org/software/make/)
 - **Serialization**: Custom binary format with big-endian encoding
 
-## ⚡️ Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -85,7 +85,7 @@
    ./tadmor -x <TASKID>
    ```
 
-## 📖 Usage Examples
+## Usage Examples
 
 ### Creating Tasks
 
@@ -128,7 +128,7 @@
 ./tadmor -q
 ```
 
-## 🏗 Architecture
+## Architecture
 
 The system follows a modular architecture with clear separation of concerns:
 
@@ -154,7 +154,7 @@ graph TD
 - **CMD_PL**: Pipeline (e.g., `cmd1 | cmd2 | cmd3`)
 - **CMD_IF**: Conditional (e.g., `if cmd1 ; then cmd2 ; else cmd3 ; fi`)
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 SY5-Projet/
@@ -176,7 +176,7 @@ SY5-Projet/
 └── Makefile            # Root build file
 ```
 
-## 🔧 Development
+## Development
 
 ### Building Individual Components
 
@@ -203,19 +203,19 @@ cd test_git
 ./autotests.sh
 ```
 
-## 📝 Documentation
+## Documentation
 
 - **Architecture**: See `docs/ARCHITECTURE.md` for detailed design decisions
 - **Specifications**: See `sujet/` directory for complete project requirements (in French)
 - **Protocol**: See `sujet/protocole.md` for client-daemon communication format
 - **Serialization**: See `sujet/serialisation.md` for binary data format
 
-## 👥 Authors
+## Authors
 
 - **Iyan Nazarian**
 - **Theo Polgar**
 - **Florian Vincent**
 
-## 📄 License
+## License
 
 This project is the final project of the Systems Course at [Paris Cité](https://u-paris.fr/) (L3 Informatique - Système).

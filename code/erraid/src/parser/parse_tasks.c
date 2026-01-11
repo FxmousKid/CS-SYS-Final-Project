@@ -21,7 +21,7 @@ void	count_individual_cmds(struct s_cmd *cmd, int *count)
 		count_individual_cmds(cmd->cmd.cmd_if.conditional, count);
 		count_individual_cmds(cmd->cmd.cmd_if.cmd_if_true, count);
 		if (!cmd->cmd.cmd_if.cmd_if_false)
-			return
+			return;
 		count_individual_cmds(cmd->cmd.cmd_if.cmd_if_false, count);
 		break;
 	case CMD_ND:
