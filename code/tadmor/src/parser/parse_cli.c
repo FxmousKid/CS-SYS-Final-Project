@@ -127,7 +127,14 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		ctx->communication_func = pipeline_tasks;
 		(*current)++;
 		break;
-	
+	case 'A':
+		ctx->communication_func = and_tasks;
+		(*current)++;
+		break;
+	case 'O':
+		ctx->communication_func = or_tasks;
+		(*current)++;
+		break;
 	// set the minutes of a task
 	case 'm':
 		minutes = optarg;
@@ -202,7 +209,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 	int		opt;
 	int		current = 0;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:R:lcspim:H:d:nP:qbh";
+	const char	*shortopts = "x:o:e:r:R:lcspiAOm:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -216,6 +223,8 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		{"combine-sequence-command", no_argument, NULL, 's'},
 		{"combine-pipeline-command", no_argument, NULL, 'p'},
 		{"combine-if-command", no_argument, NULL, 'i'},
+		{"combine-and-command", no_argument, NULL, 'A'},
+		{"combine-or-command", no_argument, NULL, 'O'},
 		{"minutes", required_argument, NULL, 'm'},
 		{"hours", required_argument, NULL, 'H'},
 		{"daysofweek", required_argument, NULL, 'd'},

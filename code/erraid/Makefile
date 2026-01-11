@@ -14,6 +14,9 @@ SRC_FILES_NAMES += parser/parse_cmd_si.c
 SRC_FILES_NAMES += parser/parse_cmd_sq.c
 SRC_FILES_NAMES += parser/parse_cmd_pl.c
 SRC_FILES_NAMES += parser/parse_cmd_if.c
+SRC_FILES_NAMES += parser/parse_cmd_nd.c
+SRC_FILES_NAMES += parser/parse_cmd_or.c
+
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
@@ -32,6 +35,9 @@ SRC_FILES_NAMES += exec/exec_si.c
 SRC_FILES_NAMES += exec/exec_sq.c
 SRC_FILES_NAMES += exec/exec_pl.c
 SRC_FILES_NAMES += exec/exec_if.c
+SRC_FILES_NAMES += exec/exec_nd.c
+SRC_FILES_NAMES += exec/exec_or.c
+
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c

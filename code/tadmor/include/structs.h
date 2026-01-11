@@ -47,6 +47,10 @@ enum	cmd_type {
 	CMD_IF = 0x4946,
 	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
 	CMD_PL = 0x504C,
+	/** @brief AND "cmd1 && cmd2 && cmd3". */
+	CMD_ND	= 0x4E44,
+	/** @brief OR "cmd1 || cmd2 || cmd3". */
+	CMD_OR = 0x4F52,
 };
 
 struct s_timing {

@@ -23,6 +23,17 @@ void	count_individual_cmds(struct s_cmd *cmd, int *count)
 		if (!cmd->cmd.cmd_if.cmd_if_false)
 			return
 		count_individual_cmds(cmd->cmd.cmd_if.cmd_if_false, count);
+		break;
+	case CMD_ND:
+		// *count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_nd.nb_cmds; i++)
+			count_individual_cmds(cmd->cmd.cmd_nd.cmds + i, count);
+		break;
+	case CMD_OR:
+		// *count = *count + 1;
+		for (int i = 0; i < cmd->cmd.cmd_or.nb_cmds; i++)
+			count_individual_cmds(cmd->cmd.cmd_or.cmds + i, count);
+		break;
 	default:
 		return;
 	}
@@ -92,7 +103,22 @@ void	set_output_paths_last_command(struct s_cmd *cmd,
 					      stderr_path,
 					      is_inside_pipeline);
 		break;
-
+	case CMD_ND:
+		for (int i = 0; i < cmd->cmd.cmd_nd.nb_cmds; i++)
+			set_output_paths_last_command(cmd->cmd.cmd_nd.cmds + i, 
+						      last_cmd_id, 
+						      stdout_path, 
+						      stderr_path,
+						      is_inside_pipeline);
+		break;
+	case CMD_OR:
+		for (int i = 0; i < cmd->cmd.cmd_or.nb_cmds; i++)
+			set_output_paths_last_command(cmd->cmd.cmd_or.cmds + i, 
+						      last_cmd_id, 
+						      stdout_path, 
+						      stderr_path,
+						      is_inside_pipeline);
+		break;
 	default:
 		return;
 	}

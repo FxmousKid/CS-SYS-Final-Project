@@ -137,8 +137,8 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
 		return *cmd_str != NULL;
 		
 	}
-	// TYPE = 'SQ' or 'PL'
-	else if (type == CMD_SQ || type == CMD_PL || type == CMD_IF){
+	// TYPE = 'SQ' or 'PL' or 'IF' or 'ND' or 'OR'
+	else {
 		// Read NBCMDS <uint32>
 		if (!read_uint32(fd, &nb_cmds))
 			return false;
@@ -207,14 +207,21 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 
 		// Add ';' or '|' if it's not the first command
 		if (i > 0) {
-			if (type == CMD_SQ) {
-				str[len++] = ' ';
-				str[len++] = ';';
-				str[len++] = ' ';
-			} else if (type == CMD_PL) {
-				str[len++] = ' ';
-				str[len++] = '|';
-				str[len++] = ' ';
+			switch(type){
+			case CMD_SQ:
+				len += sprintf(str + len, " ; ");
+				break;
+			case CMD_PL:
+				len += sprintf(str + len, " | ");
+				break;
+			case CMD_ND:
+				len += sprintf(str + len, " && ");
+				break;
+			case CMD_OR:
+				len += sprintf(str + len, " || ");
+				break;
+			default:
+				break;
 			}
 		}
 		if (type == CMD_IF) {
