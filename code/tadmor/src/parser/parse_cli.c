@@ -61,12 +61,71 @@ static bool	parse_custom_fifo_dir(struct s_data *ctx, const char *path)
 	return true;
 }
 
+
+static void	parse_timing_opt(struct s_data *ctx, char *argv[])
+{
+	const char *arg_cur = argv[optind];
+
+	if (strcmp(arg_cur, "-n") == 0) {
+		ctx->cmd.timing.days = 0;
+		ctx->cmd.timing.hours = 0;
+		ctx->cmd.timing.minutes = 0;
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-m") == 0) {
+		optind++;
+		ctx->cmd.timing.minutes = parse_minutes(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-H") == 0) {
+		optind++;
+		ctx->cmd.timing.hours = parse_hours(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+
+	if (strcmp(arg_cur, "-d") == 0) {
+		optind++;
+		ctx->cmd.timing.days = parse_days(argv[optind]);
+		optind++;
+		arg_cur = argv[optind];
+	}
+}
+
+
+/**
+ * @brief handles parsing of variadic options, -i, -p, ..., then moves
+ * optind onto the next option
+ *
+ * @param ctx 
+ * @param argv 
+ */
+int	parse_variadic_opt(struct s_data *ctx, char *argv[])
+{
+	const char	*arg_cur = NULL;
+	int		count = 0;
+
+
+	(void)ctx;
+	arg_cur = argv[optind];
+	while (arg_cur && arg_cur[0] != '-') {
+		count++;
+		optind++;
+		arg_cur = argv[optind];
+	}
+	return count;
+}
+
 static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 {
 	char	*minutes = NULL;
 	char	*hours = NULL;
 	char	*daysofweek = NULL;
-	char	c = 0;
+	// char	c = 0;
 
 	// for -Werror...
 	switch(opt) {
@@ -102,29 +161,45 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 	
 	// create a simple command
 	case 'c':
-		c = '*';
-		ctx->cmd.timing.minutes = parse_minutes(&c);
-		ctx->cmd.timing.hours = parse_hours(&c);
-		ctx->cmd.timing.days = parse_days(&c);
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = create_tasks;
-		(*current)++;
 		break;
 
 	// creates a sequence command
 	case 's':
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = sequence_tasks;
-		(*current)++;
 		break;
 
 	// creates a if command
 	case 'i':
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = if_tasks;
-		(*current)++;
 		break;
 
 	// creates a pipeline command
 	case 'p':
+		parse_timing_opt(ctx, argv);
+		argv = argv + optind - 1;
+		ctx->argv = argv;
+		ctx->current = optind ;
 		ctx->communication_func = pipeline_tasks;
+		break;
+	case 'A':
+		ctx->communication_func = and_tasks;
+		(*current)++;
+		break;
+	case 'O':
+		ctx->communication_func = or_tasks;
 		(*current)++;
 		break;
 	case 'A':
@@ -159,12 +234,13 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		//printf("%s %s\n", optarg, argv[*current + 1]);
 		break;
 
+	// NEVER SUPPOSED TO REACH IT HERE
 	// sets up a task that has no specified time to run at
 	case 'n':
 		ctx->cmd.timing.days = 0;
 		ctx->cmd.timing.hours = 0;
 		ctx->cmd.timing.minutes = 0;
-		(*current)++;
+		
 		break;
 		
 	// stop the daemon
@@ -209,7 +285,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 	int		opt;
 	int		current = 0;
 	extern int	opterr;
-	const char	*shortopts = "x:o:e:r:R:lcspiAOm:H:d:nP:qbh";
+	const char	*shortopts = "+x:o:e:r:R:lcspim:H:d:nP:qbh";
 	struct option	longopts[] = {
 		// Options to manipulate tasks
 		{"show-exit-codes-history", required_argument, NULL, 'x'},
@@ -245,7 +321,7 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		}
 	}
 	ctx->argv = argv;
-	ctx->current = current + 1;
+	//FUCK THIS LINE : ctx->current = current + 1;
 }
 
 bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
@@ -254,6 +330,7 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	ctx->cmd.timing.hours = 0x00FFFFFF;
 	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
+
 	argc -= optind;
 	argv += optind;
 	if (ctx->pipes_dir[0] == '\0')
