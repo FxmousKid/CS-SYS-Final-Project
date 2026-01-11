@@ -138,84 +138,13 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
 		
 	}
 	// TYPE = 'SQ' or 'PL'
-	else if (type == CMD_SQ || type == CMD_PL){
+	else if (type == CMD_SQ || type == CMD_PL || type == CMD_IF){
 		// Read NBCMDS <uint32>
 		if (!read_uint32(fd, &nb_cmds))
 			return false;
-		return assemble_sq_pl_string(fd, type, nb_cmds, cmd_str, parentheses);
-	}
-	else if (type == CMD_IF) {
-		return assemble_if_string(fd, cmd_str, parentheses);
+		return assemble_cmd_string(fd, type, nb_cmds, cmd_str, parentheses);
 	}
 
-	return false;
-}
-
-bool assemble_if_string(int fd, char **cmd_str, bool parentheses)
-{
-	char *cond = NULL;
-	char *t_cmd = NULL;
-	char *e_cmd = NULL;
-	char *res = NULL;
-	uint8_t has_else;
-
-	// Deserialize each bloc
-	if (!cmd_to_str_internal(fd, &cond, false))
-		goto error;
-	if (!cmd_to_str_internal(fd, &t_cmd, false))
-		goto error;
-	// Read the boolean flag indicating whether a else cmd exists or not
-	if (!read_exact(fd, &has_else, sizeof(uint8_t)))
-		goto error;
-
-	if (has_else && !cmd_to_str_internal(fd, &e_cmd, false))
-		goto error;
-
-	
-	// if + then + (else) + fi + spaces + parentheses etc
-	size_t size = strlen(cond) + strlen(t_cmd) + (e_cmd ? strlen(e_cmd) : 0) + 32;
-	res = calloc(size, sizeof(char));
-	if (!res)
-		goto error;
-
-	// Build string
-	if (parentheses)
-		strcat(res, "( ");
-	strcat(res, "if ");
-	strcat(res, cond);
-	// Add ';' if cond cmd doesn't finish with ')'
-	if (cond[strlen(cond) - 1] != ')')
-		strcat(res, " ;");
-
-	strcat(res, " then ");
-	strcat(res, t_cmd);
-	// Add ';' if then cmd doesn't finish with ')'
-	if (t_cmd[strlen(t_cmd) - 1] != ')')
-		strcat(res, " ;");
-
-	if (has_else) {
-		strcat(res, " else ");
-		strcat(res, e_cmd);
-		if (e_cmd[strlen(e_cmd) - 1] != ')')
-			strcat(res, " ;");
-	}
-
-	strcat(res, " fi");
-	if (parentheses)
-		strcat(res, " )");
-
-	*cmd_str = res;
-	free(cond);
-	free(t_cmd);
-	if (e_cmd)
-		free(e_cmd);
-	return true;
-
-error:
-	free(cond);
-	free(t_cmd);
-	if (e_cmd)
-		free(e_cmd);
 	return false;
 }
 
@@ -229,7 +158,7 @@ error:
  * @param cmd_str   Pointer to a char* where the resulting string will be stored.
  * @return true on success, false on read/allocation failure.
  */
-bool assemble_sq_pl_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
+bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
 {
 	char		*str;
 	char		*tmp;
@@ -289,11 +218,30 @@ bool assemble_sq_pl_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_s
 				str[len++] = ' ';
 			}
 		}
+		if (type == CMD_IF) {
+			switch (i){
+			case 0:
+				len += sprintf(str + len, "if ");
+				break;
+			case 1:
+				len  += sprintf(str + len, " ; then ");
+				break;
+			case 2:
+				len += sprintf(str + len, " else ");
+				break;
+			default:
+				break;
+			}
+		}
+
 
 		memcpy(str + len, sub_cmd_str, sub_len);
 		len += sub_len;
 		free(sub_cmd_str);
 	}
+
+	if (type == CMD_IF)
+		len += sprintf(str + len, " ; fi");
 
 	if (parentheses) {
 		// Add ')' at the end

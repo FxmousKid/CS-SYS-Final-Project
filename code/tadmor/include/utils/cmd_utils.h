@@ -18,7 +18,6 @@
  */
 bool	cmd_to_str(int fd, char **cmd_str);
 bool	request_opt_tasks(char *fifo_request, uint16_t opcode, uint64_t opt);
-bool    assemble_sq_pl_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses);
-bool    assemble_if_string(int fd, char **cmd_str, bool parentheses);
+bool    assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses);
 
 #endif
