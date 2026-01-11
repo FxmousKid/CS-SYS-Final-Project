@@ -66,7 +66,6 @@ static void	parse_timing_opt(struct s_data *ctx, char *argv[])
 {
 	const char *arg_cur = argv[optind];
 
-	printf("parsing timing options starting at arg '%s'\n", arg_cur);
 	if (strcmp(arg_cur, "-n") == 0) {
 		ctx->cmd.timing.days = 0;
 		ctx->cmd.timing.hours = 0;
@@ -319,8 +318,6 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	argv += optind;
 	if (ctx->pipes_dir[0] == '\0')
 		set_fifos_path_default(ctx);
-
-	print_darr("variadic args", ctx->argv + ctx->current);
 
 	// add cmd and tasks parsing
 	// parse_arguments(ctx, argc, argv);
