@@ -14,6 +14,8 @@
 # include "parser/parse_cmd_sq.h" // IWYU pragma: keep
 # include "parser/parse_cmd_pl.h" // IWYU pragma: keep
 # include "parser/parse_cmd_if.h" // IWYU pragma: keep
+# include "parser/parse_cmd_nd.h" // IWYU pragma: keep
+# include "parser/parse_cmd_or.h" // IWYU pragma: keep
 # include "utils/dir_cmd_utils.h" // IWYU pragma: keep
 
 

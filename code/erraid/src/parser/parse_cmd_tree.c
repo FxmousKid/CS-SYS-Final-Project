@@ -53,6 +53,24 @@ static bool	parse_sub_trees(struct s_cmd *cmd, int *cmd_count)
 			ret_flag &= parse_sub_trees(cmd->cmd.cmd_if.cmd_if_false, cmd_count);
 		break;
 
+	case CMD_ND:
+		if ((cmd->cmd.cmd_nd.nb_cmds = count_sub_cmds(cmd->path)) < 0)
+			goto exit;
+		if (!alloc_and_fill_nd_sub_dirs(&cmd->cmd.cmd_nd, cmd->path))
+			goto exit;
+		for (int i = 0; i < cmd->cmd.cmd_nd.nb_cmds; i++)
+			ret_flag &= parse_sub_trees(&cmd->cmd.cmd_nd.cmds[i], cmd_count);
+		break;
+
+	case CMD_OR:
+		if ((cmd->cmd.cmd_or.nb_cmds = count_sub_cmds(cmd->path)) < 0)
+			goto exit;
+		if (!alloc_and_fill_or_sub_dirs(&cmd->cmd.cmd_or, cmd->path))
+			goto exit;
+		for (int i = 0; i < cmd->cmd.cmd_or.nb_cmds; i++)
+			ret_flag &= parse_sub_trees(&cmd->cmd.cmd_or.cmds[i], cmd_count);
+		break;
+
 	default:
 		ERR_MSG("Unknown command type at parsing")
 		return false;

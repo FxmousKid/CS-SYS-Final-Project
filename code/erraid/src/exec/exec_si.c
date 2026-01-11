@@ -41,7 +41,7 @@ bool	exec_si(struct s_cmd *cmd, int fd_in, int fd_out,
 		if (parent_pl)
 			close_pipes_except(parent_pl, fd_in, fd_out);
 
-		if (cmd_si->stdout_path && \
+		if (fd_out == NO_REDIRECT && cmd_si->stdout_path && \
 		    !setup_output_last_cmd(cmd_si->stdout_path, cmd_si->stderr_path)) {
 			ERR_MSG("setup_output_last_cmd failed in cmd id %d", cmd->cmd_id);
 			exit(EXIT_FAILURE);

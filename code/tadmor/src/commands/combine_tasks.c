@@ -74,3 +74,13 @@ bool	if_tasks(struct s_data *ctx)
 {
 	return combine_tasks(ctx, CMD_IF);
 }
+
+bool	and_tasks(struct s_data *ctx)
+{
+	return combine_tasks(ctx, CMD_ND);
+}
+
+bool	or_tasks(struct s_data *ctx)
+{
+	return combine_tasks(ctx, CMD_OR);
+}

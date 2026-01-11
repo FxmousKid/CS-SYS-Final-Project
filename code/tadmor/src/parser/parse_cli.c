@@ -194,7 +194,14 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[], int *current)
 		ctx->current = optind ;
 		ctx->communication_func = pipeline_tasks;
 		break;
-	
+	case 'A':
+		ctx->communication_func = and_tasks;
+		(*current)++;
+		break;
+	case 'O':
+		ctx->communication_func = or_tasks;
+		(*current)++;
+		break;
 	// set the minutes of a task
 	case 'm':
 		minutes = optarg;
@@ -284,6 +291,8 @@ static void	parse_options(struct s_data *ctx, int argc, char *argv[])
 		{"combine-sequence-command", no_argument, NULL, 's'},
 		{"combine-pipeline-command", no_argument, NULL, 'p'},
 		{"combine-if-command", no_argument, NULL, 'i'},
+		{"combine-and-command", no_argument, NULL, 'A'},
+		{"combine-or-command", no_argument, NULL, 'O'},
 		{"minutes", required_argument, NULL, 'm'},
 		{"hours", required_argument, NULL, 'H'},
 		{"daysofweek", required_argument, NULL, 'd'},

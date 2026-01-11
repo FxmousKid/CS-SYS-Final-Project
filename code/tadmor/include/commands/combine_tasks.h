@@ -18,5 +18,7 @@ bool	combine_tasks(struct s_data *ctx, enum cmd_type type);
 bool	sequence_tasks(struct s_data *ctx);
 bool	pipeline_tasks(struct s_data *ctx);
 bool	if_tasks(struct s_data *ctx);
+bool	and_tasks(struct s_data *ctx);
+bool	or_tasks(struct s_data *ctx);
 
 #endif

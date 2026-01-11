@@ -67,6 +67,10 @@ enum	cmd_type {
 	CMD_PL = 0x504c,
 	/** @brief Conditional "if cmd_1 then cmd_2 (optional ->) else cmd_3 . */
 	CMD_IF = 0x4946,
+	/** @brief AND "cmd1 && cmd2 && cmd3". */
+	CMD_ND	= 0x4E44,
+	/** @brief OR "cmd1 || cmd2 || cmd3". */
+	CMD_OR = 0x4F52,
 };
 
 /** @brief union used to abstract the command type */
@@ -99,7 +103,7 @@ union u_cmd {
 		/** @brief allocated space of nb_cmds - 1 pairs of int, to store the pipes. */
 		int		(*fds)[2];
 		/** @brief number of commands (number of pipes + 1). */
-		int		nb_cmds;
+		int	nb_cmds;
 	} cmd_pl;
 
 	/** @brief struct representing a conditional (if - then - else). */
@@ -113,6 +117,22 @@ union u_cmd {
 		/** @brief command to execute on false condition. */
 		struct s_cmd	*cmd_if_false;
 	} cmd_if;
+	
+	/** @brief struct representing a sequence of and commands */
+	struct s_cmd_nd {
+		/** @brief cmd 0 && ... && cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief number of commands (number of && + 1). */
+		int nb_cmds;
+	} cmd_nd;
+
+	/** @brief struct representing a sequence of or commands */
+	struct s_cmd_or {
+		/** @brief cmd 0 || ... || cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief number of commands (number of || + 1). */
+		int nb_cmds;
+	} cmd_or;
 };
 
 

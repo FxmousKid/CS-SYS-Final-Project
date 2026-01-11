@@ -39,7 +39,18 @@ bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
 		else
 			retval = exec_if(cmd, fd_in, fd_out);
 		break;
-
+	case CMD_ND:
+		if (parent_type == CMD_PL)
+			retval = exec_nd_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_nd(cmd, fd_in, fd_out);
+		break;
+	case CMD_OR:
+		if (parent_type == CMD_PL)
+			retval = exec_or_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_or(cmd, fd_in, fd_out);
+		break;
 
 	default:
 		ERR_MSG("Unknown cmd_type: %d", cmd->cmd_type);
