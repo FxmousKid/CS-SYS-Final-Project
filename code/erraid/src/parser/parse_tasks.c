@@ -36,10 +36,14 @@ static void	set_output_paths_last_command(struct s_cmd *cmd,
 {
 	bool	has_else = false;
 
-	// only the last CMD_SI in the entire tree gets stdout/stderr paths
-	if (cmd->cmd_type == CMD_SI && cmd->cmd_id == last_cmd_id) {
-		cmd->cmd.cmd_si.stdout_path = stdout_path;
-		cmd->cmd.cmd_si.stderr_path = stderr_path;
+	if (cmd->cmd_type == CMD_SI) {
+		if (cmd->cmd_id == last_cmd_id || !is_inside_pipeline) {
+			cmd->cmd.cmd_si.stdout_path = stdout_path;
+			cmd->cmd.cmd_si.stderr_path = stderr_path;
+		} else {
+			cmd->cmd.cmd_si.stdout_path = NULL;
+			cmd->cmd.cmd_si.stderr_path = NULL;
+		}
 		return;
 	}
 
