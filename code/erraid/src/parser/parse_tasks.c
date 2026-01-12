@@ -39,16 +39,28 @@ void	count_individual_cmds(struct s_cmd *cmd, int *count)
 	}
 }
 
-void	set_output_paths_last_command(struct s_cmd *cmd,
-					      int last_cmd_id,
-					      const char *stdout_path,
-					      const char *stderr_path,
-					      bool is_inside_pipeline)
+/**
+ * @brief Recursively sets stdout/stderr paths for all commands in a tree.
+ * 
+ * For pipelines, only the last command gets the paths (others pipe their output).
+ * For all other types (SQ, ND, OR, IF), all commands get the paths.
+ * 
+ * @param cmd The command to process
+ * @param stdout_path Path to stdout file
+ * @param stderr_path Path to stderr file  
+ * @param is_last_in_pipeline True if this command is the last in its parent pipeline
+ */
+static void	set_output_paths_recursive(struct s_cmd *cmd,
+					   const char *stdout_path,
+					   const char *stderr_path,
+					   bool is_last_in_pipeline)
 {
-	bool	has_else = false;
+	if (!cmd)
+		return;
 
 	if (cmd->cmd_type == CMD_SI) {
-		if (cmd->cmd_id == last_cmd_id || !is_inside_pipeline) {
+		// For CMD_SI, set paths only if we're the last in pipeline (or not in a pipeline)
+		if (is_last_in_pipeline) {
 			cmd->cmd.cmd_si.stdout_path = stdout_path;
 			cmd->cmd.cmd_si.stderr_path = stderr_path;
 		} else {
@@ -60,68 +72,73 @@ void	set_output_paths_last_command(struct s_cmd *cmd,
 
 	switch (cmd->cmd_type) {
 	case CMD_PL:
-		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++)
-			set_output_paths_last_command(cmd->cmd.cmd_pl.cmds + i, 
-						      last_cmd_id, 
-						      stdout_path, 
-						      stderr_path,
-						      true);
+		// For pipelines: only the LAST command gets stdout, others get NULL
+		for (int i = 0; i < cmd->cmd.cmd_pl.nb_cmds; i++) {
+			bool is_last = (i == cmd->cmd.cmd_pl.nb_cmds - 1);
+			// Pass is_last_in_pipeline only to the last command of the pipeline
+			set_output_paths_recursive(cmd->cmd.cmd_pl.cmds + i, 
+						   stdout_path, 
+						   stderr_path,
+						   is_last && is_last_in_pipeline);
+		}
 		break;
 
 	case CMD_SQ:
-		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++)
-			set_output_paths_last_command(cmd->cmd.cmd_sq.cmds + i, 
-						      last_cmd_id, 
-						      stdout_path, 
-						      stderr_path,
-						      is_inside_pipeline);
+		// For sequences: propagate is_last_in_pipeline to all children
+		for (int i = 0; i < cmd->cmd.cmd_sq.nb_cmds; i++) {
+			set_output_paths_recursive(cmd->cmd.cmd_sq.cmds + i, 
+						   stdout_path, 
+						   stderr_path,
+						   is_last_in_pipeline);
+		}
 		break;
 
-	case CMD_SI:
-		// not the last command, clear paths
-		cmd->cmd.cmd_si.stdout_path = NULL;
-		cmd->cmd.cmd_si.stderr_path = NULL;
+	case CMD_ND:
+		// For &&: propagate is_last_in_pipeline to all children
+		for (int i = 0; i < cmd->cmd.cmd_nd.nb_cmds; i++) {
+			set_output_paths_recursive(cmd->cmd.cmd_nd.cmds + i, 
+						   stdout_path, 
+						   stderr_path,
+						   is_last_in_pipeline);
+		}
+		break;
+
+	case CMD_OR:
+		// For ||: propagate is_last_in_pipeline to all children
+		for (int i = 0; i < cmd->cmd.cmd_or.nb_cmds; i++) {
+			set_output_paths_recursive(cmd->cmd.cmd_or.cmds + i, 
+						   stdout_path, 
+						   stderr_path,
+						   is_last_in_pipeline);
+		}
 		break;
 
 	case CMD_IF:
-		has_else = (cmd->cmd.cmd_if.cmd_if_false != NULL);
-		set_output_paths_last_command(cmd->cmd.cmd_if.conditional,
-	       				      last_cmd_id,
-					      stdout_path,
-					      stderr_path,
-					      is_inside_pipeline);
-		set_output_paths_last_command(cmd->cmd.cmd_if.cmd_if_true,
-	       				      last_cmd_id, 
-					      stdout_path,
-					      stderr_path,
-					      is_inside_pipeline);
-		if (!has_else)
-			return;
-		set_output_paths_last_command(cmd->cmd.cmd_if.cmd_if_false,
-	       				      last_cmd_id + has_else,
-					      stdout_path,
-					      stderr_path,
-					      is_inside_pipeline);
+		// For if: propagate is_last_in_pipeline to all branches
+		set_output_paths_recursive(cmd->cmd.cmd_if.conditional,
+					   stdout_path, stderr_path, is_last_in_pipeline);
+		set_output_paths_recursive(cmd->cmd.cmd_if.cmd_if_true,
+					   stdout_path, stderr_path, is_last_in_pipeline);
+		if (cmd->cmd.cmd_if.cmd_if_false)
+			set_output_paths_recursive(cmd->cmd.cmd_if.cmd_if_false,
+						   stdout_path, stderr_path, is_last_in_pipeline);
 		break;
-	case CMD_ND:
-		for (int i = 0; i < cmd->cmd.cmd_nd.nb_cmds; i++)
-			set_output_paths_last_command(cmd->cmd.cmd_nd.cmds + i, 
-						      last_cmd_id, 
-						      stdout_path, 
-						      stderr_path,
-						      is_inside_pipeline);
-		break;
-	case CMD_OR:
-		for (int i = 0; i < cmd->cmd.cmd_or.nb_cmds; i++)
-			set_output_paths_last_command(cmd->cmd.cmd_or.cmds + i, 
-						      last_cmd_id, 
-						      stdout_path, 
-						      stderr_path,
-						      is_inside_pipeline);
-		break;
+
 	default:
-		return;
+		break;
 	}
+}
+
+// Wrapper for backward compatibility
+void	set_output_paths_last_command(struct s_cmd *cmd,
+				      int last_cmd_id,
+				      const char *stdout_path,
+				      const char *stderr_path,
+				      bool is_inside_pipeline)
+{
+	(void)last_cmd_id;  // No longer used
+	(void)is_inside_pipeline;  // No longer used
+	set_output_paths_recursive(cmd, stdout_path, stderr_path, true);
 }
 
 static bool	parse_sub_tasks_cmd(struct s_task *task)

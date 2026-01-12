@@ -229,7 +229,11 @@ bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str
 				len += sprintf(str + len, "if ");
 				break;
 			case 1:
-				len  += sprintf(str + len, " ; then ");
+				if (str[len-1] != ')')
+					len  += sprintf(str + len, " ; then ");
+				else
+					len  += sprintf(str + len, " then ");
+
 				break;
 			case 2:
 				len += sprintf(str + len, " else ");
