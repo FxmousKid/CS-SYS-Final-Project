@@ -2,129 +2,96 @@
 
 extern char **environ;
 
-static bool	exec_cmd_si(struct s_cmd_si *cmd_si, uint16_t *exit_code, pid_t *pid)
+bool	exec_cmd(struct s_cmd *cmd, int fd_in, int fd_out,
+	         enum cmd_type parent_type, struct s_cmd_pl *parent_pl)
 {
-	int	status;
+	int			retval = 0;
 
-	if (!cmd_si || !cmd_si->command || !cmd_si->command[0]) {
-		ERR_MSG("Invalid simple command");
-		return false;
-	}
-	
-	if (cmd_si->cmd_path[0] == '\0' &&
-	    !find_binary_path(cmd_si->command[0], cmd_si->cmd_path)) {
-		ERR_MSG("binary not found");
-		return false;
-	}
-	
-	status = 0;
-	*pid = fork();
-	switch((*pid)){
-	case -1:
-		ERR_SYS("fork");
-		return false;
-	case 0:
-		execve(cmd_si->cmd_path, cmd_si->command, environ);
-		ERR_SYS("execve");
-		exit(EXIT_FAILURE);
-	default:
-		waitpid(*pid, &status, 0);
-		*exit_code = WIFEXITED(status) ? WEXITSTATUS(status) : 0xFF;
-		return true;
-	}
-}
-
-static bool	execute_command(struct s_cmd *cmd)
-{
-	bool		success = true;
-	struct s_cmd_sq *cmd_sq;
-
-	if (!cmd) {
-		ERR_MSG("Null command");
-		return false;
-	}
-	
 	switch (cmd->cmd_type) {
 	case CMD_SI:
-		success = exec_cmd_si(&cmd->cmd.cmd_si, &cmd->exit_code, &cmd->pid);
+		if (parent_type == CMD_PL) {
+			retval = exec_si(cmd, fd_in, fd_out, parent_pl);
+			if (!retval) ERR_MSG("exec_si(cmd, %d, %d)", fd_in, fd_out);
+		}
+		else {
+			retval = exec_si_and_wait(cmd, fd_in, fd_out);
+			if (!retval) ERR_MSG("exec_si_and_wait(cmd, %d, %d)", fd_in, fd_out);
+		}
 		break;
+
 	case CMD_SQ:
-		cmd_sq = &cmd->cmd.cmd_sq;
-		for (int i = 0; i < cmd_sq->nb_cmds; i++)
-			success = execute_command(&cmd_sq->cmds[i]);
-				
-		// command sequence exit code should be the last command's exit code
-		if (cmd_sq->nb_cmds > 0)
-			cmd->exit_code = cmd_sq->cmds[cmd_sq->nb_cmds - 1].exit_code;
+		if (parent_type == CMD_PL)
+			retval = exec_sq_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_sq(cmd, fd_in, fd_out);
 		break;
+	
+	case CMD_PL:
+		if (parent_type == CMD_PL)
+			retval = exec_pl_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_pl(cmd, fd_in, fd_out);
+		break;
+
+	case CMD_IF:
+		if (parent_type == CMD_PL)
+			retval = exec_if_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_if(cmd, fd_in, fd_out);
+		break;
+	case CMD_ND:
+		if (parent_type == CMD_PL)
+			retval = exec_nd_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_nd(cmd, fd_in, fd_out);
+		break;
+	case CMD_OR:
+		if (parent_type == CMD_PL)
+			retval = exec_or_if_parent_pl(cmd, parent_pl, fd_in, fd_out);
+		else
+			retval = exec_or(cmd, fd_in, fd_out);
+		break;
+
 	default:
-		ERR_MSG("Unsupported command type");
+		ERR_MSG("Unknown cmd_type: %d", cmd->cmd_type);
 		return false;
 	}
-	return success;
+
+	return retval;
 }
 
-static bool	setup_output_redir(const char *stdout_file, const char *stderr_file)
-{
-	int	stdout_fd;
-	int	stderr_fd;
+// bool	exec_task(struct s_task *task)
+// {
+// 	return exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL);
+// }
 
-	if (stdout_file) {
-		stdout_fd = open(stdout_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-		if (stdout_fd == -1) {
-			ERR_SYS("open stdout");
-			return false;
-		}
-		if (dup2(stdout_fd, STDOUT_FILENO) == -1) {
-			ERR_SYS("dup2 stdout");
-			close(stdout_fd);
-			return false;
-		}
-		close(stdout_fd);
-	}
-    
-	if (stderr_file) {
-		stderr_fd = open(stderr_file, O_WRONLY | O_CREAT | O_TRUNC, 0666);
-		if (stderr_fd == -1) {
-			ERR_SYS("open stderr");
-			return false;
-		}
-		if (dup2(stderr_fd, STDERR_FILENO) == -1) {
-			ERR_SYS("dup2 stderr");
-			close(stderr_fd);
-			return false;
-		}
-		close(stderr_fd);
-	}
-	return true;
-}
-
-static bool	exec_cmd_with_redir(struct s_cmd *cmd,
-			    const char *stdout_path,
-			    const char *stderr_path)
+bool	exec_task(struct s_task *task)
 {
-	pid_t	pid;
-	bool	success;
+	pid_t	pid = 0;
 
 	pid = fork();
-    	switch((pid)){
+	switch (pid) {
 	case -1:
 		ERR_SYS("fork");
 		return false;
-	case 0:
-		if (!setup_output_redir(stdout_path, stderr_path))
-			exit(EXIT_FAILURE);
-		success = execute_command(cmd);
-		exit(success ? cmd->exit_code : EXIT_FAILURE);
-	default:
-		cmd->pid = pid;
-		return true;
-    	}
-}
 
-bool exec_task(struct s_task *task)
-{
-	return exec_cmd_with_redir(task->cmd,
-		 		   task->stdout_path,
-		 		   task->stderr_path);
+	case 0:
+		// Child : execute the task and wait
+		if (task->stdout_path[0] != '\0') {
+			int fd = open(task->stdout_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			if (fd >= 0) close(fd);
+		}
+		if (task->stderr_path[0] != '\0') {
+			int fd = open(task->stderr_path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+			if (fd >= 0) close(fd);
+		}
+		if (!exec_cmd(task->cmd, NO_REDIRECT, NO_REDIRECT, 0, NULL))
+			exit(EXIT_FAILURE);
+		exit(task->cmd->exit_code);
+
+	default:
+		// Parent : store the child pid and return
+		task->cmd->pid = pid;
+		return true;
+	}
 }

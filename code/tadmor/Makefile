@@ -11,10 +11,15 @@ SRC_FILES_NAMES += parser/parse_cli.c
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/buffer_utils.c
 SRC_FILES_NAMES += utils/cmd_utils.c
+SRC_FILES_NAMES += utils/timing_utils.c
 
 SRC_FILES_NAMES += commands/list_tasks.c
 SRC_FILES_NAMES += commands/exitcode_tasks.c
 SRC_FILES_NAMES += commands/std_tasks.c
+SRC_FILES_NAMES += commands/create_tasks.c
+SRC_FILES_NAMES += commands/remove_task.c
+SRC_FILES_NAMES += commands/terminate.c
+SRC_FILES_NAMES += commands/combine_tasks.c
 
 SRC_FILES_NAMES += communication/fifo_api.c
 

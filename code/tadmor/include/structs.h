@@ -44,9 +44,13 @@ enum	cmd_type {
 	CMD_SI = 0x5349,
 	/** @brief Sequence of commands "cmd1 ; cmd2 ; cmd3". */
 	CMD_SQ = 0x5351,
-	CMD_IF,
+	CMD_IF = 0x4946,
 	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
-	CMD_PL,
+	CMD_PL = 0x504C,
+	/** @brief AND "cmd1 && cmd2 && cmd3". */
+	CMD_ND	= 0x4E44,
+	/** @brief OR "cmd1 || cmd2 || cmd3". */
+	CMD_OR = 0x4F52,
 };
 
 struct s_timing {
@@ -70,6 +74,7 @@ struct s_cmd {
 
 
 struct s_data {
+	char		**argv;
 	/** @brief provided or default path to the pipes directory */
 	char		pipes_dir[PATH_MAX + 1 - 100];
 	/** @brief Full path for reply fifo.  */
@@ -86,6 +91,7 @@ struct s_data {
 	uint64_t		task_id;
 	/** @brief flag to indicate if debug mode is enabled. */
 	bool			debug_mode;
+	int		current;
 };
 
 struct s_reply {

@@ -136,27 +136,29 @@ static bool	cmd_to_str_internal(int fd, char **cmd_str, bool parentheses)
 		free_argv(argv);
 		return *cmd_str != NULL;
 		
-	} else if (type == CMD_SQ) {
+	}
+	// TYPE = 'SQ' or 'PL' or 'IF' or 'ND' or 'OR'
+	else {
 		// Read NBCMDS <uint32>
 		if (!read_uint32(fd, &nb_cmds))
 			return false;
-		
-		return assemble_seq_string(fd, nb_cmds, cmd_str, parentheses);
+		return assemble_cmd_string(fd, type, nb_cmds, cmd_str, parentheses);
 	}
 
 	return false;
 }
 
 /**
- * @brief Recursively reads a CMD_SQ from the FIFO and reconstructs the command string.
- * Format: ( [sub_cmd_1] ; [sub_cmd_2] ; ... )
+ * @brief Recursively reads a CMD_SQ or CMD_PL from the FIFO and reconstructs the command string.
+ * Format: ( [sub_cmd_1] ; [sub_cmd_2] ; ... ) or ( [sub_cmd_1] | [sub_cmd_2] | ... )
  *
  * @param fd        The file descriptor to read from.
+ * @param type	    The command type.
  * @param nb_cmds   The number of sub-commands in the sequence.
  * @param cmd_str   Pointer to a char* where the resulting string will be stored.
  * @return true on success, false on read/allocation failure.
  */
-bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parentheses)
+bool assemble_cmd_string(int fd, uint16_t type, uint32_t nb_cmds, char **cmd_str, bool parentheses)
 {
 	char		*str;
 	char		*tmp;
@@ -176,7 +178,6 @@ bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parenthe
 	if (parentheses) {
 		// Start with '('
 		str[len++] = '(';
-		str[len++] = ' ';
 	}
 
 	// For every sub commands
@@ -191,8 +192,7 @@ bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parenthe
 
 		size_t sub_len = strlen(sub_cmd_str);
 
-		// Make sure to have enough space + 3 for ';' / ',' / ')' space and '\0'
-		while (len + sub_len + 3 > size) {
+		while (len + sub_len + 15 > size) {
 			size *= 2;
 			tmp = realloc(str, size);
 			if (!tmp) {
@@ -204,21 +204,60 @@ bool assemble_seq_string(int fd, uint32_t nb_cmds, char **cmd_str, bool parenthe
 			str = tmp;
 		}
 
-		// Add ';' if it's not the first command
+		// Add ';' or '|' if it's not the first command
 		if (i > 0) {
-			str[len++] = ' ';
-			str[len++] = ';';
-			str[len++] = ' ';
+			switch(type){
+			case CMD_SQ:
+				len += sprintf(str + len, " ; ");
+				break;
+			case CMD_PL:
+				len += sprintf(str + len, " | ");
+				break;
+			case CMD_ND:
+				len += sprintf(str + len, " && ");
+				break;
+			case CMD_OR:
+				len += sprintf(str + len, " || ");
+				break;
+			default:
+				break;
+			}
 		}
+		if (type == CMD_IF) {
+			switch (i){
+			case 0:
+				len += sprintf(str + len, "if ");
+				break;
+			case 1:
+				if (str[len-1] != ')')
+					len  += sprintf(str + len, " ; then ");
+				else
+					len  += sprintf(str + len, " then ");
+
+				break;
+			case 2:
+				len += sprintf(str + len, " else ");
+				break;
+			default:
+				break;
+			}
+		}
+
 
 		memcpy(str + len, sub_cmd_str, sub_len);
 		len += sub_len;
 		free(sub_cmd_str);
 	}
 
+	if (type == CMD_IF) {
+		if (str[len-1] != ')')
+			len += sprintf(str + len, " ; fi");
+		else
+			len += sprintf(str + len, " fi");
+	}
+
 	if (parentheses) {
 		// Add ')' at the end
-		str[len++] = ' ';
 		str[len++] = ')';
 	}
 	str[len] = '\0';

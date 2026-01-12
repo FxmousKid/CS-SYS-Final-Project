@@ -1,3 +1,7 @@
+# Projet : planification de tâches
+
+**L3 Informatique - Système**
+
 ## Format de sérialisation des données
 
 La communication entre le client et le serveur, ainsi que le stockage

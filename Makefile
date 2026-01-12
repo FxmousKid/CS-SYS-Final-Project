@@ -43,7 +43,7 @@ distclean:
 	@$(ECHO) "$(BROWN)[CLN] Cleaning all sub-makefiles...$(NC)"
 	@$(MAKE) --no-print-directory -s -C $(TADMOR_DIR) distclean > /dev/null
 	@$(MAKE) --no-print-directory -s -C $(ERRAID_DIR) distclean > /dev/null
-	@rm tadmor erraid 2> /dev/null || true
+	@rm tadmor erraid tadmor.log erraid.log 2> /dev/null || true
 	@$(ECHO) "$(GREEN)[CLN] All sub-makefiles cleaned.$(NC)"
 
 re: distclean all

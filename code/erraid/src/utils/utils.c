@@ -11,7 +11,8 @@ Spawns a deamon that receives tasks to perform at specific times.\n\
 \n\
 Options Valid for the deamon :\n\
 \n\
- -r, --run-directory=PATH\n\
+ -P, --pipes-directory=PATH\n\
+ -R, --run-directory=PATH\n\
  -h, --help\n\
  -l, --little-endian\n\
  -d, --debug\n\
@@ -62,7 +63,7 @@ void	_write_perr(const char *location)
 void	_write_err(const char *location)
 {
 
-	dprintf(get_logfd(), "[%s]\n", location);
+	dprintf(get_logfd(), " [%s]\n", location);
 }
 
 /**
@@ -81,6 +82,10 @@ void	print_cmd_enum(enum cmd_type type, bool newline)
 		printf("CMD_IF");
 	else if (type == CMD_PL)
 		printf("CMD_PL");
+	else if (type == CMD_ND)
+		printf("CMD_ND");
+	else if (type == CMD_OR)
+		printf("CMD_OR");
 	else
 		printf("UNKNOWN_CMD_TYPE");
 	if (newline)
