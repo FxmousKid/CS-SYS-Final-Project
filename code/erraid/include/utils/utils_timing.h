@@ -15,5 +15,6 @@
 
 
 void	print_timing(struct s_timing timing);
+void	print_timing_human(struct s_timing timing);
 
 #endif

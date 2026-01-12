@@ -12,16 +12,32 @@ SRC_FILES_NAMES += parser/parse_timing.c
 SRC_FILES_NAMES += parser/parse_cmd_tree.c
 SRC_FILES_NAMES += parser/parse_cmd_si.c
 SRC_FILES_NAMES += parser/parse_cmd_sq.c
+SRC_FILES_NAMES += parser/parse_cmd_pl.c
+SRC_FILES_NAMES += parser/parse_cmd_if.c
+SRC_FILES_NAMES += parser/parse_cmd_nd.c
+SRC_FILES_NAMES += parser/parse_cmd_or.c
+
 
 SRC_FILES_NAMES += utils/utils.c
 SRC_FILES_NAMES += utils/utils_endian.c
 SRC_FILES_NAMES += utils/binary_utils.c
 SRC_FILES_NAMES += utils/utils_timing.c
 SRC_FILES_NAMES += utils/cmd_utils.c
+SRC_FILES_NAMES += utils/utils_exec.c
 SRC_FILES_NAMES += utils/dir_cmd_utils.c
 SRC_FILES_NAMES += utils/buffer_utils.c
+SRC_FILES_NAMES += utils/task_create_utils.c
+SRC_FILES_NAMES += utils/combine_utils.c
+
 
 SRC_FILES_NAMES += exec/exec.c
+SRC_FILES_NAMES += exec/exec_si.c
+SRC_FILES_NAMES += exec/exec_sq.c
+SRC_FILES_NAMES += exec/exec_pl.c
+SRC_FILES_NAMES += exec/exec_if.c
+SRC_FILES_NAMES += exec/exec_nd.c
+SRC_FILES_NAMES += exec/exec_or.c
+
 
 SRC_FILES_NAMES += daemon/daemon.c
 SRC_FILES_NAMES += daemon/daemon_loop.c
@@ -32,6 +48,10 @@ SRC_FILES_NAMES += commands/list_tasks.c
 SRC_FILES_NAMES += commands/exitcode_tasks.c
 SRC_FILES_NAMES += commands/std_tasks.c
 SRC_FILES_NAMES += commands/commands.c
+SRC_FILES_NAMES += commands/create_tasks.c
+SRC_FILES_NAMES += commands/remove_task.c
+SRC_FILES_NAMES += commands/combine_tasks.c
+SRC_FILES_NAMES += commands/terminate.c
 
 # Full Path to .c files
 SRC_FILES = $(addprefix $(SRC_DIR)/, $(SRC_FILES_NAMES))
@@ -46,7 +66,7 @@ DEP_FILES := $(OBJ_FILES:.o=.d)
 
 NAME 	:= erraid
 CC 	:= cc
-CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3
+CFLAGS	= -Wall -Wextra -Werror -I $(INC_DIR) -MMD -MP -g3 -trigraphs -Wno-trigraphs
 
 LOGFILE_PATH ?= $(PWD)/erraid.log
 CFLAGS	+= -DLOGFILE_PATH=\"$(LOGFILE_PATH)\"

@@ -14,7 +14,7 @@
 # define MAX_LINE_LEN           2048
 # define MAX_TIMING_LEN         512
 # define INITIAL_CMD_STR_SIZE   512
-
+# define INITIAL_BUF_CAPACITY   512
 
 
 #endif
