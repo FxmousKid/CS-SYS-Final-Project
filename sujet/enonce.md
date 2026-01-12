@@ -42,12 +42,21 @@ une éventuelle interruption, (c'est-à-dire si un processus `erraid` a
 terminé, et qu'un nouveau processus est lancé).  Il est donc nécessaire
 que le démon stocke les informations nécessaires sur le disque. Celles-ci
 seront regroupées dans une arborescence dont la racine pourra être passée
-en paramètre à `erraid` grâce à une option `-r RUN_DIRECTORY` (avec comme
+en paramètre à `erraid` grâce à une option `-R RUN_DIRECTORY` (avec comme
 valeur par défaut `/tmp/$USER/erraid`).  Cette arborescence contiendra au
 minimum une sous-arborescence `tasks` décrivant les tâches à effectuer,
 selon le format décrit dans le fichier
 [arborescence.md](arborescence.md).
 
+`erraid` doit proposer les options suivantes :
+
+ * `-F` : exécution en avant-plan sans démonisation
+ 
+ * `-R RUN_DIR` : définition du répertoire de stockage (par défaut `/tmp/$USER/erraid`)
+
+ * `-P PIPES_DIR` : définition du répertoire contenant les tubes de
+   communication avec le client (par défaut le sous-répertoire `pipes` de
+   `RUN_DIR`)
 
 ### Le client
 
@@ -58,14 +67,19 @@ réponse du démon, qu'il interprète puis affiche le cas échéant sur sa
 sortie standard dans un format adapté à un utilisateur humain avant de
 terminer.
 
-`tadmor` devra proposer au minimum les options suivantes :
+`tadmor` doit proposer au minimum les options suivantes :
 
 ##### Création/suppression de tâches
 
  * `-c [-m MINUTES] [-H HOURS] [-d DAYSOFWEEK] CMD [ARG_1] ... [ARG_N]` : création d'une tâche simple 
 
  * `-s [-m MINUTES] [-H HOURS] [-d DAYSOFWEEK] TASKID_1 ... TASKID_N` :
-   combinaison séquentielle des tâches d'identifiants `TASKID_1` à `TASKID_N`; la commande à exécuter est `(CMD_1 ; ... ; CMD_N)`
+   combinaison séquentielle des tâches d'identifiants `TASKID_1` à `TASKID_N`; la commande à exécuter est `( CMD_1 ; ... ; CMD_N )`
+
+ * `-p [-m MINUTES] [-H HOURS] [-d DAYSOFWEEK] TASKID_1 ... TASKID_N` :
+   combinaison en _pipeline_ des tâches d'identifiants `TASKID_1` à `TASKID_N`; la commande à exécuter est `( CMD_1 | ... | CMD_N )`
+
+ * `-i [-m MINUTES] [-H HOURS] [-d DAYSOFWEEK] TASKID_1 TASKID_2 [TASKID_3]` : combinaison conditionnelle des tâches d'identifiants `TASKID_1`, `TASKID_2` et éventuellement `TASKID_3`; la commande à exécuter est `( if CMD_1 ; then CMD_2 ; else CMD_3 ; fi )`
 
  * `-n` : en combinaison avec les précédentes, définition d'une tâche
    sans horaire d'exécution (donc qui ne sera jamais exécutée, et
@@ -76,7 +90,7 @@ terminer.
 
 ##### Consultation des données du serveur
 
- * `-l` : liste des tâches
+ * `-l` : liste des tâches avec identifiant
 
  * `-x TASKID` : liste datée des valeurs de retour des exécutions de la
    tâche d'identifiant `TASKID`
@@ -90,11 +104,29 @@ terminer.
 
 ##### Divers
 
- * `-p PIPES_DIR` : définition du répertoire contenant les tubes de
+ * `-P PIPES_DIR` : définition du répertoire contenant les tubes de
    communication avec le démon (par défaut `/tmp/$USER/erraid/pipes`)
 
  * `-q` : arrêt du démon
 
+
+##### Format d'affichage de `tadmor -l`
+
+L'affichage comprend une ligne par tâche, dans un ordre quelconque, avec
+pour chaque tâche, séparés par des espaces : 
+ * son identifiant suivi de `:`,
+ * ses dates d'exécution programmées au format usuel de `cron`, ou `- - -` pour les tâches abstraites,
+ * la commande à exécuter, au format suivant :
+    - chaque sous-combinaison de commandes est délimitée par des parenthèses,
+    - les commandes simples ne sont pas parenthésées,
+    - les parenthèses externes autour d'une combinaison de commandes sont facultatives,
+    - les sous-commandes (simples ou combinées) combinées en séquence sont séparées par des `;`,
+    - les sous-commandes (simples ou combinées) combinées en pipeline sont séparées par des `|`,
+    - les sous-commandes d'une combinaison conditionnelle sont délimitées par les mots-clés `if`, `then`, (`else`) et `fi`,
+    - entre une sous-commande **simple** d'une combinaison conditionnelle et le mot-clé suivant, le délimiteur `;`
+      est impératif,
+    - il n'y a pas de `;` entre une sous-commande d'une combinaison conditionnelle et le mot-clé suivant si elle est elle-même **combinée** (donc délimitée par des parenthèses),
+    - les espaces autour des parenthèses et des connecteurs `;` et `|` sont facultatifs.
 
 ### Communication
 
@@ -105,21 +137,21 @@ Pour communiquer, `erraid` et `tadmor` utilisent deux tubes nommés :
     appelés _réponses_), de nom `erraid-reply-pipe`.
 
 Ces fichiers se trouvent dans un répertoire dédié, défini par l'option
-`-p PIPES_DIR` du démon (par défaut le sous-répertoire `pipes` de son
+`-P PIPES_DIR` du démon (par défaut le sous-répertoire `pipes` de son
 arborescence de stockage).  Ils sont créés par le démon au démarrage
 s'ils n'existent pas.
 
 Les requêtes et les réponses doivent respecter le format décrit dans le
 fichier [protocole.md](protocole.md), en utilisant les mêmes conventions
-de [serialisation](sérialisation.md) que pour l'arborescence des tâches.
+de [sérialisation](serialisation.md) que pour l'arborescence des tâches.
 
 
 ### Exemple d'utilisation :
 
 ```bash
 $ tadmor -l                     # liste des tâches définies antérieurement
-37: 30 19 1 echo "C'est lundi, c'est ravioli"
-68: 0 5 * echo "Il est 5 heures, Paris s'éveille..."
+37: 30 19 1 echo "C'est lundi, c'est ravioli"           # à exécuter tous les lundis à 19h30
+68: 0 5 * echo "Il est 5 heures, Paris s'éveille..."    # à exécuter tous les jours à 5h00
 $ tadmor -r 37                  # suppression des tâches antérieures
 $ tadmor -r 68
 $ tadmor -l                     # il n'y a plus de tâche définie
@@ -131,7 +163,7 @@ $ tadmor -c -n echo au revoir   # création d'une tâche "abstraite", sans exéc
 83
 $ tadmor -l                     # liste des 3 tâches nouvellement créées
 81: * * * echo coucou
-82: 0,3,6 * * date
+82: 0,3,6,9 * * date
 83: - - - echo au revoir
 $ tadmor -x 81                  # un peu plus tard, quelques exécutions ont eu lieu
 2025-10-21 17:59:00 0
@@ -147,7 +179,7 @@ $ tadmor -x 83                  # mais pas pour la tâche "abstraite"
 $ tadmor -s 81 82 83            # création d'une nouvelle tâche par combinaison séquentielle des 3 préexistantes
 84
 $ tadmor -l                     # les sous-tâches combinées n'existent plus
-84: * * * (echo coucou; date; echo au revoir)
+84: * * * ( echo coucou ; date ; echo au revoir )
 $ tadmor -x 84                  # un peu plus tard...
 2025-10-21 18:05:00 0
 2025-10-21 18:06:00 0
@@ -156,6 +188,25 @@ $ tadmor -o 84                  # sortie standard de la dernière exécution
 coucou
 mar. 21 oct. 2025 18:07:00 CEST
 au revoir
+$ tadmor -r 84
+$ tadmor -c -n host -W 1 informatique.u-paris.fr
+85
+$ tadmor -c -n mr up
+86
+$ tadmor -c -n tail -1
+87
+$ tadmor -c -n echo UFR injoignable
+88
+$ tadmor -p -n 86 87            # création d'une nouvelle tâche par combinaison en pipeline de 2 tâches préexistantes
+89
+$ tadmor -l
+85: - - - host -W 1 informatique.u-paris.fr
+88: - - - echo UFR injoignable
+89: - - - ( mr up | tail -1 )
+$ tadmor -i 85 89 88 -m 0       # création d'une nouvelle tâche par combinaison conditionnelle de 3 tâches préexistantes
+90
+$ tadmor -l
+90: 0 * * ( if host -W 1 informatique.u-paris.fr ; then ( mr up | tail -1 ) else echo UFR injoignable ; fi )
 ```
 
 
@@ -220,7 +271,7 @@ soutenance, et un rendu final avec soutenance. Les deux jalons
 intermédiaires seront évalués par des tests automatiques.
 
 
-### Premier jalon le 21 novembre
+### Premier jalon le ~~21 novembre~~ 25 novembre
 
 La version à évaluer devra être spécifiée à l'aide du tag `jalon-1` sur
 la branche `main`.
@@ -247,7 +298,7 @@ Points testés :
  - mise à jour des fichiers de log (valeurs de retour et sorties standard)
 
 
-### Deuxième jalon le 12 décembre
+### Deuxième jalon le ~~12 décembre~~ 15 décembre
 
 La version à évaluer devra être spécifiée à l'aide du tag `jalon-2`.
 
@@ -261,13 +312,25 @@ statique, et répondre aux requêtes du client.  On se limite toujours aux
 tâches simples ou combinées en séquences. 
 
 
-### Rendu final
+### Rendu final le 11 janvier 2026
 
 La version à évaluer devra être spécifiée à l'aide du tag `rendu-final`.
 
-Le projet final devra être rendu à une date encore à définir mais au plus
-tard le 10 janvier, pour des soutenances dans la semaine du 12 janvier
-2026.
+Pour permettre le regroupement correct des commits de chaque auteur par
+`git shortlog`, ajouter un fichier `.mailmap` contenant une ligne de la forme
+```
+NOM Prénom <adresse-mail>
+```
+pour chaque adresse mail apparaissant dans les commits, par exemple :
+```
+TOURNESOL Tryphon <tryphon@moulinsart.be>
+TOURNESOL Tryphon <professeur.tournesol@hotel-cornavin.ch>
+TOURNESOL Tryphon <professeur.tournesol@cra-sbrodj.sy>
+```
+
+Le projet final devra être rendu ~~à une date encore à définir mais au
+plus tard le 10~~ le 11 janvier au soir, pour des soutenances ~~dans la
+semaine du 12~~ les 13, 14 et 15 janvier 2026.
 
 ### Participation effective
 

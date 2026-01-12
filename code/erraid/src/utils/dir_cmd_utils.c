@@ -142,48 +142,90 @@ bool	create_initial_dirs(const char *run_dir)
 
 bool create_dirs_recursive(const char *path, mode_t mode)
 {
-    char *path_copy;
-    char *p;
-    struct stat st;
+	char *path_copy;
+	char *p;
+	struct stat st;
 
-    // Check if path already exists
-    if (stat(path, &st) == 0) {
-        if (S_ISDIR(st.st_mode))
-            return true;
-        return false; // If it's a file
-    }
+	// Check if path already exists
+	if (stat(path, &st) == 0) {
+		if (S_ISDIR(st.st_mode))
+		return true;
+		return false; // If it's a file
+	}
 
-    path_copy = strdup(path);
-    if (!path_copy)
-        return false;
-
-    for (p = path_copy + 1; *p; p++)
-    {
-        if (*p == '/') {
-            *p = '\0';
-
-            // Create intermediate dir if it does not exist
-            if (stat(path_copy, &st) != 0 &&
-		mkdir(path_copy, mode) != 0 && errno != EEXIST) {
-
-		free(path_copy);
+	path_copy = strdup(path);
+	if (!path_copy)
 		return false;
 
-            }else if (!S_ISDIR(st.st_mode)) {
-                // File exists with this name
-                free(path_copy);
-                return false;
-            }
-            *p = '/';
-        }
-    }
+	for (p = path_copy + 1; *p; p++)
+	{
+		if (*p == '/') {
+		*p = '\0';
 
-    // Create final directory
-    if (mkdir(path_copy, mode) != 0 && errno != EEXIST) {
-        free(path_copy);
-        return false;
-    }
+		// Create intermediate dir if it does not exist
+		if (stat(path_copy, &st) != 0 &&
+			mkdir(path_copy, mode) != 0 && errno != EEXIST) {
 
-    free(path_copy);
-    return true;
+			free(path_copy);
+			return false;
+
+		}else if (!S_ISDIR(st.st_mode)) {
+			// File exists with this name
+			free(path_copy);
+			return false;
+		}
+		*p = '/';
+		}
+	}
+
+	// Create final directory
+	if (mkdir(path_copy, mode) != 0 && errno != EEXIST) {
+		free(path_copy);
+		return false;
+	}
+
+	free(path_copy);
+	return true;
+}
+
+bool recursive_rm(const char *path)
+{
+	DIR *dir;
+	struct dirent *p;
+	size_t path_len;
+	struct stat statbuf;
+	bool success = true;
+
+	dir = opendir(path);
+	path_len = strlen(path);
+
+	if (!dir)
+		return false;
+
+	while (success && (p = readdir(dir))) {
+		// Ignore '.' and '..'
+		if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+			continue;
+
+		char *buf = malloc(path_len + strlen(p->d_name) + 2);
+		if (buf) {
+			sprintf(buf, "%s/%s", path, p->d_name);
+			if (!stat(buf, &statbuf)) {
+				if (S_ISDIR(statbuf.st_mode))
+					// Need to delete entries recursively from this dir
+					success = recursive_rm(buf);
+				else
+					// Not a dir, just unlink it
+					success = (unlink(buf) == 0);
+			}
+			free(buf);
+		}
+	}
+	closedir(dir);
+
+	if (success)
+		// Finally delete directory
+		success = (rmdir(path) == 0);
+
+	return success;
 }

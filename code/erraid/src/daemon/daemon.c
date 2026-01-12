@@ -26,6 +26,11 @@ bool    is_daemon_running()
         return running;
 }
 
+void    stop_daemon()
+{
+        running = 0;
+}
+
 /**
  * @brief daemonize the process (see man 7 daemon for every steps)
  */

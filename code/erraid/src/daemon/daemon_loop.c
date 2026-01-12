@@ -91,7 +91,7 @@ static int	check_date(struct s_task *task)
 		((task->timing.days >> t->tm_wday) & 1));
 }
 
-static void	exec_tasks_loop_debug(struct s_data *ctx)
+static void	exec_tasks_loop_debug(struct s_data *ctx, bool instant)
 {
 	struct s_task 	*current_task;
 	taskid_t	task_id;
@@ -112,7 +112,7 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 		// printf("stderr: %s\n", current_task->stderr_path);
                 // printf("times-exitcodes: %s\n", current_task->texit_path);
 
-		if (check_date(current_task)) {
+		if (check_date(current_task) || instant) {
 			current_task->launch_time = (int64_t)time(NULL);
 			exec_task(current_task);
 			printf("Task %" PRId64 " launched successfully\n", task_id);
@@ -126,13 +126,13 @@ static void	exec_tasks_loop_debug(struct s_data *ctx)
 	printf("\n\tTotal: %d tasks\n", task_count);
 }
 
-static void     exec_tasks_loop(struct s_data *ctx)
+static void     exec_tasks_loop(struct s_data *ctx, bool instant)
 {
 	struct s_task *current_task;
 
 	current_task = ctx->tasks;
 	while (current_task) {
-		if (check_date(current_task)) {
+		if (check_date(current_task) || instant) {
 			current_task->launch_time = (int64_t)time(NULL);
 			exec_task(current_task);
 		}
@@ -169,7 +169,7 @@ void    daemon_loop(struct s_data *ctx)
 		current_time = time(NULL);
 		// Check every minute if a task can be executed
 		if (current_time >= next_execution) {
-			ctx->debug_mode ? exec_tasks_loop_debug(ctx) : exec_tasks_loop(ctx);
+			ctx->debug_mode ? exec_tasks_loop_debug(ctx, ctx->exec_instant) : exec_tasks_loop(ctx, ctx->exec_instant);
 			next_execution = ((current_time/60) + 1) * 60;
 		}
 		// Wait 1 sec, maybe change it to 30s or 60s.
