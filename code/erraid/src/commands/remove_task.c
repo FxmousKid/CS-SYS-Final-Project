@@ -3,8 +3,9 @@
 static bool	del_task_dir(struct s_data *ctx, uint64_t taskid)
 {
 
-	char taskid_dir [PATH_MAX + 1] = {0};
-	char taskid_str [PATH_MAX + 1] = {0};
+	char taskid_dir[PATH_MAX + 1] = {0};
+	char taskid_dir_final[PATH_MAX + 1] = {0};
+	char taskid_str[PATH_MAX + 1] = {0};
 
 	// Build run_dir/tasks directory path
 	if (!build_safe_path(taskid_dir, sizeof(taskid_dir), ctx->run_directory, TASKS_DIR)) {
@@ -15,13 +16,13 @@ static bool	del_task_dir(struct s_data *ctx, uint64_t taskid)
 	snprintf(taskid_str, sizeof(taskid_str), "%" PRIu64, taskid);
 
 	// Build run_dir/tasks/taskid directory path
-	if (!build_safe_path(taskid_dir, sizeof(taskid_dir), taskid_dir, taskid_str)) {
+	if (!build_safe_path(taskid_dir_final, sizeof(taskid_dir), taskid_dir, taskid_str)) {
 		ERR_MSG("Failed to build taskid_dir directory %s", taskid_dir);
 		return false;
 	}
 	// Delete taskid dir and all its files/repertory inside
-	if (!recursive_rm(taskid_dir)) {
-		ERR_MSG("Failed to delete directory %s", taskid_dir);
+	if (!recursive_rm(taskid_dir_final)) {
+		ERR_MSG("Failed to delete directory %s", taskid_dir_final);
 		return false;
 	}
 	return true;
