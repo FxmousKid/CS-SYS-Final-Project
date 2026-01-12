@@ -38,6 +38,10 @@ error:
 		return false;
 	if (close(fd_reply) < 0)
 		return false;
+	// If the task hasn't been executed yet (OPCODE_NR), return success
+	// but write nothing to stdout (task will have empty stdout/stderr)
+	if (errtype == 0x4e52)
+		return true;
 	return false;
 	
 }
