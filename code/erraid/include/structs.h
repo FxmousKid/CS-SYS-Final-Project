@@ -8,7 +8,7 @@
 # include <stdbool.h>
 # include <dirent.h>
 
-# include "macros.h"
+# include "macros.h" // IWYU pragma: keep
 
 typedef uint64_t	taskid_t;
 
@@ -50,25 +50,42 @@ enum reply_opcode {
 	OPCODE_ER = 0x4552,
 };
 
+enum reply_errcode {
+	/** @brief Task id not found */
+	OPCODE_NF = 0x4e46,
+	/** @brief Task has not been executed yet */
+	OPCODE_NR = 0x4e52,
+};
+
 
 enum	cmd_type {
 	/** @brief Simple command "echo hello". */
 	CMD_SI = 0x5349,
-	/** @brief Sequence of commands "cmd1 ; cmd2 ; cmd3". */
+	/** @brief Sequence of commands "cmd_1 ; ... ; cmd_n". */
 	CMD_SQ = 0x5351,
-	CMD_IF,
-	/** @brief Pipeline "cmd1 | cmd2 | cmd3". */
-	CMD_PL,
+	/** @brief Pipeline "cmd_1 | ... | cmd_n". */
+	CMD_PL = 0x504c,
+	/** @brief Conditional "if cmd_1 then cmd_2 (optional ->) else cmd_3 . */
+	CMD_IF = 0x4946,
+	/** @brief AND "cmd1 && cmd2 && cmd3". */
+	CMD_ND	= 0x4E44,
+	/** @brief OR "cmd1 || cmd2 || cmd3". */
+	CMD_OR = 0x4F52,
 };
 
 /** @brief union used to abstract the command type */
 union u_cmd {
 	/** @brief struct representing a simple command */
 	struct s_cmd_si {
+		int		fd_in;
+		int		fd_out;
+		int		fd_err;
+		const char	*stdout_path;
+		const char	*stderr_path;
 		/** @brief absolute cmd path : "/usr/bin/echo" */
-		char	cmd_path[PATH_MAX + 1];
+		char		cmd_path[PATH_MAX + 1];
 		/** @brief execve compliant char ** : {"echo", "lol", NULL}. */
-		char	**command;
+		char		**command;
 	} cmd_si;
 
 	/** @brief struct representing a sequence of commands */
@@ -78,10 +95,58 @@ union u_cmd {
 		/** @brief number of commands (number of semi-colons + 1). */
 		int		nb_cmds;
 	} cmd_sq;
+
+	/** @brief struct representing a pipeline of commands. */
+	struct s_cmd_pl {
+		/** @brief cmd 0 | ... | cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief allocated space of nb_cmds - 1 pairs of int, to store the pipes. */
+		int		(*fds)[2];
+		/** @brief number of commands (number of pipes + 1). */
+		int	nb_cmds;
+	} cmd_pl;
+
+	/** @brief struct representing a conditional (if - then - else). */
+	struct s_cmd_if {
+		/** @brief command whose exit code will be the conditional :
+		 * if (conditional->exit_code == 0) 
+		 * then exec(cmd_if_true) else exec(cmd_if_false)*/
+		struct s_cmd	*conditional;
+		/** @brief command to execute on true condition. */
+		struct s_cmd	*cmd_if_true;
+		/** @brief command to execute on false condition. */
+		struct s_cmd	*cmd_if_false;
+	} cmd_if;
+	
+	/** @brief struct representing a sequence of and commands */
+	struct s_cmd_nd {
+		/** @brief cmd 0 && ... && cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief number of commands (number of && + 1). */
+		int nb_cmds;
+	} cmd_nd;
+
+	/** @brief struct representing a sequence of or commands */
+	struct s_cmd_or {
+		/** @brief cmd 0 || ... || cmd n - 1 <=> cmds[0], ... , cmds[n-1]. */
+		struct s_cmd	*cmds;
+		/** @brief number of commands (number of || + 1). */
+		int nb_cmds;
+	} cmd_or;
+};
+
+
+struct s_timing {
+	uint64_t	minutes;
+	uint32_t	hours;
+	uint8_t		days;
 };
 
 /** @brief struct representing a abstract command via a tagged union*/
 struct s_cmd {
+	/** @brief The "index" of the command (0 or 1 indexed doesn't matter
+	*   what matters is the fact that the order remains. */
+	int		cmd_id;
 	DIR		*cmd_dir;
 	char		path[PATH_MAX + 1];
 	enum cmd_type	cmd_type;
@@ -90,13 +155,9 @@ struct s_cmd {
 	uint16_t	exit_code;
 };
 
-struct s_timing {
-	uint64_t	minutes;
-	uint32_t	hours;
-	uint8_t		days;
-};
-
 struct s_task {
+	/** @brief The number of sub commands. */
+	int		sub_cmds_count;
 	char		path[PATH_MAX + 1];
 	char		stdout_path[PATH_MAX + 1];
 	char		stderr_path[PATH_MAX + 1];
@@ -106,14 +167,22 @@ struct s_task {
 	struct s_task	*next;
 	taskid_t	task_id;
 	int64_t		launch_time;
+	bool		new_task;
 };
 
 /* @brief struct representing the daemon data */
 struct s_data {
+	/** @brief wether to wait for the right timing or to execute
+	*   all tasks instantly. */
+	bool		exec_instant;
 	/** @brief Ptr to first tasks, linked list like structure*/
 	struct s_task	*tasks;
+	/** @brief max number of taskid -> not create a taskid that already exist*/
+	taskid_t	max_taskid;
 	/** @brief exit code of the daemon. */
 	uint8_t		exit_code;
+	/** @brief to execute in foreground (no daemonization). */
+	bool		foreground;
 	/** @brief provided or default path to the run directory. *
 	 * '- 100' to keep space for dedicated folders like tasks/ */
 	char		run_directory[PATH_MAX + 1 - 100];
@@ -127,6 +196,7 @@ struct s_data {
 	bool		is_data_le;
 	/** @brief flag to indicate if debug mode is enabled. */
 	bool		debug_mode;
+	int		nb_base_tasks;
 };
 
 #endif

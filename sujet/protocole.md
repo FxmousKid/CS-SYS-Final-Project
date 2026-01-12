@@ -1,3 +1,7 @@
+# Projet : planification de tâches
+
+**L3 Informatique - Système**
+
 ## Protocole de communication entre le client et le démon
 
 
@@ -33,7 +37,7 @@ OPCODE='LS' <uint16>
 #### Requête CREATE
 
 ```
-OPCODE='CR' <uint16>, TIMING <timing>, COMMAND <arguments>
+OPCODE='CR' <uint16>, TIMING <timing>, ARGUMENTS <arguments>
 ```
 
 #### Requête COMBINE
@@ -96,9 +100,9 @@ Seule une réponse OK est possible :
 
 ```
 ANSTYPE='OK' <uint16>, NBTASKS=N <uint32>,
-TASK[0].TASKID <uint64>, TASK[0].TIMING <timing>, TASK[0].COMMANDLINE <commandline>,
+TASK[0].TASKID <uint64>, TASK[0].TIMING <timing>, TASK[0].COMMAND <command>,
 ...
-TASK[N-1].TASKID <uint64>, TASK[N-1].TIMING <timing>, TASK[N-1].COMMANDLINE <commandline>
+TASK[N-1].TASKID <uint64>, TASK[N-1].TIMING <timing>, TASK[N-1].COMMAND <command>
 ```
 
 
@@ -251,11 +255,11 @@ TIMING.MINUTES         : 00 00 00 00 00 00  00 01  |........|
 TIMING.HOURS           : 00 00 42 00               |..B.|
 TIMING.DAYSOFWEEK      : 08                        |.|
 
-COMMAND.ARGC           : 00 00 00 02               |....|
-COMMAND.ARGV[0].LENGTH : 00 00 00 04               |....|
-COMMAND.ARGV[0].DATA   : 65 63 68 6f               |echo|
-COMMAND.ARGV[1].LENGTH : 00 00 00 06               |....|
-COMMAND.ARGV[1].DATA   : 63 6f 75 63 6f 75         |coucou|
+ARGUMENTS.ARGC           : 00 00 00 02               |....|
+ARGUMENTS.ARGV[0].LENGTH : 00 00 00 04               |....|
+ARGUMENTS.ARGV[0].DATA   : 65 63 68 6f               |echo|
+ARGUMENTS.ARGV[1].LENGTH : 00 00 00 06               |....|
+ARGUMENTS.ARGV[1].DATA   : 63 6f 75 63 6f 75         |coucou|
 ```
 
 

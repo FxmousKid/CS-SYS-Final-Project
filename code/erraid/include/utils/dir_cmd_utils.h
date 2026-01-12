@@ -44,4 +44,7 @@ bool	create_initial_dirs(const char *run_dir);
 /** @brief performs a recursive mkdir like mkdir -p */
 bool    create_dirs_recursive(const char *path, mode_t mode);
 
+/** @brief performs a recursive rm like rm -r */
+bool    recursive_rm(const char *path);
+
 #endif
