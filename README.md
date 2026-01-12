@@ -2,7 +2,7 @@
   <h1>erraid & tadmor</h1>
   <p><strong>A task scheduling daemon-client system for automated command execution.</strong></p>
 
-  <p>
+<p>
     <a href="https://en.wikipedia.org/wiki/C_(programming_language)"><img src="https://img.shields.io/badge/Language-C-00599C?style=flat-square&logo=c&logoColor=white" alt="C"/></a>
     <a href="https://pubs.opengroup.org/onlinepubs/9699919799/"><img src="https://img.shields.io/badge/POSIX-Compliant-4EAA25?style=flat-square" alt="POSIX"/></a>
     <a href="https://www.gnu.org/software/make/"><img src="https://img.shields.io/badge/Make-Build%20System-427819?style=flat-square&logo=gnu&logoColor=white" alt="Make"/></a>
@@ -16,7 +16,7 @@
 
 ## Features
 
-- **Complex Command Support**: Execute simple commands, sequences (`;`), pipelines (`|`), and conditionals (`if-then-else`)
+- **Complex Command Support**: Execute simple commands, sequences (`;`), pipelines (`|`), conditionals (`if-then-else, &&, ||`)
 - **Flexible Scheduling**: Cron-like scheduling with minute, hour, and day-of-week specifications
 - **Persistent Storage**: Task definitions and execution history stored on disk for recovery after restarts
 - **Nested Pipelines**: Support for pipelines containing sequences and nested pipelines
@@ -43,18 +43,22 @@
 ### Installation
 
 1. **Clone the repository**:
+   
    ```bash
    git clone <repository-url>
    cd SY5-Projet
    ```
 
 2. **Build the project**:
+   
    ```bash
    make
    ```
+   
    This creates both `erraid` and `tadmor` executables in the root directory.
 
 3. **Clean build artifacts**:
+   
    ```bash
    make distclean
    ```
@@ -62,25 +66,31 @@
 ### Quick Start
 
 1. **Start the daemon** (in foreground for testing):
+   
    ```bash
    ./erraid -F -I -R /tmp/my-erraid
    ```
+   
    - `-F`: Run in foreground (no daemonization)
    - `-I`: Execute tasks immediately (for testing)
    - `-R`: Specify run directory
 
 2. **Create a task** (in another terminal):
+   
    ```bash
-   ./tadmor -c echo "Hello, World!"
+   ./tadmor -c echo Hello, World!
    ```
+   
    This creates a task that runs every minute.
 
 3. **List tasks**:
+   
    ```bash
    ./tadmor -l
    ```
 
 4. **View execution history**:
+   
    ```bash
    ./tadmor -x <TASKID>
    ```
@@ -91,7 +101,7 @@
 
 ```bash
 # Simple command (runs every minute)
-./tadmor -c echo "Hello"
+./tadmor -c echo Hello
 
 # Scheduled task (runs at 9:00 AM every day)
 ./tadmor -c -H 9 date
@@ -102,8 +112,14 @@
 # Pipeline
 ./tadmor -p 85 86 87
 
-# Conditional
+# Conditional if-then-else
 ./tadmor -i 88 89 90
+
+# Conditional &&
+./tadmor -A 92 93 94
+
+# Conditional ||
+./tadmor -O 96 97
 ```
 
 ### Managing Tasks
@@ -153,6 +169,8 @@ graph TD
 - **CMD_SQ**: Sequence (e.g., `cmd1 ; cmd2 ; cmd3`)
 - **CMD_PL**: Pipeline (e.g., `cmd1 | cmd2 | cmd3`)
 - **CMD_IF**: Conditional (e.g., `if cmd1 ; then cmd2 ; else cmd3 ; fi`)
+- **CMD_ND**: Conditional (e.g., `cmd1 && cmd2 && cmd3`)
+- **CMD_OR**: Conditional (e.g., `cmd1 || cmd2 || cmd3`)
 
 ## Project Structure
 
@@ -191,6 +209,7 @@ cd code/tadmor && make
 ### Debug Mode
 
 Run the daemon with debug output:
+
 ```bash
 ./erraid -F -d -R /tmp/my-erraid
 ```
@@ -198,6 +217,7 @@ Run the daemon with debug output:
 ### Testing
 
 Test files are located in `test_git/`:
+
 ```bash
 cd test_git
 ./autotests.sh
