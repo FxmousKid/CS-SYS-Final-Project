@@ -1,5 +1,7 @@
 #include "parser/parse_cli.h"
 
+static int minus_i_idx;
+
 static void	set_fifos_path_default(struct s_data *ctx)
 {
 	char    *user;
@@ -180,6 +182,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 	// creates a if command
 	case 'i':
 		parse_timing_opt(ctx, argv);
+		minus_i_idx = optind;
 		argv = argv + optind - 1;
 		ctx->argv = argv;
 		ctx->current = optind ;
@@ -194,12 +197,15 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 		ctx->current = optind ;
 		ctx->communication_func = pipeline_tasks;
 		break;
+
 	case 'A':
 		ctx->communication_func = and_tasks;
 		break;
+
 	case 'O':
 		ctx->communication_func = or_tasks;
 		break;
+
 	case 'm':
 		minutes = optarg;
 		ctx->cmd.timing.minutes = parse_minutes(minutes);
@@ -252,8 +258,7 @@ static bool	opts_handle(struct s_data *ctx, int opt, char *argv[])
 
 	// Unknown opts
 	case '?':
-		ERR_MSG("Unkown option '%s'", argv[optind]);
-		fprintf(stderr, "Check usage with -h, --help\n");
+		ERR_MSG("Unknown option '%s'", argv[optind]);
 		ctx->exit_code = false;
 		return false;
 
@@ -314,6 +319,9 @@ bool	parse_cli(struct s_data *ctx, int argc, char *argv[])
 	ctx->cmd.timing.hours = 0x00FFFFFF;
 	ctx->cmd.timing.minutes = 0x0FFFFFFFFFFFFFFF;
 	parse_options(ctx, argc, argv);
+
+	if (ctx->communication_func == if_tasks)
+		ctx->argv[minus_i_idx + ctx->current - 1] = NULL;
 
 	argc -= optind;
 	argv += optind;
