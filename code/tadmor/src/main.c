@@ -9,6 +9,9 @@ int main(int argc, char *argv[])
 
 	parse_cli(&ctx, argc, argv);
 
-	// Segfault if no option given
+	// If no option given, just return success
+	if (!ctx.communication_func)
+		return 0;
+
 	return !ctx.communication_func(&ctx);
 }
