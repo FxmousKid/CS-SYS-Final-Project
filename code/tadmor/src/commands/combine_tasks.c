@@ -16,6 +16,7 @@ static bool	request_combine_tasks(struct s_data *ctx, enum cmd_type type)
 	if (get_arg_len(ctx->argv + ctx->current) < 2
 	|| (type == CMD_IF && get_arg_len(ctx->argv + ctx->current) > 3)) {
 		buffer_free(&buf);
+		ERR_MSG("Invalid number of task IDs for combine command")
 		return false;
 	}
 	buffer_append_taskids(&buf, ctx->argv + ctx->current);
@@ -42,8 +43,10 @@ static bool	handle_combine_reply(struct s_data *ctx)
 	if (!read_uint16(fd_reply, &ans))
 		return false;
 
-	if (ans == OPCODE_ER)
+	if (ans == OPCODE_ER) {
+		ERR_MSG("Daemon reported an error processing combine command")
 		return false;
+	}
 	read_uint64(fd_reply, &id);
 	len = snprintf(buf, 21, "%" PRId64 "\n", id);
 	write(STDOUT_FILENO, buf, len);
@@ -57,6 +60,7 @@ bool	combine_tasks(struct s_data *ctx, enum cmd_type type)
 		return false;
 	if (!handle_combine_reply(ctx))
 		return false;
+
 	return true;
 }
 
