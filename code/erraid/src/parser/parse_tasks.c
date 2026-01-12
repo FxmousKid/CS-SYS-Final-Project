@@ -116,7 +116,7 @@ static void	set_output_paths_recursive(struct s_cmd *cmd,
 	case CMD_IF:
 		// For if: propagate is_last_in_pipeline to all branches
 		set_output_paths_recursive(cmd->cmd.cmd_if.conditional,
-					   stdout_path, stderr_path, is_last_in_pipeline);
+					   NULL, NULL, is_last_in_pipeline);
 		set_output_paths_recursive(cmd->cmd.cmd_if.cmd_if_true,
 					   stdout_path, stderr_path, is_last_in_pipeline);
 		if (cmd->cmd.cmd_if.cmd_if_false)

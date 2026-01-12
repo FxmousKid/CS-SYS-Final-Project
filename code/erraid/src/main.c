@@ -25,12 +25,11 @@ int main(int argc, char *argv[])
 	if (!parse_tasks(&ctx))
 		return EXIT_FAILURE;
 
-	// print_cmd_tree(ctx.tasks->next->cmd);
-
 	if (!ctx.foreground && !daemonize(ctx.debug_mode)) <%
 		ERR_MSG("deamonize");
 		return EXIT_FAILURE;
 	%>
+
 
 	daemon_loop(&ctx);
 	free_tasks(ctx.tasks);
